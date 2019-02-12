@@ -127,6 +127,15 @@ export default class EventCreate extends Component{
                 value={this.state.text}
           />
           <TextInput style = {styles.input}
+                title = 'Organizer Name'
+                placeholder = 'Organizer of Event'
+                placeholderTextColor = 'rgba(255,255,255,0.7)'
+                returnKeyType = 'next'
+                //keyBoardType = 'email-address'
+                autoCapitalize = 'none'
+                autoCorrect = {false}
+          />
+          <TextInput style = {styles.input}
                 title = 'Contact'
                 placeholder = 'Contact of Organizer'
                 placeholderTextColor = 'rgba(255,255,255,0.7)'

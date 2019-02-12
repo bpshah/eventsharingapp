@@ -3,6 +3,8 @@ import { Button, TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, Flat
 import { Avatar,CheckBox, ButtonGroup } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import DatePicker from 'react-native-datepicker'
+import ImagePicker from 'react-native-image-picker';
+
 
 export  default class ProfilePage extends Component{
 
@@ -163,12 +165,12 @@ export  default class ProfilePage extends Component{
                     customStyles={{
                       dateIcon: {
                         position: 'absolute',
-                        left: 0,
-                        top: 4,
-                        marginLeft: 0
+                        left : 292,
+                        top : 4,
+                        marginLeft : 0
                       },
                       dateInput: {
-                        marginLeft: 36
+                        marginRight: 44
                       }
                     }}
                     onDateChange={(date) => {this.setState({date: date})}}

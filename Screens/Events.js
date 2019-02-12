@@ -29,9 +29,9 @@ export default class Events extends Component {
   constructor(props) {
     super(props);
     this.state = { ritems : [
-      {key : 'Event',image : require('C:/Users/DELL/Documents/EventSharingSystem/images/logo.png'), description : 'This is default event'},
-      {key : 'Event2',image : require('C:/Users/DELL/Documents/EventSharingSystem/images/logo.png'), description : 'This is default event'},
-      {key : 'Event3',image : require('C:/Users/DELL/Documents/EventSharingSystem/images/logo.png'), description : 'This is default event'},
+      {key : 'Event',image : require('C:/Users/DELL/Documents/EventSharingSystem/images/logo.png'), time : 'default',place : 'default',org : 'default', contact : 'xxxxxxxxxx',description : 'This is default event'},
+      {key : 'Event2',image : require('C:/Users/DELL/Documents/EventSharingSystem/images/logo.png'), time : 'default',place : 'default',org : 'default', contact : 'xxxxxxxxxx',description : 'This is default event'},
+      {key : 'Event3',image : require('C:/Users/DELL/Documents/EventSharingSystem/images/logo.png'), time : 'default',place : 'default',org : 'default', contact : 'xxxxxxxxxx',description : 'This is default event'},
     ]
       };
   }
@@ -69,7 +69,11 @@ export default class Events extends Component {
                         imageProps = {styles.imageP}
                         titleStyle = {styles.title}
                         titleNumberOfLines = {2}>
-                    <Text style = {styles.desc}>{item.description} {item.description} {item.description} {item.description}</Text>
+                    <Text style = {styles.desc}>Time : {item.time} {"\n"}</Text>
+                    <Text style = {styles.desc}>Place : {item.place} {"\n"}</Text>
+                    <Text style = {styles.desc}>Organizer : {item.org} {"\n"}</Text>
+                    <Text style = {styles.desc}>Contact of Organizer : {item.contact} {"\n"}</Text>
+                    <Text style = {styles.desc}>{item.description}{"\n"}</Text>
                   </Card>
                 </TouchableWithoutFeedback>
               </View>

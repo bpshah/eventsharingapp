@@ -17,8 +17,20 @@ import Ex from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/ex.js';
 import ProfilePage from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/ProfilePage.js';
 import EventCreate from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/EventCreate.js';
 import { createStackNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation';
+import firebase from 'react-native-firebase';
 
 type Props = {};
+
+  const config = {
+      apiKey: "AIzaSyAmtO-w9eUbDoeqPe-uI1YkgtRdwB45YWI",
+      authDomain: "practice-69846.firebaseapp.com",
+      databaseURL: "https://practice-69846.firebaseio.com",
+      projectId: "practice-69846",
+      storageBucket: "practice-69846.appspot.com",
+      messagingSenderId: "273328326983"
+    };
+firebase.initializeApp(config);
+
 
 const EventStack = createStackNavigator({
     Events : {

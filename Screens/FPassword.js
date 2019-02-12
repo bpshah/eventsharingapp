@@ -1,8 +1,24 @@
 import React, { Component } from 'react';
 import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar} from 'react-native';
-
+import firebase from 'react-native-firebase';
 
 export default class FPassword extends Component{
+
+  constructor(){
+    super();
+    this.state = {
+      email : '',
+    }
+  }
+
+  handleResetPwd = () => {
+        //const { email, pasword } = this.state
+        firebase
+          .auth()
+          .sendPasswordResetEmail(this.state.email)
+          .then(() => this.props.navigation.navigate('Login'))
+          .catch(error => this.setState({ errorMessage: error.message }))
+  }
 
   static navigationOptions = {
     header : null,
@@ -21,11 +37,13 @@ export default class FPassword extends Component{
             keyBoardType = 'email-address'
             autoCapitalize = 'none'
             autoCorrect = {false}
+            onChangeText={email => this.setState({ email })}
+            value={this.state.email}
       />
       <Text style={{color: 'white'}}>A link will be sent to your email address to change password {"\n"}
       </Text>
       <TouchableOpacity style = {styles.buttonContainer}
-      onPress={() => this.props.navigation.navigate('Login')}>
+                        onPress={this.handleResetPwd}>
             <Text style = {styles.buttonText}>Submit</Text>
       </TouchableOpacity>
       </View>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image, ScrollView, Dimensions} from 'react-native';
 import Events from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/Events.js';
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
+import firebase from 'react-native-firebase';
 
 //import {exitAlert} from './ExitAlert';
 //import { BackAndroid } from 'react-native';
@@ -9,12 +10,30 @@ import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 
 export default class Login extends Component {
 
+  constructor(){
+    super()
+    this.state = {
+      email : '',
+      password : '',
+      errorMessage: null,
+    }
+  }
+
   onLayout(e) {
     const {
         nativeEvent : { layout : {height}}} = e;
         this.height = height;
         this.forceUpdate();
       }
+
+  handleLogin = () => {
+        const { email, pasword } = this.state
+        firebase
+          .auth()
+          .signInWithEmailAndPassword(this.state.email, this.state.password)
+          .then(() => this.props.navigation.navigate('Events'))
+          .catch(error => this.setState({ errorMessage: error.message }))
+  }
 
   render(){
     const {height : heightOfDeviceScreen} = Dimensions.get('window');
@@ -37,6 +56,8 @@ export default class Login extends Component {
                   returnKeyType = 'next'
                   keyBoardType = 'email-address'
                   autoCapitalize = 'none'
+                  onChangeText={email => this.setState({ email })}
+                  value={this.state.email}
 
             />
             <TextInput style = {styles.input}
@@ -45,6 +66,8 @@ export default class Login extends Component {
                   returnKeyType = 'go'
                   placeholderTextColor = 'rgba(255,255,255,0.7)'
                   maxLength = {20}
+                  onChangeText={password => this.setState({ password })}
+                  value={this.state.password}
             />
             <Text style = {styles.textstyle}
             onPress={() => this.props.navigation.navigate('FPassword')}>
@@ -54,7 +77,7 @@ export default class Login extends Component {
 
         <View style = {styles.childcontainer3}>
             <TouchableOpacity style = {styles.buttonContainer1}
-                              onPress={() => this.props.navigation.navigate('Events')}>
+                              onPress={this.handleLogin}>
                   <Text style = {styles.buttonText}>Login</Text>
             </TouchableOpacity>
             <TouchableOpacity style = {styles.buttonContainer2}

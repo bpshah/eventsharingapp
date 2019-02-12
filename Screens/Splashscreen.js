@@ -1,13 +1,18 @@
 import React, { Component } from 'react';
 import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image} from 'react-native';
+import firebase from 'react-native-firebase';
 
 
 export default class SplashScreen extends Component {
 
   componentDidMount(){
-    setTimeout (() => {
+    /*setTimeout (() => {
       this.props.navigation.navigate('Login')
-    },500)
+    },500)*/
+
+      firebase.auth().onAuthStateChanged(user => {
+      this.props.navigation.navigate(user ? 'Login' : 'Signup')
+    })
   }
   render(){
     return(

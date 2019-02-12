@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "273328326983",
+    "firebase_url": "https://practice-69846.firebaseio.com",
+    "project_id": "practice-69846",
+    "storage_bucket": "practice-69846.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:273328326983:android:7cffc40d7ab5614d",
+        "android_client_info": {
+          "package_name": "com.eventsharingsystem"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "273328326983-ehv607dliqku3pj7bar884vhn9lrgfjd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpmVKAW9HlMqhtUNziJcdlWqUiOFhjAhg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -3,6 +3,9 @@ import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar,
 import {BackHandler} from 'react-native';
 import { Avatar, CheckBox, ButtonGroup } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
+import ImagePicker from 'react-native-image-picker';
+import firebase from 'react-native-firebase';
+
 
 export default class Signup extends Component {
 
@@ -10,10 +13,44 @@ export default class Signup extends Component {
     super()
     this.state = {
       selectedIndex : 1,
-      date : "2019-01-01",
+      date : '',
       filePath : {},
+      email : '',
+      password : '',
+      username : '',
+      lastName : '',
+      mobileNumber : '',
+      gender : 'Male',
+      errorMessage: null,
     }
     this.updateIndex = this.updateIndex.bind(this)
+  }
+
+  handleSignUp = () => {
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(this.state.email, this.state.password)
+      .catch(error => this.setState({ errorMessage: error.message }))
+  }
+
+  handleProfileData = () => {
+    var username = this.state.username;
+    var lastname = this.state.lastName;
+    var mno = this.state.mobileNumber;
+    var date = this.state.date;
+    var gen = this.state.gender;
+
+    firebase
+      .database()
+      .ref('Users/' + this.username)
+      .set({ username, lastname, mno, date, gen})
+      .then(() => this.props.navigation.navigate('Events'))
+      .catch(error => this.setState({ errorMessage: error.message }))
+  }
+
+  handle = () => {
+    this.handleProfileData();
+    this.handleSignUp();
   }
 
   chooseFile = () => {
@@ -71,6 +108,8 @@ export default class Signup extends Component {
               returnKeyType = 'next'
               autoCapitalize = 'none'
               autoCorrect = {false}
+              onChangeText={username => this.setState({ username })}
+              value={this.state.username}
               //autoFocus = {true}
               //clearTextOnFocus = {true}
         />
@@ -80,9 +119,11 @@ export default class Signup extends Component {
               returnKeyType = 'next'
               autoCapitalize = 'none'
               autoCorrect = {false}
+              onChangeText={lastName => this.setState({ lastName })}
+              value={this.state.lastName}
         />
         <DatePicker
-              style={{height : 40,width : '60%',marginBottom : 20,alignSelf : 'center',backgroundColor : 'rgba(255,255,255,0.2)'}}
+              style={{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : 'rgba(255,255,255,0.2)'}}
               date={this.state.date}
               mode="date"
               placeholder="select date"
@@ -94,12 +135,12 @@ export default class Signup extends Component {
               customStyles={{
                 dateIcon: {
                   position: 'absolute',
-                  left: 0,
-                  top: 4,
-                  marginLeft: 0
+                  left : 292,
+                  top : 4,
+                  marginLeft : 0
                 },
                 dateInput: {
-                  marginLeft: 36
+                  marginRight: 44
                 }
               }}
               onDateChange={(date) => {this.setState({date: date})}}
@@ -117,6 +158,8 @@ export default class Signup extends Component {
               keyBoardType = 'email-address'
               autoCapitalize = 'none'
               autoCorrect = {false}
+              onChangeText={email => this.setState({ email })}
+              value={this.state.email}
 
         />
         <TextInput style = {styles.input}
@@ -128,6 +171,8 @@ export default class Signup extends Component {
               autoCorrect = {false}
               dataDetectorTypes = 'phoneNumber'
               maxLength = {13}
+              onChangeText={mobileNumber => this.setState({ mobileNumber })}
+              value={this.state.mobileNumber}
         />
         <TextInput style = {styles.input}
               placeholder = 'Password'
@@ -135,6 +180,8 @@ export default class Signup extends Component {
               returnKeyType = 'go'
               placeholderTextColor = 'rgba(255,255,255,0.7)'
               maxLength = {20}
+              onChangeText={password => this.setState({ password })}
+              value={this.state.password}
         />
         <TextInput style = {styles.input}
               placeholder = 'Repeat Password'
@@ -145,6 +192,11 @@ export default class Signup extends Component {
         />
         <TouchableOpacity style = {styles.buttonContainer}
         onPress={() => this.props.navigation.navigate('Login')}>
+
+              <Text style = {styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style = {styles.buttonContainer}
+        onPress={this.handle}>
 
               <Text style = {styles.buttonText}>Submit</Text>
         </TouchableOpacity>
@@ -160,9 +212,9 @@ const styles = StyleSheet.create({
     flexGrow : 1,
     backgroundColor : '#E96A69',
     flexDirection : 'column',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent : 'flex-start',
-    height : 750,
+    height : 850,
     width : '100%'
     //width: 100,
     //height: 100,
@@ -172,7 +224,7 @@ const styles = StyleSheet.create({
     backgroundColor : 'rgba(255,255,255,0.2)',
     marginBottom : 20,
     alignSelf : 'center',
-    width : '60%',
+    width : '80%',
     paddingHorizontal : 15,
     paddingVertical : 0,
     color : '#FFF'
@@ -183,7 +235,7 @@ const styles = StyleSheet.create({
     paddingVertical : 20,
     bottom : 5,
     alignSelf : 'stretch',
-    width : '60%',
+    width : '80%',
     alignSelf : 'center',
   },
   buttonText : {
