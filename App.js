@@ -16,7 +16,7 @@ import Events from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/Events.js
 import Ex from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/ex.js';
 import ProfilePage from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/ProfilePage.js';
 import EventCreate from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/EventCreate.js';
-import { createStackNavigator, createAppContainer, createBottomTabNavigator } from 'react-navigation';
+import { createStackNavigator, createAppContainer, createBottomTabNavigator, createDrawerNavigator, DrawerItems, DrawerActions } from 'react-navigation';
 import firebase from 'react-native-firebase';
 
 type Props = {};
@@ -32,6 +32,7 @@ type Props = {};
 firebase.initializeApp(config);
 
 
+
 const EventStack = createStackNavigator({
     Events : {
       screen : Events ,
@@ -43,6 +44,25 @@ const EventStack = createStackNavigator({
         screen : EventCreate,
     },
     initialRouteName : 'Events',
+})
+
+const logoutDrawer = createDrawerNavigator(
+{
+      mainpage : {
+        screen : Events
+      },
+},
+{
+  contentComponent : (props) => (
+  <View style = {{flex : 1}}>
+    <DrawerItems {...props} />
+    <Button title = "Logout"
+            onItemPress={() => this.props.navigation.navigate('Login')}/>
+  </View>
+),
+  drawerOpenRoute: 'DrawerOpen',
+  drawerCloseRoute: 'DrawerClose',
+  drawerToggleRoute: 'DrawerToggle'
 })
 
 const ProfileStack = createStackNavigator({

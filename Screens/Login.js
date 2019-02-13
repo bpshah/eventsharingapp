@@ -77,7 +77,7 @@ export default class Login extends Component {
 
         <View style = {styles.childcontainer3}>
             <TouchableOpacity style = {styles.buttonContainer1}
-                              onPress={this.handleLogin}>
+                              onPress={() => this.props.navigation.navigate('Events')}>
                   <Text style = {styles.buttonText}>Login</Text>
             </TouchableOpacity>
             <TouchableOpacity style = {styles.buttonContainer2}
