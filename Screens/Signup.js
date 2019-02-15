@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, ScrollView, Picker} from 'react-native';
+import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, ScrollView, Picker, Platform} from 'react-native';
 import {BackHandler} from 'react-native';
 import { Avatar, CheckBox, ButtonGroup } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker';
 import firebase from 'react-native-firebase';
+import RNFetchBlob from 'react-native-fetch-blob';
 
-const button = ['Male', 'Female','Other'];
 export default class Signup extends Component {
 
   constructor(){
@@ -14,24 +14,71 @@ export default class Signup extends Component {
     this.state = {
       selectedIndex : 1,
       date : '',
-      filePath : {},
+      filePath : '',
       email : '',
       password : '',
       confirmPassword : '',
       username : '',
       lastName : '',
       mobileNumber : '',
-      gender : 'Gender',
+      gender : '',
       errorMessage: null,
     }
-
+    const button = ['Male', 'Female','Other'];
   }
 
   handleSignUp = () => {
     firebase
       .auth()
       .createUserWithEmailAndPassword(this.state.email, this.state.password)
+      .then(() => this.props.navigation.navigate('Events'))
       .catch(error => this.setState({ errorMessage: error.message }))
+  }
+
+  uploadImage = (uri, imageName, mime = 'image/png') => {
+    const Blob = RNFetchBlob.polyfill.Blob;
+    const fs = RNFetchBlob.fs;
+    window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
+    window.Blob = Blob;
+    return new Promise((resolve, reject) => {
+      //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+        const uploadUri = uri;
+        let uploadBlob = null
+        const imageRef = firebase.storage().ref('images').child(imageName)
+        fs.readFile(uploadUri, 'base64')
+        .then((data) => {
+          return Blob.build(data, { type: `${mime};BASE64` })
+        })
+        .then((blob) => {
+          uploadBlob = blob
+          return imageRef.put(uri, { contentType: mime })
+        })
+        .then(() => {
+          uploadBlob.close()
+          return imageRef.getDownloadURL()
+        })
+        .then((url) => {
+          resolve(url)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    })
+  }
+
+  storeReference = () => {
+    let imageRef = firebase.storage().ref("UsersImage/").child(username);
+    let currentUser = firebase.auth().currentUser;
+    let image = {
+      type : 'image',
+      url : downloadUrl,
+      createdAt : sessionId,
+      user : {
+        id : currentUser.uid,
+        email : currentUser.email,
+      }
+    }
+    firebase.database().ref('Users/' + username).push(image);
   }
 
   handleProfileData = () => {
@@ -45,21 +92,7 @@ export default class Signup extends Component {
         .database()
         .ref('Users/' + username)
         .set({ username, lastname, mobileno, birthdate, gender})
-        .then(() => this.props.navigation.navigate('Events'))
         .catch(error => this.setState({ errorMessage: error.message }))
-  }
-
-  handle = () => {
-
-    const { password, confirmPassword } = this.state;
-    if(password !== confirmPassword ){
-      Alert("Password dont match");
-    }
-    else {
-      this.handleProfileData();
-      this.handleSignUp();
-
-    }
   }
 
   chooseFile = () => {
@@ -77,6 +110,7 @@ export default class Signup extends Component {
         console.log('Response = ', response);
 
         if (response.didCancel) {
+
           console.log('User cancelled image picker');
         } else if (response.error) {
           console.log('ImagePicker Error: ', response.error);
@@ -84,15 +118,30 @@ export default class Signup extends Component {
           let source = response;
           // You can also display the image using data:
           // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+
           this.setState({
-            filePath: source,
+            filePath : response.uri,
+            imageHeight : response.height,
+            imageWidth : response.width,
           });
         }
       });
   };
 
-  render(){
+  handle = () => {
 
+    const { password, confirmPassword } = this.state;
+    if(password !== confirmPassword ){
+      Alert("Password don't match");
+    }
+    else {
+      this.handleProfileData();
+      this.uploadImage(this.state.filePath, this.state.username + '.png');
+      this.handleSignUp();
+    }
+  }
+
+  render(){
 
     const { selectedIndex } = this.state
     return(
@@ -100,7 +149,7 @@ export default class Signup extends Component {
         <StatusBar barStyle = 'light-content'/>
           <Avatar
             rounded
-            source = {require('C:/Users/DELL/Documents/EventSharingSystem/images/logo.png')}
+            source = {{uri: this.state.filePath}}
             showEditButton
             size = "xlarge"
             margin = {20}
@@ -116,7 +165,7 @@ export default class Signup extends Component {
               autoCorrect = {false}
               onChangeText = {username => this.setState({ username })}
               value = {this.state.username}
-              //autoFocus = {true}
+              autoFocus = {true}
               //clearTextOnFocus = {true}
         />
         <TextInput style = {styles.input}
@@ -129,7 +178,7 @@ export default class Signup extends Component {
               value = {this.state.lastName}
         />
         <DatePicker
-              style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : 'rgba(255,255,255,0.2)'}}
+              style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : 'rgba(255,255,255,0.2)',}}
               date = {this.state.date}
               mode = "date"
               placeholder = "Select Your Birthdate"
@@ -156,12 +205,10 @@ export default class Signup extends Component {
             style = {styles.input}
             itemStyle = {{fontSize : 12,paddingHorizontal : 15,}}
             mode = 'dropdown'
-            onValueChange = {(itemValue, itemIndex) =>
-              this.setState({gender : itemValue})
-            }>
-            <Picker.Item label = "Male" value = "male" />
-            <Picker.Item label = "Female" value = "female" />
-            <Picker.Item label = "Other" value = "other" />
+            onValueChange = {(itemValue, itemIndex) => this.setState({gender : itemValue})}>
+            <Picker.Item label = 'Male' value = 'male'/>
+            <Picker.Item label = 'Female' value = 'female'/>
+            <Picker.Item label = 'Other' value = 'other'/>
         </Picker>
         <TextInput style = {styles.input}
               placeholder = 'Username or Email'
