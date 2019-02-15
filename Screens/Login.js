@@ -152,32 +152,3 @@ const styles = StyleSheet.create({
     paddingVertical : 10,
   },
 });
-
-//<Image source={require('/images/logo.png')} style = {{height : 150, width : 150,}} />
-//onPress={() => LinkingIOS.openURL('http://google.com')}
-
-/*<StatusBar barStyle = 'light-content'/>
-<TextInput style = {styles.input}
-      placeholder = 'Username or Email'
-      placeholderTextColor = 'rgba(255,255,255,0.7)'
-      returnKeyType = 'next'
-      keyBoardType = 'email-address'
-      autoCapitalize = 'none'
-      autoCorrect = {false}
-/>
-<TextInput style = {styles.input}
-      placeholder = 'Password'
-      secureTextEntry = {true}
-      returnKeyType = 'go'
-      placeholderTextColor = 'rgba(255,255,255,0.7)'
-/>
-<Text style={{color: 'white'}}
-onPress={() => LinkingIOS.openURL('http://google.com')}>
-                Forgot Password?
-</Text>
-<TouchableOpacity style = {styles.buttonContainer1}>
-      <Text style = {styles.buttonText}>Login</Text>
-</TouchableOpacity>
-<TouchableOpacity style = {styles.buttonContainer2}>
-      <Text style = {styles.buttonText}>Signup</Text>
-</TouchableOpacity>*/

@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import { FlatList, Image, StyleSheet, View, Text, TouchableWithoutFeedback, BackHandler, Alert, Modal} from 'react-native';
+import { FlatList, Image, StyleSheet, View, Text, TouchableWithoutFeedback, BackHandler, Alert} from 'react-native';
 import { List, ListItem, Card } from 'react-native-elements';
-import { createStackNavigator, createBottomTabNavigator, createAppContainer, DrawerActions } from 'react-navigation';
+import { createStackNavigator, createBottomTabNavigator, createAppContainer } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
-import { Avatar } from "react-native-elements";
-
 
 export default class Events extends Component {
 
@@ -18,22 +16,13 @@ export default class Events extends Component {
       <View marginRight = {10}>
         <TouchableWithoutFeedback onPress={() => navigation.navigate('EventCreate')} >
           <Icon id = {1} name="plus" size={20} color="#900" />
-        </TouchableWithoutFeedback>
+          </TouchableWithoutFeedback>
       </View>
 
     ),
     headerLeft : (
       <View marginLeft = {10}>
-        <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Login')} >
-          <Avatar
-            rounded
-            source={require('C:/Users/DELL/Documents/EventSharingSystem/images/logo.png')}
-            size="small"
-            margin = {20}
-            alignSelf= 'center'
-            showEditButton = {false}
-          />
-        </TouchableWithoutFeedback>
+        <Icon name="angle-left" size={30} color="#900" onPress={() => navigation.navigate('Login')}/>
       </View>
     )
   })

@@ -82,11 +82,11 @@ export default class Signup extends Component {
   }
 
   handleProfileData = () => {
-      var username = this.state.username;
-      var lastname = this.state.lastName;
-      var mobileno = this.state.mobileNumber;
-      var birthdate = this.state.date;
-      var gender = this.state.gender;
+      let username = this.state.username;
+      let lastname = this.state.lastName;
+      let mobileno = this.state.mobileNumber;
+      let birthdate = this.state.date;
+      let gender = this.state.gender;
 
       firebase
         .database()

@@ -1,9 +1,12 @@
 import React, {Component}  from 'react';
-import {PixelRatio,View, ScrollView ,Text, Image, StyleSheet, TextInput, KeyboardAvoidingView} from 'react-native';
+import {PixelRatio,View, ScrollView ,Text, Image, StyleSheet, TextInput, KeyboardAvoidingView, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import ImagePicker from 'react-native-image-picker';
 //import ImageSlider from 'react-native-image-slider';
 import { Avatar, CheckBox, ButtonGroup } from 'react-native-elements';
+import firebase from 'react-native-firebase';
+import RNFetchBlob from 'react-native-fetch-blob';
+
 
 const options = {
   title : 'Add Picture',
@@ -14,18 +17,18 @@ export default class EventCreate extends Component{
 
   static navigationOptions = ({navigation}) => ({
     headerTitleStyle : {
-       textAlign : 'center',
+       textAlign : 'justify',
        flex : 1,
        },
     title : 'New Event',
     //swipeEnabled : false,
     //tabBarVisible : false,
-    headerRight : (
+    /*headerRight : (
       <View marginRight = {10}>
-        <Icon id = {1} name="check" size={20} color="#900" onPress={() => navigation.navigate('Events')}/>
+        <Icon id = {1} name="check" size={20} color="#900" onPress = {this.handle}/>
       </View>
 
-    ),
+    ),*/
     headerLeft : (
       <View marginLeft = {10}>
         <Icon name="angle-left" size={30} color="#900" onPress={() => navigation.navigate('Events')}/>
@@ -37,8 +40,45 @@ export default class EventCreate extends Component{
     super(props);
     this.state= {
       avatarSource : null,
-      filePath : {},
+      filePath : '',
+      time : '',
+      place : '',
+      organizer : '',
+      contact : '',
+      description : '',
+      name : '',
     };
+  }
+
+  uploadImage = (uri, imageName, mime = 'image/png') => {
+    const Blob = RNFetchBlob.polyfill.Blob;
+    const fs = RNFetchBlob.fs;
+    window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
+    window.Blob = Blob;
+    return new Promise((resolve, reject) => {
+      //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+        const uploadUri = uri;
+        let uploadBlob = null
+        const imageRef = firebase.storage().ref('events').child(this.state.name).child(imageName)
+        fs.readFile(uploadUri, 'base64')
+        .then((data) => {
+          return Blob.build(data, { type: `${mime};BASE64` })
+        })
+        .then((blob) => {
+          uploadBlob = blob
+          return imageRef.put(uri, { contentType: mime })
+        })
+        .then(() => {
+          uploadBlob.close()
+          return imageRef.getDownloadURL()
+        })
+        .then((url) => {
+          resolve(url)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    })
   }
 
   selectPhotoTapped() {
@@ -52,7 +92,7 @@ export default class EventCreate extends Component{
       }
     }
 
-    chooseFile = () => {
+  chooseFile = () => {
         var options = {
           title: 'Select Image',
           customButtons: [
@@ -75,11 +115,32 @@ export default class EventCreate extends Component{
             // You can also display the image using data:
             // let source = { uri: 'data:image/jpeg;base64,' + response.data };
             this.setState({
-              filePath: source,
+              filePath : response.uri,
             });
           }
         });
     };
+
+  handleEvent = () => {
+      let time = this.state.time;
+      let place = this.state.place;
+      let mobileno = this.state.contact;
+      let description = this.state.description;
+      let name = this.state.organizer;
+      let eventname = this.state.name;
+
+      firebase
+        .database()
+        .ref('Events/' + name)
+        .set({ time, place, mobileno, description, name,eventname})
+        .then(() => this.props.navigation.navigate('Events'))
+        .catch(error => this.setState({ errorMessage: error.message }))
+    }
+
+  handle = () => {
+    this.uploadImage(this.state.filePath, this.state.name + '.png');
+    this.handleEvent();
+  }
 
   render(){
 
@@ -89,7 +150,7 @@ export default class EventCreate extends Component{
                   keyboardDismissMode = 'none'>
           <Avatar
             rectangle
-            source = {this.filePath}
+            source = {{uri: this.state.filePath}}
             showEditButton
             height = {175}
             width = '80%'
@@ -107,6 +168,8 @@ export default class EventCreate extends Component{
                 //keyBoardType = 'email-address'
                 autoCapitalize = 'none'
                 autoCorrect = {false}
+                onChangeText = { eventname => this.setState({ eventname })}
+                value = {this.state.eventname}
           />
           <TextInput style = {styles.input}
                 title = 'Time'
@@ -116,6 +179,8 @@ export default class EventCreate extends Component{
                 //keyBoardType = 'email-address'
                 autoCapitalize = 'none'
                 autoCorrect = {false}
+                onChangeText = { time => this.setState({ time })}
+                value = {this.state.time}
           />
           <TextInput style = {styles.input}
                 title = 'Place'
@@ -125,6 +190,8 @@ export default class EventCreate extends Component{
                 autoCapitalize = 'none'
                 autoCorrect = {false}
                 value={this.state.text}
+                onChangeText = { place => this.setState({ place })}
+                value = {this.state.place}
           />
           <TextInput style = {styles.input}
                 title = 'Organizer Name'
@@ -134,6 +201,8 @@ export default class EventCreate extends Component{
                 //keyBoardType = 'email-address'
                 autoCapitalize = 'none'
                 autoCorrect = {false}
+                onChangeText = { organizer => this.setState({ organizer })}
+                value = {this.state.organizer}
           />
           <TextInput style = {styles.input}
                 title = 'Contact'
@@ -143,6 +212,8 @@ export default class EventCreate extends Component{
                 keyBoardType = 'email-address'
                 autoCapitalize = 'none'
                 autoCorrect = {false}
+                nChangeText = { contact => this.setState({ contact })}
+                value = {this.state.contact}
 
           />
           <TextInput style = {styles.input}
@@ -157,7 +228,14 @@ export default class EventCreate extends Component{
                 onContentSizeChange={(event) => {
                     this.setState({height: event.nativeEvent.contentSize.height});
                   }}
+                  onChangeText = { description => this.setState({ description })}
+                  value = {this.state.description}
           />
+          <TouchableOpacity style = {styles.buttonContainer}
+                            onPress = {this.handle}>
+
+                <Text style = {styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
 
       </ScrollView>
     )
@@ -172,7 +250,7 @@ const styles = StyleSheet.create({
     flexDirection : 'column',
     alignItems: 'flex-start',
     justifyContent : 'flex-start',
-    height : 575,
+    height : 675,
     width : '100%'
     //width: 100,
     //height: 100,
@@ -200,5 +278,20 @@ const styles = StyleSheet.create({
       marginTop : 25,
       width : '80%',
       aspectRatio : 1/1,
-    }
+    },
+    buttonContainer : {
+      //position: 'absolute',
+      backgroundColor : '#E96A69',
+      paddingVertical : 20,
+      bottom : 5,
+      alignSelf : 'stretch',
+      width : '80%',
+      alignSelf : 'center',
+    },
+    buttonText : {
+      textAlign : 'center',
+      backgroundColor : '#FFFFFF',
+      paddingVertical : 15,
+      fontWeight : '700'
+    },
   })
