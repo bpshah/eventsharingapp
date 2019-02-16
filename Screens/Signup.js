@@ -12,15 +12,15 @@ export default class Signup extends Component {
   constructor(){
     super()
     this.state = {
-      selectedIndex : 1,
-      date : '',
       filePath : '',
       email : '',
       password : '',
       confirmPassword : '',
-      username : '',
+      firstname : '',
       lastName : '',
+      date : '',
       mobileNumber : '',
+      selectedIndex : 1,
       gender : '',
       errorMessage: null,
     }
@@ -32,7 +32,20 @@ export default class Signup extends Component {
       .auth()
       .createUserWithEmailAndPassword(this.state.email, this.state.password)
       .then(() => this.props.navigation.navigate('Events'))
-      .catch(error => this.setState({ errorMessage: error.message }))
+      .catch(error => {
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            console.log(`Email address ${this.state.email} already in use.`);
+          case 'auth/invalid-email':
+            console.log(`Email address ${this.state.email} is invalid.`);
+          case 'auth/operation-not-allowed':
+            console.log(`Error during sign up.`);
+          case 'auth/weak-password':
+            console.log('Password is not strong enough. Add additional characters including special characters and numbers.');
+          default:
+            console.log(error.message);
+      }
+    })
   }
 
   uploadImage = (uri, imageName, mime = 'image/png') => {
@@ -87,10 +100,13 @@ export default class Signup extends Component {
       let mobileno = this.state.mobileNumber;
       let birthdate = this.state.date;
       let gender = this.state.gender;
+      let email = this.state.email;
+
+      let temail = email.slice(0,email.indexOf('@'));
 
       firebase
         .database()
-        .ref('Users/' + username)
+        .ref('Users/' + temail)
         .set({ username, lastname, mobileno, birthdate, gender})
         .catch(error => this.setState({ errorMessage: error.message }))
   }
@@ -131,12 +147,15 @@ export default class Signup extends Component {
   handle = () => {
 
     const { password, confirmPassword } = this.state;
+    let email = this.state.email;
+    let temail = email.slice(0,email.indexOf('@'));
+    
     if(password !== confirmPassword ){
       Alert("Password don't match");
     }
     else {
       this.handleProfileData();
-      this.uploadImage(this.state.filePath, this.state.username + '.png');
+      this.uploadImage(this.state.filePath, temail + '.png');
       this.handleSignUp();
     }
   }
@@ -157,14 +176,14 @@ export default class Signup extends Component {
             onEditPress = {this.chooseFile.bind(this)}
           />
         <TextInput style = {styles.input}
-              title = 'Username'
+              title = 'First Name'
               placeholder = 'First Name'
               placeholderTextColor = 'rgba(255,255,255,0.7)'
               returnKeyType = 'next'
               autoCapitalize = 'none'
               autoCorrect = {false}
-              onChangeText = {username => this.setState({ username })}
-              value = {this.state.username}
+              onChangeText = {firstname => this.setState({ firstname })}
+              value = {this.state.firstname}
               autoFocus = {true}
               //clearTextOnFocus = {true}
         />
@@ -211,17 +230,6 @@ export default class Signup extends Component {
             <Picker.Item label = 'Other' value = 'other'/>
         </Picker>
         <TextInput style = {styles.input}
-              placeholder = 'Username or Email'
-              placeholderTextColor = 'rgba(255,255,255,0.7)'
-              returnKeyType = 'next'
-              keyBoardType = 'email-address'
-              autoCapitalize = 'none'
-              autoCorrect = {false}
-              onChangeText = {email => this.setState({ email })}
-              value = {this.state.email}
-
-        />
-        <TextInput style = {styles.input}
               placeholder = 'Mobile Number'
               placeholderTextColor = 'rgba(255,255,255,0.7)'
               returnKeyType = 'next'
@@ -232,6 +240,17 @@ export default class Signup extends Component {
               maxLength = {13}
               onChangeText = {mobileNumber => this.setState({ mobileNumber })}
               value = {this.state.mobileNumber}
+        />
+        <TextInput style = {styles.input}
+              placeholder = 'Email'
+              placeholderTextColor = 'rgba(255,255,255,0.7)'
+              returnKeyType = 'next'
+              keyBoardType = 'email-address'
+              autoCapitalize = 'none'
+              autoCorrect = {false}
+              onChangeText = {email => this.setState({ email })}
+              value = {this.state.email}
+
         />
         <TextInput style = {styles.input}
               placeholder = 'Password'
@@ -252,13 +271,7 @@ export default class Signup extends Component {
               value = {this.state.confirmPassword}
         />
         <TouchableOpacity style = {styles.buttonContainer}
-                          onPress = {() => this.props.navigation.navigate('Login')}>
-
-              <Text style = {styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style = {styles.buttonContainer}
                           onPress = {this.handle}>
-
               <Text style = {styles.buttonText}>Submit</Text>
         </TouchableOpacity>
       </ScrollView>

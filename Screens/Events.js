@@ -3,8 +3,18 @@ import { FlatList, Image, StyleSheet, View, Text, TouchableWithoutFeedback, Back
 import { List, ListItem, Card } from 'react-native-elements';
 import { createStackNavigator, createBottomTabNavigator, createAppContainer } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
+import firebase from 'react-native-firebase';
 
 export default class Events extends Component {
+
+  signOutUser = async () => {
+      try {
+          await firebase.auth().signOut();
+          navigate('Login');
+      } catch (e) {
+          console.log(e);
+      }
+  }
 
     static navigationOptions = ({navigation}) => ({
     headerTitleStyle : {
@@ -14,15 +24,15 @@ export default class Events extends Component {
     title : 'Events',
     headerRight : (
       <View marginRight = {10}>
-        <TouchableWithoutFeedback onPress={() => navigation.navigate('EventCreate')} >
-          <Icon id = {1} name="plus" size={20} color="#900" />
-          </TouchableWithoutFeedback>
+        <Icon name="sign-out-alt" size={30} color="#900" onPress = {this.signOutUser}/>
       </View>
 
     ),
     headerLeft : (
       <View marginLeft = {10}>
-        <Icon name="angle-left" size={30} color="#900" onPress={() => navigation.navigate('Login')}/>
+        <TouchableWithoutFeedback onPress={() => navigation.navigate('EventCreate')} >
+          <Icon id = {1} name="plus" size={20} color="#900" />
+        </TouchableWithoutFeedback>
       </View>
     )
   })
@@ -35,26 +45,6 @@ export default class Events extends Component {
     ]
       };
   }
-
-  componentWillMount() {
-   BackHandler.addEventListener('hardwareBackPress', this.backPressed);
-}
-
-  componentWillUnmount() {
-   BackHandler.removeEventListener('hardwareBackPress', this.backPressed);
-}
-
-  backPressed = () => {
-  Alert.alert(
-    'Exit App',
-    'Do you want to exit?',
-    [
-      {text : 'No', onPress : () => console.log('Cancel Pressed'), style : 'cancel'},
-      {text : 'Yes', onPress : () => BackHandler.exitApp()},
-    ],
-    { cancelable : false });
-    return true;
-}
 
   render(){
       return(

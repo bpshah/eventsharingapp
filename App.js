@@ -31,8 +31,6 @@ type Props = {};
     };
 firebase.initializeApp(config);
 
-
-
 const EventStack = createStackNavigator({
     Events : {
       screen : Events ,
@@ -142,7 +140,6 @@ const LoginStack = createStackNavigator({
     header : null,
     }
   },
-  initialRouteName : 'Login',
 })
 
 const App1 = createStackNavigator({

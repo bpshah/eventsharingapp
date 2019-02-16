@@ -13,8 +13,8 @@ export default class Login extends Component {
   constructor(){
     super()
     this.state = {
-      email : '',
-      password : '',
+      email : 'bhumit1206@gmail.com',
+      password : 'asdf1234',
       errorMessage: null,
     }
   }
@@ -27,12 +27,13 @@ export default class Login extends Component {
       }
 
   handleLogin = () => {
-        const { email, pasword } = this.state
-        firebase
-          .auth()
-          .signInWithEmailAndPassword(this.state.email, this.state.password)
-          .then(() => this.props.navigation.navigate('Events'))
-          .catch(error => this.setState({ errorMessage: error.message }))
+    const { email, password } = this.state
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(this.state.email, this.state.password)
+      .then(() => this.props.navigation.navigate('Events'))
+      .catch(error => this.setState({ errorMessage: error.message }))
+    console.log("Logged In");
   }
 
   render(){
@@ -77,7 +78,7 @@ export default class Login extends Component {
 
         <View style = {styles.childcontainer3}>
             <TouchableOpacity style = {styles.buttonContainer1}
-                              onPress={() => this.props.navigation.navigate('Events')}>
+                              onPress={this.handleLogin}>
                   <Text style = {styles.buttonText}>Login</Text>
             </TouchableOpacity>
             <TouchableOpacity style = {styles.buttonContainer2}

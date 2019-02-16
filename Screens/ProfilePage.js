@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { Button, TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, FlatList, StatusBar, View, Dimensions, KeyboardAvoidingView} from 'react-native';
+import { Button, TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, FlatList, StatusBar, View, Dimensions, KeyboardAvoidingView, Picker} from 'react-native';
 import { Avatar,CheckBox, ButtonGroup } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker';
-
+import firebase from 'react-native-firebase';
 
 export  default class ProfilePage extends Component{
 
@@ -29,18 +29,17 @@ export  default class ProfilePage extends Component{
   constructor(){
       super();
       this.state = {
-        usename : 'Bhumit',
-        firstname : 'Bhumit',
-        gender : 'Male',
-        mobileno : '9824213232',
-        email : 'sbhumit98@gmail.com',
-        lastname : 'Shah',
-        birthdate : '12/06/98',
-        avatarSource : null,
-        screenHeight: 0,
+        filePath : '',
+        email : '',
+        password : '',
+        confirmPassword : '',
+        firstname : '',
+        lastName : '',
+        date : '',
+        mobileNumber : '',
         selectedIndex : 1,
-        date : "2019-01-01",
-        filePath : {},
+        gender : '',
+        errorMessage: null,
       }
       this.updateIndex = this.updateIndex.bind(this)
   }
@@ -83,6 +82,25 @@ export  default class ProfilePage extends Component{
     this.setState({selectedIndex})
   }
 
+  readUserData() {
+    let user = firebase.auth().currentUser;
+    let firstname,lastname,birthdate,mobileno,gender,email,password;
+
+    if(user !== null){
+      let temail = user.email.slice(0,user.email.indexOf('@'));
+    }
+
+    firebase.database().ref('Users/').on('value').then(function(snapshot) {
+        snapshot.forEach(function (childSnapshot) {
+          let value = childSnapshot.val();
+          console.log("Hello");
+          this.setState({
+            lastName : value.lastname,
+        })
+      });
+    });
+  }
+
   render(){
     const buttons = ['Male', 'Female','Other']
     const { selectedIndex } = this.state
@@ -91,90 +109,111 @@ export  default class ProfilePage extends Component{
                     behaviour = 'height'
                     keyboardVerticalOffset = {64}
                     horizontal = {false}>
-            <View style = {{margin : 20}}>
-              <Avatar
-                rounded
-                source={require('C:/Users/DELL/Documents/EventSharingSystem/images/logo.png')}
-                showEditButton
-                size="xlarge"
-                onEditPress = {this.chooseFile.bind(this)}
-              />
-            </View>
+          <Avatar
+              rounded
+              source = {{uri: this.state.filePath}}
+              showEditButton
+              size = "xlarge"
+              margin = {20}
+              alignSelf = 'center'
+              onEditPress = {this.chooseFile.bind(this)}
+            />
+          <TextInput style = {styles.input}
+                title = 'First Name'
+                placeholder = {this.state.firstname}
+                placeholderTextColor = 'rgba(255,255,255,0.7)'
+                returnKeyType = 'next'
+                autoCapitalize = 'none'
+                autoCorrect = {false}
+                onChangeText = {firstname => this.setState({ firstname })}
+                value = {this.state.firstname}
+                autoFocus = {true}
+                //clearTextOnFocus = {true}
+          />
+          <TextInput style = {styles.input}
+                placeholder = {this.state.lastName}
+                placeholderTextColor = 'rgba(255,255,255,0.7)'
+                returnKeyType = 'next'
+                autoCapitalize = 'none'
+                autoCorrect = {false}
+                onChangeText = {lastName => this.setState({ lastName })}
+                value = {this.state.lastName}
+          />
+          <DatePicker
+                style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : 'rgba(255,255,255,0.2)',}}
+                date = {this.state.date}
+                mode = "date"
+                placeholder = "Select Your Birthdate"
+                format = "DD-MM-YYYY"
+                minDate = "01-01-1950"
+                maxDate = "01-01-2020"
+                confirmBtnText = "Confirm"
+                cancelBtnText = "Cancel"
+                customStyles = {{
+                  dateIcon : {
+                    position : 'absolute',
+                    left : 292,
+                    top : 4,
+                    marginLeft : 0
+                  },
+                  dateInput : {
+                    marginRight : 44
+                  }
+                }}
+                onDateChange = {(date) => {this.setState({date : date})}}
+          />
+          <Picker
+              selectedValue = {this.state.gender}
+              style = {styles.input}
+              itemStyle = {{fontSize : 12,paddingHorizontal : 15,}}
+              mode = 'dropdown'
+              onValueChange = {(itemValue, itemIndex) => this.setState({gender : itemValue})}>
+              <Picker.Item label = 'Male' value = 'male'/>
+              <Picker.Item label = 'Female' value = 'female'/>
+              <Picker.Item label = 'Other' value = 'other'/>
+          </Picker>
+          <TextInput style = {styles.input}
+                placeholder = {this.state.mobileNumber}
+                placeholderTextColor = 'rgba(255,255,255,0.7)'
+                returnKeyType = 'next'
+                keyBoardType = 'phone-pad'
+                autoCapitalize = 'none'
+                autoCorrect = {false}
+                dataDetectorTypes = 'phoneNumber'
+                maxLength = {13}
+                onChangeText = {mobileNumber => this.setState({ mobileNumber })}
+                value = {this.state.mobileNumber}
+          />
+          <TextInput style = {styles.input}
+                placeholder = {this.state.email}
+                placeholderTextColor = 'rgba(255,255,255,0.7)'
+                returnKeyType = 'next'
+                keyBoardType = 'email-address'
+                autoCapitalize = 'none'
+                autoCorrect = {false}
+                onChangeText = {email => this.setState({ email })}
+                value = {this.state.email}
 
-            <TextInput style = {styles.input}
-                    title = 'Username'
-                    placeholder = {this.state.usename}
-                    placeholderTextColor = 'rgba(255,255,255,0.7)'
-                    returnKeyType = 'next'
-                    keyBoardType = 'email-address'
-                    autoCapitalize = 'none'
-                    autoCorrect = {false}
-              />
-              <TextInput style = {styles.input}
-                    title = 'firstname'
-                    placeholder = {this.state.firstname}
-                    placeholderTextColor = 'rgba(255,255,255,0.7)'
-                    returnKeyType = 'next'
-                    //keyBoardType = 'email-address'
-                    autoCapitalize = 'none'
-                    autoCorrect = {false}
-              />
-              <TextInput style = {styles.input}
-                    title = 'Lastname'
-                    placeholder = {this.state.lastname}
-                    placeholderTextColor = 'rgba(255,255,255,0.7)'
-                    returnKeyType = 'next'
-                    //keyBoardType = 'email-address'
-                    autoCapitalize = 'none'
-                    autoCorrect = {false}
-              />
-              <TextInput style = {styles.input}
-                    title = 'E-mail'
-                    placeholder = {this.state.email}
-                    placeholderTextColor = 'rgba(255,255,255,0.7)'
-                    returnKeyType = 'next'
-                    //keyBoardType = 'email-address'
-                    autoCapitalize = 'none'
-                    autoCorrect = {false}
-              />
-              <ButtonGroup
-                    onPress={this.updateIndex}
-                    selectedIndex={selectedIndex}
-                    buttons={buttons}
-                    containerStyle= {styles.input}
-              />
-              <TextInput style = {styles.input}
-                    title = 'Mobile No.'
-                    placeholder = {this.state.mobileno}
-                    placeholderTextColor = 'rgba(255,255,255,0.7)'
-                    returnKeyType = 'next'
-                    //keyBoardType = 'email-address'
-                    autoCapitalize = 'none'
-                    autoCorrect = {false}
-              />
-              <DatePicker
-                    style={{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : 'rgba(255,255,255,0.2)'}}
-                    date={this.state.date}
-                    mode="date"
-                    placeholder="select date"
-                    format="DD-MM-YYYY"
-                    minDate="01-01-1950"
-                    maxDate="01-01-2020"
-                    confirmBtnText="Confirm"
-                    cancelBtnText="Cancel"
-                    customStyles={{
-                      dateIcon: {
-                        position: 'absolute',
-                        left : 292,
-                        top : 4,
-                        marginLeft : 0
-                      },
-                      dateInput: {
-                        marginRight: 44
-                      }
-                    }}
-                    onDateChange={(date) => {this.setState({date: date})}}
-              />
+          />
+          <TextInput style = {styles.input}
+                placeholder = {this.state.password}
+                secureTextEntry = {true}
+                returnKeyType = 'go'
+                placeholderTextColor = 'rgba(255,255,255,0.7)'
+                minLength = {8}
+                onChangeText = {password => this.setState({ password })}
+                value = {this.state.password}
+          />
+          <TextInput style = {styles.input}
+                placeholder = {this.state.confirmPassword}
+                secureTextEntry = {true}
+                returnKeyType = 'go'
+                placeholderTextColor = 'rgba(255,255,255,0.7)'
+                minLength = {20}
+                onChangeText = {confirmPassword => this.setState({ confirmPassword })}
+                value = {this.state.confirmPassword}
+          />
+
           </ScrollView>
 
     );
@@ -188,7 +227,7 @@ const styles = StyleSheet.create({
     flexDirection : 'column',
     alignItems: 'center',
     justifyContent : 'flex-start',
-    height : 625,
+    height : 750,
     width : '100%'
   },
   childContainer1 : {

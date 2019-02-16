@@ -11,7 +11,7 @@ export default class SplashScreen extends Component {
     },500)*/
 
       firebase.auth().onAuthStateChanged(user => {
-      this.props.navigation.navigate(user ? 'Login' : 'Signup')
+      this.props.navigation.navigate(user ? 'TabNav' : 'Signup')
     })
   }
   render(){
