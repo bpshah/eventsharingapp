@@ -234,7 +234,7 @@ export default class EventCreate extends Component{
           <TouchableOpacity style = {styles.buttonContainer}
                             onPress = {this.handle}>
 
-                <Text style = {styles.buttonText}>Submit</Text>
+                <Text style = {styles.buttonText}>Create Event</Text>
           </TouchableOpacity>
 
       </ScrollView>

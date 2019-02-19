@@ -7,15 +7,6 @@ import firebase from 'react-native-firebase';
 
 export default class Events extends Component {
 
-  signOutUser = async () => {
-      try {
-          await firebase.auth().signOut();
-          navigate('Login');
-      } catch (e) {
-          console.log(e);
-      }
-  }
-
     static navigationOptions = ({navigation}) => ({
     headerTitleStyle : {
        textAlign : 'center',
@@ -24,7 +15,7 @@ export default class Events extends Component {
     title : 'Events',
     headerRight : (
       <View marginRight = {10}>
-        <Icon name="sign-out-alt" size={30} color="#900" onPress = {this.signOutUser}/>
+        <Icon name="sign-out-alt" size={30} color="#900" onPress = {() => firebase.auth().signOut().then((navigation.navigate('Login')))}/>
       </View>
 
     ),

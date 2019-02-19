@@ -22,6 +22,7 @@ export default class Signup extends Component {
       mobileNumber : '',
       selectedIndex : 1,
       gender : '',
+      location : '',
       errorMessage: null,
     }
     const button = ['Male', 'Female','Other'];
@@ -54,10 +55,11 @@ export default class Signup extends Component {
     window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
     window.Blob = Blob;
     return new Promise((resolve, reject) => {
-      //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+        //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
         const uploadUri = uri;
-        let uploadBlob = null
-        const imageRef = firebase.storage().ref('images').child(imageName)
+        let uploadBlob = null;
+        const imageRef = firebase.storage().ref('images').child(imageName);
+        console.log("In UI : " + uploadUri + imageName);
         fs.readFile(uploadUri, 'base64')
         .then((data) => {
           return Blob.build(data, { type: `${mime};BASE64` })
@@ -95,19 +97,20 @@ export default class Signup extends Component {
   }
 
   handleProfileData = () => {
-      let username = this.state.username;
+      let firstname = this.state.firstname;
       let lastname = this.state.lastName;
       let mobileno = this.state.mobileNumber;
       let birthdate = this.state.date;
       let gender = this.state.gender;
       let email = this.state.email;
+      let location = this.state.location;
 
       let temail = email.slice(0,email.indexOf('@'));
 
       firebase
         .database()
         .ref('Users/' + temail)
-        .set({ username, lastname, mobileno, birthdate, gender})
+        .set({ firstname, lastname, mobileno, birthdate, gender, location})
         .catch(error => this.setState({ errorMessage: error.message }))
   }
 
@@ -149,13 +152,14 @@ export default class Signup extends Component {
     const { password, confirmPassword } = this.state;
     let email = this.state.email;
     let temail = email.slice(0,email.indexOf('@'));
-    
+
     if(password !== confirmPassword ){
       Alert("Password don't match");
     }
     else {
       this.handleProfileData();
       this.uploadImage(this.state.filePath, temail + '.png');
+      console.log("URI : "+ this.state.filePath + temail);
       this.handleSignUp();
     }
   }
@@ -240,6 +244,15 @@ export default class Signup extends Component {
               maxLength = {13}
               onChangeText = {mobileNumber => this.setState({ mobileNumber })}
               value = {this.state.mobileNumber}
+        />
+        <TextInput style = {styles.input}
+              placeholder = 'City'
+              placeholderTextColor = 'rgba(255,255,255,0.7)'
+              returnKeyType = 'next'
+              autoCapitalize = 'none'
+              autoCorrect = {false}
+              onChangeText = {location => this.setState({ location })}
+              value = {this.state.location}
         />
         <TextInput style = {styles.input}
               placeholder = 'Email'

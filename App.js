@@ -31,6 +31,8 @@ type Props = {};
     };
 firebase.initializeApp(config);
 
+console.disableYellowBox = true;
+
 const EventStack = createStackNavigator({
     Events : {
       screen : Events ,
@@ -114,7 +116,6 @@ EventStack.navigationOptions = ({ navigation }) => {
   };
 };
 
-
 const LoginStack = createStackNavigator({
   Login : {
     screen : Login,
@@ -156,8 +157,6 @@ const App1 = createStackNavigator({
     },
   },
 });
-
-
 
 const App =  createAppContainer(App1);
 export default App;
