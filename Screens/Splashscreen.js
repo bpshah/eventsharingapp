@@ -10,6 +10,7 @@ export default class SplashScreen extends Component {
       this.props.navigation.navigate(user ? 'TabNav' : 'Login')
     })},500);
   }
+  
   render(){
     return(
       <View  style = {styles.Container}>

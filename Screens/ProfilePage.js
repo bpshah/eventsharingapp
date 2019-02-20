@@ -6,7 +6,6 @@ import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker';
 import firebase from 'react-native-firebase';
 
-
 export default class ProfilePage extends Component{
 
   constructor(props){
@@ -22,9 +21,11 @@ export default class ProfilePage extends Component{
         mobileNumber : '',
         gender : '',
         location : '',
+        imgsrc : '',
         errorMessage: null,
       }
-      this.updateIndex = this.updateIndex.bind(this)
+      this.updateIndex = this.updateIndex.bind(this);
+
   }
 
   static navigationOptions = ({navigation}) => ({
@@ -48,10 +49,10 @@ export default class ProfilePage extends Component{
   componentWillMount(){
 
     let user = firebase.auth().currentUser;
-    console.log(user);
-    let firstname,lastname,birthdate,mobileno,gender,email,password;
+    //console.log(user);
+    //let firstname,lastname,birthdate,mobileno,gender,email,password;
     const temail = user.email.slice(0,user.email.indexOf('@'));
-    console.log(temail);
+    //console.log(temail);
     firebase
       .database()
       .ref('Users/')
@@ -66,21 +67,54 @@ export default class ProfilePage extends Component{
           gender : snapshot.val().gender,
           email : user.email,
           location : snapshot.val().location,
+          imgsrc : snapshot.val().imgsrc,
         })
+        //console.log("In read :" + this.setState.imgsrc);
       });
+    //console.log("After Read");
+    }
 
-      /*  firebase
-        .storage()
-        .ref('images/')
-        .getDownloadURL()
-        .then((url) => {
-          console.log(url);
-          let imgUrl = JSON.stringify(url);
-          this.setState({
-              filePath :  imgUrl,
+  uploadImage = (uri, imageName, mime = 'image/png') => {
+      const Blob = RNFetchBlob.polyfill.Blob;
+      const fs = RNFetchBlob.fs;
+      window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
+      window.Blob = Blob;
+      return new Promise((resolve, reject) => {
+          //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+          const uploadUri = uri;
+          let uploadBlob = null;
+          const imageRef = firebase.storage().ref('images').child(imageName);
+          //console.log("In UI : " + uploadUri + imageName);
+          fs.readFile(uploadUri, 'base64')
+          .then((data) => {
+            return Blob.build(data, { type: `${mime};BASE64` })
           })
-        });*/
-    //console.log('URL :'+ this.state.filePath);
+          .then((blob) => {
+            uploadBlob = blob
+            return imageRef.put(uri, { contentType: mime })
+          })
+          .then(() => {
+            uploadBlob.close()
+            return imageRef.getDownloadURL()
+          })
+          .then((url) => {
+            this.setState({
+              imgsrc : url,
+            });
+            console.log("In Ui :" + this.state.imgsrc);
+            resolve(url)
+          })
+          .catch((error) => {
+            reject(error)
+          });
+
+      })
+    }
+
+  updateDP = () => {
+    let user = firebase.auth().currentUser;
+    const temail = user.email.slice(0,user.email.indexOf('@'));
+    this.uploadImage(this.state.filePath,temail + '.png').then( () => { this.handleUpdate() })
   }
 
   handleUpdate = () => {
@@ -95,13 +129,14 @@ export default class ProfilePage extends Component{
     let birthdate = this.state.date;
     let gender = this.state.gender;
     let location = this.state.location;
+    let imgsrc = this.state.imgsrc;
 
-    console.log("Before Update");
+    //console.log("Before Update");
     const temail = email.slice(0,user.email.indexOf('@'));
 
     console.log(temail);
-    firebase.database().ref('Users/' + temail).update({firstname,lastname,birthdate,mobileno,gender,location});
-    console.log("Updated");
+    firebase.database().ref('Users/' + temail).update({firstname,lastname,birthdate,mobileno,gender,location,imgsrc});
+    //console.log("Updated");
   };
 
   onContentSizeChange = (contentWidth, contentHeight) => {
@@ -134,6 +169,7 @@ export default class ProfilePage extends Component{
           this.setState({
             filePath : source,
           });
+          console.log("In uploadImage: " + this.state.filePath);
         }
       });
   };
@@ -143,8 +179,7 @@ export default class ProfilePage extends Component{
   }
 
   render(){
-    const buttons = ['Male', 'Female','Other']
-    const { selectedIndex } = this.state
+    const { selectedIndex } = this.state;
     return(
         <ScrollView contentContainerStyle = {styles.Container}
                     behaviour = 'height'
@@ -152,7 +187,7 @@ export default class ProfilePage extends Component{
                     horizontal = {false}>
           <Avatar
               rounded
-              source = {{uri: this.state.filePath}}
+              source = {{uri : this.state.imgsrc }}
               showEditButton
               size = "xlarge"
               margin = {20}
@@ -183,8 +218,8 @@ export default class ProfilePage extends Component{
           <DatePicker
                 style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : 'rgba(255,255,255,0.2)',}}
                 date = {this.state.date}
-                mode = "date"
-                placeholder = "Select Your Birthdate"
+                mode = "datetime"
+                placeholder = "Select Time of Event"
                 format = "DD-MM-YYYY"
                 minDate = "01-01-1950"
                 maxDate = "01-01-2020"
@@ -209,8 +244,8 @@ export default class ProfilePage extends Component{
               itemStyle = {{fontSize : 12,paddingHorizontal : 15,}}
               mode = 'dropdown'
               onValueChange = {(itemValue, itemIndex) => this.setState({gender : itemValue})}>
-              <Picker.Item label = 'Female' value = 'male'/>
-              <Picker.Item label = 'Male' value = 'female'/>
+              <Picker.Item label = 'Female' value = 'female'/>
+              <Picker.Item label = 'Male' value = 'male'/>
               <Picker.Item label = 'Other' value = 'other'/>
           </Picker>
           <TextInput style = {styles.input}
@@ -245,24 +280,6 @@ export default class ProfilePage extends Component{
                 value = {this.state.email}
 
           />
-          <TextInput style = {styles.input}
-                placeholder = {this.state.password}
-                secureTextEntry = {true}
-                returnKeyType = 'go'
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
-                minLength = {8}
-                onChangeText = {password => this.setState({ password })}
-                value = {this.state.password}
-          />
-          <TextInput style = {styles.input}
-                placeholder = {this.state.confirmPassword}
-                secureTextEntry = {true}
-                returnKeyType = 'go'
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
-                minLength = {20}
-                onChangeText = {confirmPassword => this.setState({ confirmPassword })}
-                value = {this.state.confirmPassword}
-          />
           <TouchableOpacity style = {styles.buttonContainer}
                             onPress = {this.handleUpdate}>
 
@@ -281,7 +298,7 @@ const styles = StyleSheet.create({
     flexDirection : 'column',
     alignItems: 'center',
     justifyContent : 'flex-start',
-    height : 850,
+    height : 725,
     width : '100%'
   },
   childContainer1 : {

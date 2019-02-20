@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, ScrollView, Picker, Platform} from 'react-native';
+import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, ScrollView, Picker, Platform, Alert} from 'react-native';
 import {BackHandler} from 'react-native';
 import { Avatar, CheckBox, ButtonGroup } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
@@ -13,9 +13,9 @@ export default class Signup extends Component {
     super()
     this.state = {
       filePath : '',
-      email : '',
-      password : '',
-      confirmPassword : '',
+      email : 'bhumit1206@gmail.com',
+      password : 'asdf1234',
+      confirmPassword : 'asdf1234',
       firstname : '',
       lastName : '',
       date : '',
@@ -23,30 +23,32 @@ export default class Signup extends Component {
       selectedIndex : 1,
       gender : '',
       location : '',
+      imgsrc : '',
       errorMessage: null,
     }
     const button = ['Male', 'Female','Other'];
   }
 
   handleSignUp = () => {
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(this.state.email, this.state.password)
-      .then(() => this.props.navigation.navigate('Events'))
-      .catch(error => {
-        switch (error.code) {
-          case 'auth/email-already-in-use':
-            console.log(`Email address ${this.state.email} already in use.`);
-          case 'auth/invalid-email':
-            console.log(`Email address ${this.state.email} is invalid.`);
-          case 'auth/operation-not-allowed':
-            console.log(`Error during sign up.`);
-          case 'auth/weak-password':
-            console.log('Password is not strong enough. Add additional characters including special characters and numbers.');
-          default:
-            console.log(error.message);
-      }
-    })
+    //if(pwd.length >= 8 ){
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(this.state.email, this.state.password)
+        .then(() => this.props.navigation.navigate('Events'))
+        .catch(error => {
+          switch (error.code) {
+            case 'auth/email-already-in-use':
+              console.log(`Email address ${this.state.email} already in use.`);
+            case 'auth/invalid-email':
+              console.log(`Email address ${this.state.email} is invalid.`);
+            case 'auth/operation-not-allowed':
+              console.log(`Error during sign up.`);
+            case 'auth/weak-password':
+              console.log('Password is not strong enough. Add additional characters including special characters and numbers.');
+            default:
+              console.log(error.message);
+        }
+      })
   }
 
   uploadImage = (uri, imageName, mime = 'image/png') => {
@@ -59,7 +61,7 @@ export default class Signup extends Component {
         const uploadUri = uri;
         let uploadBlob = null;
         const imageRef = firebase.storage().ref('images').child(imageName);
-        console.log("In UI : " + uploadUri + imageName);
+        //console.log("In UI : " + uploadUri + imageName);
         fs.readFile(uploadUri, 'base64')
         .then((data) => {
           return Blob.build(data, { type: `${mime};BASE64` })
@@ -73,27 +75,17 @@ export default class Signup extends Component {
           return imageRef.getDownloadURL()
         })
         .then((url) => {
+          this.setState({
+            imgsrc : url,
+          });
+          console.log("In Ui :" + this.state.imgsrc);
           resolve(url)
         })
         .catch((error) => {
           reject(error)
-        })
-    })
-  }
+        });
 
-  storeReference = () => {
-    let imageRef = firebase.storage().ref("UsersImage/").child(username);
-    let currentUser = firebase.auth().currentUser;
-    let image = {
-      type : 'image',
-      url : downloadUrl,
-      createdAt : sessionId,
-      user : {
-        id : currentUser.uid,
-        email : currentUser.email,
-      }
-    }
-    firebase.database().ref('Users/' + username).push(image);
+    })
   }
 
   handleProfileData = () => {
@@ -104,14 +96,21 @@ export default class Signup extends Component {
       let gender = this.state.gender;
       let email = this.state.email;
       let location = this.state.location;
+      let imgsrc = this.state.imgsrc;
 
       let temail = email.slice(0,email.indexOf('@'));
+
+      //let url = firebase.storage().ref('images/' + temail + '.png').getDownloadURL();
+      //let imgUrl = url;
+
+      console.log("IMGURL:" + imgsrc);
 
       firebase
         .database()
         .ref('Users/' + temail)
-        .set({ firstname, lastname, mobileno, birthdate, gender, location})
+        .set({ firstname, lastname, mobileno, birthdate, gender, location , imgsrc})
         .catch(error => this.setState({ errorMessage: error.message }))
+
   }
 
   chooseFile = () => {
@@ -143,24 +142,26 @@ export default class Signup extends Component {
             imageHeight : response.height,
             imageWidth : response.width,
           });
+
         }
       });
   };
 
   handle = () => {
 
+    console.log("In handle");
     const { password, confirmPassword } = this.state;
     let email = this.state.email;
     let temail = email.slice(0,email.indexOf('@'));
 
     if(password !== confirmPassword ){
       Alert("Password don't match");
+      console.log("Password don't match");
     }
     else {
-      this.handleProfileData();
-      this.uploadImage(this.state.filePath, temail + '.png');
-      console.log("URI : "+ this.state.filePath + temail);
-      this.handleSignUp();
+        this.uploadImage(this.state.filePath, temail + '.png')
+        .then(() => { this.handleProfileData(); });
+        this.handleSignUp();
     }
   }
 
@@ -189,6 +190,7 @@ export default class Signup extends Component {
               onChangeText = {firstname => this.setState({ firstname })}
               value = {this.state.firstname}
               autoFocus = {true}
+              blurOnSubmit = {true}
               //clearTextOnFocus = {true}
         />
         <TextInput style = {styles.input}
@@ -197,6 +199,7 @@ export default class Signup extends Component {
               returnKeyType = 'next'
               autoCapitalize = 'none'
               autoCorrect = {false}
+              blurOnSubmit = {true}
               onChangeText = {lastName => this.setState({ lastName })}
               value = {this.state.lastName}
         />
@@ -242,6 +245,7 @@ export default class Signup extends Component {
               autoCorrect = {false}
               dataDetectorTypes = 'phoneNumber'
               maxLength = {13}
+              blurOnSubmit = {true}
               onChangeText = {mobileNumber => this.setState({ mobileNumber })}
               value = {this.state.mobileNumber}
         />
@@ -251,6 +255,7 @@ export default class Signup extends Component {
               returnKeyType = 'next'
               autoCapitalize = 'none'
               autoCorrect = {false}
+              blurOnSubmit = {true}
               onChangeText = {location => this.setState({ location })}
               value = {this.state.location}
         />
@@ -261,6 +266,7 @@ export default class Signup extends Component {
               keyBoardType = 'email-address'
               autoCapitalize = 'none'
               autoCorrect = {false}
+              blurOnSubmit = {true}
               onChangeText = {email => this.setState({ email })}
               value = {this.state.email}
 
@@ -271,6 +277,7 @@ export default class Signup extends Component {
               returnKeyType = 'go'
               placeholderTextColor = 'rgba(255,255,255,0.7)'
               minLength = {8}
+              blurOnSubmit = {true}
               onChangeText = {password => this.setState({ password })}
               value = {this.state.password}
         />
@@ -280,6 +287,7 @@ export default class Signup extends Component {
               returnKeyType = 'go'
               placeholderTextColor = 'rgba(255,255,255,0.7)'
               minLength = {20}
+              blurOnSubmit = {true}
               onChangeText = {confirmPassword => this.setState({ confirmPassword })}
               value = {this.state.confirmPassword}
         />

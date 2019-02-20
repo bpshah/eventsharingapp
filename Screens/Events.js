@@ -7,7 +7,7 @@ import firebase from 'react-native-firebase';
 
 export default class Events extends Component {
 
-    static navigationOptions = ({navigation}) => ({
+  static navigationOptions = ({navigation}) => ({
     headerTitleStyle : {
        textAlign : 'center',
        flex : 1,
@@ -27,6 +27,7 @@ export default class Events extends Component {
       </View>
     )
   })
+  
   constructor(props) {
     super(props);
     this.state = { ritems : [

@@ -22,16 +22,17 @@ import firebase from 'react-native-firebase';
 type Props = {};
 
   const config = {
-      apiKey: "AIzaSyAmtO-w9eUbDoeqPe-uI1YkgtRdwB45YWI",
-      authDomain: "practice-69846.firebaseapp.com",
-      databaseURL: "https://practice-69846.firebaseio.com",
-      projectId: "practice-69846",
-      storageBucket: "practice-69846.appspot.com",
-      messagingSenderId: "273328326983"
-    };
+    apiKey: "AIzaSyAmtO-w9eUbDoeqPe-uI1YkgtRdwB45YWI",
+    authDomain: "practice-69846.firebaseapp.com",
+    databaseURL: "https://practice-69846.firebaseio.com",
+    projectId: "practice-69846",
+    storageBucket: "practice-69846.appspot.com",
+    messagingSenderId: "273328326983"
+
+  };
 firebase.initializeApp(config);
 
-console.disableYellowBox = true;
+//console.disableYellowBox = true;
 
 const EventStack = createStackNavigator({
     Events : {
@@ -70,7 +71,6 @@ const ProfileStack = createStackNavigator({
     screen : ProfilePage,
   },
 })
-
 
 export const TabNav = createBottomTabNavigator(
     {
@@ -159,4 +159,5 @@ const App1 = createStackNavigator({
 });
 
 const App =  createAppContainer(App1);
+
 export default App;

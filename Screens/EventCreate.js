@@ -6,6 +6,7 @@ import ImagePicker from 'react-native-image-picker';
 import { Avatar, CheckBox, ButtonGroup } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
+import DatePicker from 'react-native-datepicker'
 
 
 const options = {
@@ -171,16 +172,28 @@ export default class EventCreate extends Component{
                 onChangeText = { eventname => this.setState({ eventname })}
                 value = {this.state.eventname}
           />
-          <TextInput style = {styles.input}
-                title = 'Time'
-                placeholder = 'Time of Event'
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
-                returnKeyType = 'next'
-                //keyBoardType = 'email-address'
-                autoCapitalize = 'none'
-                autoCorrect = {false}
-                onChangeText = { time => this.setState({ time })}
-                value = {this.state.time}
+          <DatePicker
+                style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : 'rgba(255,255,255,0.2)',}}
+                date = {this.state.time}
+                mode = "date"
+                placeholder = "Select Your Birthdate"
+                format = "DD-MM-YYYY"
+                minDate = "01-01-1950"
+                maxDate = "01-01-2020"
+                confirmBtnText = "Confirm"
+                cancelBtnText = "Cancel"
+                customStyles = {{
+                  dateIcon : {
+                    position : 'absolute',
+                    left : 292,
+                    top : 4,
+                    marginLeft : 0
+                  },
+                  dateInput : {
+                    marginRight : 44
+                  }
+                }}
+                onDateChange = {(time) => {this.setState({date : time})}}
           />
           <TextInput style = {styles.input}
                 title = 'Place'
