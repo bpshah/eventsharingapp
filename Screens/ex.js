@@ -4,7 +4,6 @@ import Ev from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/Events.js';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 
-
 export default class Ex extends Component {
   static navigationOptions = ({navigation}) =>({
     headerTitleStyle : {

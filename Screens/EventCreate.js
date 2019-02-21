@@ -139,8 +139,8 @@ export default class EventCreate extends Component{
     }
 
   handle = () => {
-    this.uploadImage(this.state.filePath, this.state.name + '.png');
-    this.handleEvent();
+    this.uploadImage(this.state.filePath, this.state.name + '.png').then(() => this.handleEvent());
+    //this.handleEvent();
   }
 
   render(){

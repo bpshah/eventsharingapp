@@ -5,13 +5,14 @@ import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker';
 import firebase from 'react-native-firebase';
+import RNFetchBlob from 'react-native-fetch-blob';
 
 export default class ProfilePage extends Component{
 
   constructor(props){
       super(props);
       this.state = {
-        filePath : '',
+        filePath : {},
         email : '',
         password : '',
         confirmPassword : '',
@@ -45,6 +46,10 @@ export default class ProfilePage extends Component{
         </View>
       )
   });
+
+  shouldComponentUpdate(nextState){
+    return nextState.imgsrc != this.state.imgsrc;
+  }
 
   componentWillMount(){
 
@@ -84,7 +89,8 @@ export default class ProfilePage extends Component{
           const uploadUri = uri;
           let uploadBlob = null;
           const imageRef = firebase.storage().ref('images').child(imageName);
-          //console.log("In UI : " + uploadUri + imageName);
+          //console.log("In UI : " + uploadUri);
+          //console.log("Before readFile");
           fs.readFile(uploadUri, 'base64')
           .then((data) => {
             return Blob.build(data, { type: `${mime};BASE64` })
@@ -95,6 +101,7 @@ export default class ProfilePage extends Component{
           })
           .then(() => {
             uploadBlob.close()
+            console.log("After ref");
             return imageRef.getDownloadURL()
           })
           .then((url) => {
@@ -111,17 +118,32 @@ export default class ProfilePage extends Component{
       })
     }
 
+  /*deletePrevImage = () => {
+    let user = firebase.auth().currentUser;
+    const temail = user.email.slice(0,user.email.indexOf('@'));
+    console.log("In Delete:");
+    firebase.storage().ref('images').child(temail + ".png").delete();
+  }*/
+
   updateDP = () => {
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
-    this.uploadImage(this.state.filePath,temail + '.png').then( () => { this.handleUpdate() })
+    console.log("In DP:");
+    this.uploadImage(this.state.filePath,temail + '.png').then( () => { this.handleUpdate() });
   }
 
   handleUpdate = () => {
 
     let user = firebase.auth().currentUser;
 
+    //this.updateDP();
     const email = user.email;
+    const temail = email.slice(0,user.email.indexOf('@'));
+    /*console.log("Before Uploading");
+
+    this.uploadImage(`"${this.state.filePath}"`,temail + '.png');
+
+    console.log("After Uploading");*/
 
     let firstname = this.state.firstname;
     let lastname = this.state.lastName;
@@ -131,12 +153,12 @@ export default class ProfilePage extends Component{
     let location = this.state.location;
     let imgsrc = this.state.imgsrc;
 
-    //console.log("Before Update");
-    const temail = email.slice(0,user.email.indexOf('@'));
+    console.log("Before Update");
 
-    console.log(temail);
+
+    //console.log(temail);
     firebase.database().ref('Users/' + temail).update({firstname,lastname,birthdate,mobileno,gender,location,imgsrc});
-    //console.log("Updated");
+    console.log("Updated");
   };
 
   onContentSizeChange = (contentWidth, contentHeight) => {
@@ -166,8 +188,13 @@ export default class ProfilePage extends Component{
           let source = response;
           // You can also display the image using data:
           // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+          console.log("Before SetState.");
+          //JSON.stringify(source.path);
+          console.log("Source : " + source.path);
+          //let path = `"${source.path}"`
+          //console.log("Path : " + path);
           this.setState({
-            filePath : source,
+            filePath : source.path,
           });
           console.log("In uploadImage: " + this.state.filePath);
         }
@@ -281,7 +308,7 @@ export default class ProfilePage extends Component{
 
           />
           <TouchableOpacity style = {styles.buttonContainer}
-                            onPress = {this.handleUpdate}>
+                            onPress = {this.updateDP}>
 
                 <Text style = {styles.buttonText}>Profile Ok</Text>
           </TouchableOpacity>
