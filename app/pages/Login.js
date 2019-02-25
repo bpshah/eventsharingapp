@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image, ScrollView, Dimensions} from 'react-native';
-import Events from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/Events.js';
+import Events from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/Events.js';
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 import firebase from 'react-native-firebase';
+import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
 
 //import {exitAlert} from './ExitAlert';
 //import { BackAndroid } from 'react-native';
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
 
   container : {
     flex : 1,
-    backgroundColor : '#00BFFF'
+    backgroundColor : Colors.primaryAppColor,
   },
   childcontainer1 : {
     flex : 2,
@@ -120,26 +121,25 @@ const styles = StyleSheet.create({
   input : {
     height : 40,
     width : '80%',
-    backgroundColor : 'rgba(255,255,255,0.2)',
+    backgroundColor : Colors.inputBackgroundColor,
     marginBottom : 10,
     paddingHorizontal : 15,
-    color : '#FFF',
-
+    color : Colors.white,
   },
   buttonContainer1 : {
-    backgroundColor : '#E96A69',
+    backgroundColor : Colors.primaryAppColor,
     paddingVertical : 15,
     width : '40%',
     bottom : '0%',
   },
   buttonContainer2 : {
-    backgroundColor : '#E96A69',
+    backgroundColor : Colors.primaryAppColor,
     paddingVertical : 15,
     width : '40%',
   },
   buttonText : {
     textAlign : 'center',
-    backgroundColor : '#FFFFFF',
+    backgroundColor : Colors.buttonTextColor,
     paddingVertical : 15,
     fontWeight : '700'
   },
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     justifyContent : 'space-between',
   },
   textstyle : {
-    color : '#FFF',
+    color : Colors.white,
     paddingVertical : 10,
   },
 });

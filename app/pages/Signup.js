@@ -6,6 +6,7 @@ import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
+import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
 
 export default class Signup extends Component {
 
@@ -204,7 +205,7 @@ export default class Signup extends Component {
               value = {this.state.lastName}
         />
         <DatePicker
-              style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : 'rgba(255,255,255,0.2)',}}
+              style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : Colors.inputBackgroundColor,}}
               date = {this.state.date}
               mode = "date"
               placeholder = "Select Your Birthdate"
@@ -305,7 +306,7 @@ const styles = StyleSheet.create({
 
   container : {
     flexGrow : 1,
-    backgroundColor : '#E96A69',
+    backgroundColor : Colors.primaryAppColor,
     flexDirection : 'column',
     alignItems: 'center',
     justifyContent : 'flex-start',
@@ -316,17 +317,17 @@ const styles = StyleSheet.create({
   },
   input : {
     height : 40,
-    backgroundColor : 'rgba(255,255,255,0.2)',
+    backgroundColor : Colors.inputBackgroundColor,
     marginBottom : 20,
     alignSelf : 'center',
     width : '80%',
     paddingHorizontal : 15,
     paddingVertical : 0,
-    color : '#FFF'
+    color : Colors.white
   },
   buttonContainer : {
     //position: 'absolute',
-    backgroundColor : '#E96A69',
+    backgroundColor : Colors.primaryAppColor,
     paddingVertical : 20,
     bottom : 5,
     alignSelf : 'stretch',
@@ -335,7 +336,7 @@ const styles = StyleSheet.create({
   },
   buttonText : {
     textAlign : 'center',
-    backgroundColor : '#FFFFFF',
+    backgroundColor : Colors.buttonTextColor,
     paddingVertical : 15,
     fontWeight : '700'
   },

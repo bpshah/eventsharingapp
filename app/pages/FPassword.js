@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar} from 'react-native';
 import firebase from 'react-native-firebase';
+import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
 
 export default class FPassword extends Component{
 
@@ -28,7 +29,7 @@ export default class FPassword extends Component{
     return(
       <View style = {styles.container}>
       <StatusBar barStyle = 'light-content'/>
-      <Text style={{color: 'white', fontSize : 20, marginTop : 100}}>Please enter email address :{"\n"}
+      <Text style={{color: Colors.textColor, fontSize : 20, marginTop : 100}}>Please enter email address :{"\n"}
       </Text>
       <TextInput style = {styles.input}
             placeholder = 'Username or Email'
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
 
   container : {
     flex : 1,
-    backgroundColor : '#E96A69',
+    backgroundColor : Colors.primaryAppColor,
     padding : 20,
     justifyContent : 'flex-start',
 
@@ -65,20 +66,20 @@ const styles = StyleSheet.create({
   },
   input : {
     height : 40,
-    backgroundColor : 'rgba(255,255,255,0.2)',
+    backgroundColor : Colors.inputBackgroundColor,
     marginBottom : 20,
     paddingHorizontal : 15,
-    color : '#FFF'
+    color : Colors.inputColor,
   },
   buttonContainer : {
     //flex:1,
-    backgroundColor : '#E96A69',
+    backgroundColor : Colors.primaryAppColor,
     paddingVertical : 15,
     //width: '40%',
   },
   buttonText : {
     textAlign : 'center',
-    backgroundColor : '#FFFFFF',
+    backgroundColor : Colors.buttonTextColor,
     paddingVertical : 15,
     fontWeight : '700'
   },

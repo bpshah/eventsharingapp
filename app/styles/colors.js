@@ -1,0 +1,15 @@
+export default Colors = {
+
+  primaryBackGourndColor : '#F2F2F2',
+  white : '#FFFFFF',
+  tabBarColor : '#4682B4',
+  primaryAppColor : '#4682B4',
+  inputColor : '#000000',
+  borderColor : '#E96A69',
+  inputBackgroundColor : 'rgba(255,255,255,0.2)',
+  buttonColor : '#F2F2F2',
+  buttonTextColor : '#FFFFFF',
+  textColor : '#FFFFFF',
+  cardTextColor : '#808080',
+
+};

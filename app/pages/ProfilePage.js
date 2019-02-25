@@ -6,6 +6,9 @@ import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
+import ui from 'C:/Users/DELL/Documents/EventSharingSystem/app/utils/uploadImage.js';
+import cfile from 'C:/Users/DELL/Documents/EventSharingSystem/app/utils/chooseFile.js';
+import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
 
 export default class ProfilePage extends Component{
 
@@ -26,7 +29,6 @@ export default class ProfilePage extends Component{
         errorMessage: null,
       }
       this.updateIndex = this.updateIndex.bind(this);
-
   }
 
   static navigationOptions = ({navigation}) => ({
@@ -35,10 +37,10 @@ export default class ProfilePage extends Component{
          flex : 1,
          },
          headerStyle : {
-           backgroundColor : '#E96A69',
+           backgroundColor : Colors.tabBarColor,
          },
       title : 'My Profile',
-      headerTintColor : '#FFFFFF',
+      headerTintColor : Colors.white,
       /*headerRight : (
         <View marginRight = {10}>
           <Icon id = {1} name="check" size={20} color="#900" />
@@ -46,14 +48,10 @@ export default class ProfilePage extends Component{
       ),*/
       headerLeft : (
         <View marginLeft = {10}>
-          <Icon name="angle-left" size={30} color="#FFFFFF" onPress={() => navigation.navigate('Events')}/>
+          <Icon name="angle-left" size={30} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
         </View>
       )
   });
-
-  shouldComponentUpdate(nextState){
-    return nextState.imgsrc != this.state.imgsrc;
-  }
 
   componentWillMount(){
 
@@ -83,120 +81,82 @@ export default class ProfilePage extends Component{
     //console.log("After Read");
     }
 
-  uploadImage = (uri, imageName, mime = 'image/png') => {
-      const Blob = RNFetchBlob.polyfill.Blob;
-      const fs = RNFetchBlob.fs;
-      window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
-      window.Blob = Blob;
-      return new Promise((resolve, reject) => {
-          //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
-          const uploadUri = uri;
-          let uploadBlob = null;
-          const imageRef = firebase.storage().ref('images').child(imageName);
-          //console.log("In UI : " + uploadUri);
-          //console.log("Before readFile");
-          fs.readFile(uploadUri, 'base64')
-          .then((data) => {
-            return Blob.build(data, { type: `${mime};BASE64` })
-          })
-          .then((blob) => {
-            uploadBlob = blob
-            return imageRef.put(uri, { contentType: mime })
-          })
-          .then(() => {
-            uploadBlob.close()
-            console.log("After ref");
-            return imageRef.getDownloadURL()
-          })
-          .then((url) => {
-            this.setState({
-              imgsrc : url,
-            });
-            console.log("In Ui :" + this.state.imgsrc);
-            resolve(url)
-          })
-          .catch((error) => {
-            reject(error)
-          });
+  /*shouldComponentUpdate(nextProps){
+    return nextState.filePath != this.state.filePath;
+  }
 
+  componentWillUpdate(){
+    if(this.shouldComponentUpdate()){
+      let fp = chooseFile();
+      this.setState({
+        filePath : fp,
       })
     }
+  }*/
+
+  chooseFile = () => {
+        var options = {
+          title: 'Select Image',
+          customButtons: [
+            { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
+          ],
+          storageOptions: {
+            skipBackup: true,
+            path: 'images',
+          },
+        };
+        ImagePicker.showImagePicker(response => {
+          console.log('Response = ', response);
+
+          if (response.didCancel) {
+            console.log('User cancelled image picker');
+          } else if (response.error) {
+            console.log('ImagePicker Error: ', response.error);
+          } else {
+            let source = response;
+            // You can also display the image using data:
+            // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+            this.setState({
+              filePath : source.path,
+            });
+          }
+        });
+    };
+
+  handleUpdate = () => {
+
+  let user = firebase.auth().currentUser;
+
+  const email = user.email;
+  const temail = email.slice(0,user.email.indexOf('@'));
+  //console.log("Before Uploading");
+
+  let firstname = this.state.firstname;
+  let lastname = this.state.lastName;
+  let mobileno = this.state.mobileNumber;
+  let birthdate = this.state.date;
+  let gender = this.state.gender;
+  let location = this.state.location;
+  let imgsrc = this.state.imgsrc;
+
+  console.log("Before Update");
+
+  //console.log(temail);
+  firebase.database().ref('Users/' + temail).update({firstname,lastname,birthdate,mobileno,gender,location,imgsrc});
+  console.log("Updated");
+};
 
   updateDP = () => {
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
-    console.log("In DP:");
-    this.uploadImage(this.state.filePath,temail + '.png').then( () => { this.handleUpdate() });
+    //console.log("In DP:");
+    console.log("FilePath : " + this.state.filePath);
+    ui.uploadImage(this.state.filePath,temail + '.png').then( () => { this.handleUpdate() });
+    //console.log("T:" + timgsrc);
+    /*this.setState({
+      imgsrc : timgsrc,
+    });*/
   }
-
-  handleUpdate = () => {
-
-    let user = firebase.auth().currentUser;
-
-    //this.updateDP();
-    const email = user.email;
-    const temail = email.slice(0,user.email.indexOf('@'));
-    /*console.log("Before Uploading");
-
-    this.uploadImage(`"${this.state.filePath}"`,temail + '.png');
-
-    console.log("After Uploading");*/
-
-    let firstname = this.state.firstname;
-    let lastname = this.state.lastName;
-    let mobileno = this.state.mobileNumber;
-    let birthdate = this.state.date;
-    let gender = this.state.gender;
-    let location = this.state.location;
-    let imgsrc = this.state.imgsrc;
-
-    console.log("Before Update");
-
-
-    //console.log(temail);
-    firebase.database().ref('Users/' + temail).update({firstname,lastname,birthdate,mobileno,gender,location,imgsrc});
-    console.log("Updated");
-  };
-
-  onContentSizeChange = (contentWidth, contentHeight) => {
-    // Save the content height in state
-    this.setState({ screenHeight: contentHeight });
-  };
-
-  chooseFile = () => {
-      var options = {
-        title: 'Select Image',
-        customButtons: [
-          { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
-        ],
-        storageOptions: {
-          skipBackup: true,
-          path: 'images',
-        },
-      };
-      ImagePicker.showImagePicker(options, response => {
-        console.log('Response = ', response);
-
-        if (response.didCancel) {
-          console.log('User cancelled image picker');
-        } else if (response.error) {
-          console.log('ImagePicker Error: ', response.error);
-        } else {
-          let source = response;
-          // You can also display the image using data:
-          // let source = { uri: 'data:image/jpeg;base64,' + response.data };
-          console.log("Before SetState.");
-          //JSON.stringify(source.path);
-          console.log("Source : " + source.path);
-          //let path = `"${source.path}"`
-          //console.log("Path : " + path);
-          this.setState({
-            filePath : source.path,
-          });
-          console.log("In uploadImage: " + this.state.filePath);
-        }
-      });
-  };
 
   updateIndex (selectedIndex) {
     this.setState({selectedIndex})
@@ -217,7 +177,7 @@ export default class ProfilePage extends Component{
               margin = {20}
               alignSelf = 'center'
               onEditPress = {this.chooseFile.bind(this)}
-            />
+          />
           <TextInput style = {styles.input}
                 title = 'First Name'
                 placeholder = {this.state.firstname}
@@ -240,7 +200,7 @@ export default class ProfilePage extends Component{
                 value = {this.state.lastName}
           />
           <DatePicker
-                style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : '#FFFFFF',}}
+                style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : Colors.white,}}
                 date = {this.state.date}
                 mode = "datetime"
                 placeholder = ""
@@ -319,7 +279,7 @@ export default class ProfilePage extends Component{
 const styles = StyleSheet.create({
   Container : {
     flexGrow : 1,
-    backgroundColor : '#F2F2F2',
+    backgroundColor : Colors.primaryBackGourndColor,
     flexDirection : 'column',
     alignItems: 'center',
     justifyContent : 'flex-start',
@@ -332,7 +292,7 @@ const styles = StyleSheet.create({
     flexDirection : 'column',
     alignItems : 'center',
     justifyContent : 'center',
-    backgroundColor : '#FFFFFF',
+    backgroundColor : Colors.white,
     borderRadius : 200/2,
     marginLeft : 10,
     marginRight : 10,
@@ -345,7 +305,7 @@ const styles = StyleSheet.create({
     flexDirection : 'column',
     alignSelf : 'center',
     justifyContent : 'flex-start',
-    backgroundColor : '#E96A69',
+    backgroundColor : Colors.tabBarColor,
     marginLeft : 15,
     marginRight : 10,
     marginTop : 10,
@@ -358,16 +318,16 @@ const styles = StyleSheet.create({
     height : 40,
     width : '80%',
     alignSelf : 'center',
-    backgroundColor : 'rgba(255,255,255,0.2)',
+    backgroundColor : Colors.inputBackgroundColor,
     marginBottom : 20,
     paddingHorizontal : 15,
-    color : '#000',
-    borderBottomColor : '#E96A69',
+    color : Colors.inputColor,
+    borderBottomColor : Colors.borderColor,
     borderBottomWidth : 1,
   },
   buttonContainer : {
     //position: 'absolute',
-    backgroundColor : '#F2F2F2',
+    backgroundColor : Colors.backgroundColor,
     paddingVertical : 20,
     bottom : 5,
     alignSelf : 'stretch',
@@ -376,7 +336,7 @@ const styles = StyleSheet.create({
   },
   buttonText : {
     textAlign : 'center',
-    backgroundColor : '#FFFFFF',
+    backgroundColor : Colors.buttonTextColor,
     paddingVertical : 15,
     fontWeight : '700'
   },

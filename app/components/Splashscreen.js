@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image} from 'react-native';
 import firebase from 'react-native-firebase';
+import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
+
 
 
 export default class SplashScreen extends Component {
@@ -30,6 +32,6 @@ const styles = StyleSheet.create({
     alignItems : 'center',
     justifyContent : 'center',
     flexDirection : 'column',
-    backgroundColor : '#E96A69',
+    backgroundColor : Colors.primaryAppColor,
   },
 });

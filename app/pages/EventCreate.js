@@ -6,7 +6,8 @@ import ImagePicker from 'react-native-image-picker';
 import { Avatar, CheckBox, ButtonGroup } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
-import DatePicker from 'react-native-datepicker'
+import DatePicker from 'react-native-datepicker';
+import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
 
 
 const options = {
@@ -23,9 +24,9 @@ export default class EventCreate extends Component{
        },
     title : 'New Event',
     headerStyle : {
-      backgroundColor : '#E96A69',
+      backgroundColor : Colors.primaryAppColor,
     },
-    headerTintColor : '#FFFFFF',
+    headerTintColor : Colors.white,
     //swipeEnabled : false,
     //tabBarVisible : false,
     /*headerRight : (
@@ -36,7 +37,7 @@ export default class EventCreate extends Component{
     ),*/
     headerLeft : (
       <View marginLeft = {10}>
-        <Icon name="angle-left" size={30} color="#FFFFFF" onPress={() => navigation.navigate('Events')}/>
+        <Icon name="angle-left" size={30} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
       </View>
     )
   })
@@ -178,7 +179,7 @@ export default class EventCreate extends Component{
                 value = {this.state.eventname}
           />
           <DatePicker
-                style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : 'rgba(255,255,255,0.7)',  borderBottomColor : '#E96A69',
+                style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : Colors.inputBackgroundColor,  borderBottomColor : Colors.borderColor,
                   borderBottomWidth : 1}}
                 date = {this.state.time}
                 mode = "date"
@@ -194,13 +195,13 @@ export default class EventCreate extends Component{
                     left : 292,
                     top : 4,
                     marginLeft : 0,
-                    borderColor : '#F2F2F2',
-                    borderBottomColor : '#E96A69',
+                    borderColor : Colors.primaryBackGourndColor,
+                    borderBottomColor : Colors.primaryAppColor,
                     borderBottomWidth : 1
                   },
                   dateInput : {
                     marginRight : 44,
-                    borderBottomColor : '#E96A69',
+                    borderBottomColor : Colors.primaryAppColor,
                     borderBottomWidth : 1
                   }
                 }}
@@ -270,7 +271,7 @@ const styles = StyleSheet.create({
 
   container : {
     flexGrow : 1,
-    backgroundColor : '#F2F2F2',
+    backgroundColor : Colors.primaryBackGourndColor,
     flexDirection : 'column',
     alignItems: 'flex-start',
     justifyContent : 'flex-start',
@@ -283,12 +284,12 @@ const styles = StyleSheet.create({
     height : 40,
     width : '80%',
     alignSelf : 'center',
-    backgroundColor : 'rgba(255,255,255,0.2)',
+    backgroundColor : Colors.inputBackgroundColor,
     marginBottom : 20,
 
     paddingHorizontal : 15,
     color : '#000',
-    borderBottomColor : '#E96A69',
+    borderBottomColor : Colors.primaryAppColor,
     borderBottomWidth : 1,
   },
   ImageContainer: {
@@ -299,7 +300,7 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       alignSelf: 'center',
       alignItems : 'center',
-      backgroundColor: '#FFFFFF',
+      backgroundColor: Colors.white,
       marginBottom : 25,
       marginTop : 25,
       width : '80%',
@@ -307,16 +308,16 @@ const styles = StyleSheet.create({
     },
     buttonContainer : {
       //position: 'absolute',
-      backgroundColor : '#F2F2F2',
+      backgroundColor : Colors.primaryBackGourndColor,
       paddingVertical : 20,
       bottom : 5,
       alignSelf : 'stretch',
       width : '80%',
-      alignSelf : 'center',
+      
     },
     buttonText : {
       textAlign : 'center',
-      backgroundColor : '#FFFFFF',
+      backgroundColor : Colors.buttonTextColor,
       paddingVertical : 15,
       fontWeight : '700'
     },
