@@ -6,8 +6,6 @@ import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
-import uploadImage from 'C:/Users/DELL/Documents/EventSharingSystem/app/utils/uploadImage.js';
-import chooseFile from 'C:/Users/DELL/Documents/EventSharingSystem/app/utils/chooseFile.js';
 
 export default class ProfilePage extends Component{
 
@@ -85,44 +83,120 @@ export default class ProfilePage extends Component{
     //console.log("After Read");
     }
 
-  handleUpdate = () => {
+  uploadImage = (uri, imageName, mime = 'image/png') => {
+      const Blob = RNFetchBlob.polyfill.Blob;
+      const fs = RNFetchBlob.fs;
+      window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
+      window.Blob = Blob;
+      return new Promise((resolve, reject) => {
+          //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+          const uploadUri = uri;
+          let uploadBlob = null;
+          const imageRef = firebase.storage().ref('images').child(imageName);
+          //console.log("In UI : " + uploadUri);
+          //console.log("Before readFile");
+          fs.readFile(uploadUri, 'base64')
+          .then((data) => {
+            return Blob.build(data, { type: `${mime};BASE64` })
+          })
+          .then((blob) => {
+            uploadBlob = blob
+            return imageRef.put(uri, { contentType: mime })
+          })
+          .then(() => {
+            uploadBlob.close()
+            console.log("After ref");
+            return imageRef.getDownloadURL()
+          })
+          .then((url) => {
+            this.setState({
+              imgsrc : url,
+            });
+            console.log("In Ui :" + this.state.imgsrc);
+            resolve(url)
+          })
+          .catch((error) => {
+            reject(error)
+          });
 
-  let user = firebase.auth().currentUser;
-
-  const email = user.email;
-  const temail = email.slice(0,user.email.indexOf('@'));
-  //console.log("Before Uploading");
-
-  let firstname = this.state.firstname;
-  let lastname = this.state.lastName;
-  let mobileno = this.state.mobileNumber;
-  let birthdate = this.state.date;
-  let gender = this.state.gender;
-  let location = this.state.location;
-  let imgsrc = this.state.imgsrc;
-
-  console.log("Before Update");
-
-  //console.log(temail);
-  firebase.database().ref('Users/' + temail).update({firstname,lastname,birthdate,mobileno,gender,location,imgsrc});
-  //console.log("Updated");
-};
+      })
+    }
 
   updateDP = () => {
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
     console.log("In DP:");
-    let fp = chooseFile();
-    this.setState({
-      filePath : fp,
-    })
-    console.log("FilePath : " + this.state.filePath);
-    let timgsrc =  this.uploadImage(this.state.filePath,temail + '.png').then( () => { this.handleUpdate() });
-    this.setState({
-    /imgsrc : timgsrc,
-    })
     this.uploadImage(this.state.filePath,temail + '.png').then( () => { this.handleUpdate() });
   }
+
+  handleUpdate = () => {
+
+    let user = firebase.auth().currentUser;
+
+    //this.updateDP();
+    const email = user.email;
+    const temail = email.slice(0,user.email.indexOf('@'));
+    /*console.log("Before Uploading");
+
+    this.uploadImage(`"${this.state.filePath}"`,temail + '.png');
+
+    console.log("After Uploading");*/
+
+    let firstname = this.state.firstname;
+    let lastname = this.state.lastName;
+    let mobileno = this.state.mobileNumber;
+    let birthdate = this.state.date;
+    let gender = this.state.gender;
+    let location = this.state.location;
+    let imgsrc = this.state.imgsrc;
+
+    console.log("Before Update");
+
+
+    //console.log(temail);
+    firebase.database().ref('Users/' + temail).update({firstname,lastname,birthdate,mobileno,gender,location,imgsrc});
+    console.log("Updated");
+  };
+
+  onContentSizeChange = (contentWidth, contentHeight) => {
+    // Save the content height in state
+    this.setState({ screenHeight: contentHeight });
+  };
+
+  chooseFile = () => {
+      var options = {
+        title: 'Select Image',
+        customButtons: [
+          { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
+        ],
+        storageOptions: {
+          skipBackup: true,
+          path: 'images',
+        },
+      };
+      ImagePicker.showImagePicker(options, response => {
+        console.log('Response = ', response);
+
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.error) {
+          console.log('ImagePicker Error: ', response.error);
+        } else {
+          let source = response;
+          // You can also display the image using data:
+          // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+          console.log("Before SetState.");
+          //JSON.stringify(source.path);
+          console.log("Source : " + source.path);
+          //let path = `"${source.path}"`
+          //console.log("Path : " + path);
+          this.setState({
+            filePath : source.path,
+          });
+          console.log("In uploadImage: " + this.state.filePath);
+        }
+      });
+  };
 
   updateIndex (selectedIndex) {
     this.setState({selectedIndex})
@@ -142,7 +216,7 @@ export default class ProfilePage extends Component{
               size = "xlarge"
               margin = {20}
               alignSelf = 'center'
-              onEditPress = {chooseFile.bind()}
+              onEditPress = {this.chooseFile.bind(this)}
             />
           <TextInput style = {styles.input}
                 title = 'First Name'
