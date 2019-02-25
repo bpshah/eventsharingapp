@@ -28,7 +28,6 @@ export default class ProfilePage extends Component{
         errorMessage: null,
       }
       this.updateIndex = this.updateIndex.bind(this);
-
   }
 
   static navigationOptions = ({navigation}) => ({
@@ -52,10 +51,6 @@ export default class ProfilePage extends Component{
         </View>
       )
   });
-
-  shouldComponentUpdate(nextState){
-    return nextState.imgsrc != this.state.imgsrc;
-  }
 
   componentWillMount(){
 
@@ -85,6 +80,19 @@ export default class ProfilePage extends Component{
     //console.log("After Read");
     }
 
+  shouldComponentUpdate(nextProps){
+    return nextState.filePath != this.state.filePath;
+  }
+
+  componentWillUpdate(){
+    if(this.shouldComponentUpdate()){
+      let fp = chooseFile();
+      this.setState({
+        filePath : fp,
+      })
+    }
+  }
+
   handleUpdate = () => {
 
   let user = firebase.auth().currentUser;
@@ -112,10 +120,6 @@ export default class ProfilePage extends Component{
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
     console.log("In DP:");
-    let fp = chooseFile();
-    this.setState({
-      filePath : fp,
-    })
     console.log("FilePath : " + this.state.filePath);
     let timgsrc =  this.uploadImage(this.state.filePath,temail + '.png').then( () => { this.handleUpdate() });
     this.setState({
