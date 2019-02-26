@@ -16,7 +16,7 @@ import Events from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/Events.
 import Ex from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/ex.js';
 import ProfilePage from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/ProfilePage.js';
 import EventCreate from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/EventCreate.js';
-import { createStackNavigator, createAppContainer, createBottomTabNavigator, createDrawerNavigator, DrawerItems, DrawerActions } from 'react-navigation';
+import { createStackNavigator, createAppContainer, createBottomTabNavigator, createDrawerNavigator, createSwitchNavigator,DrawerItems, DrawerActions } from 'react-navigation';
 import firebase from 'react-native-firebase';
 
 type Props = {};
@@ -28,11 +28,10 @@ type Props = {};
     projectId: "practice-69846",
     storageBucket: "practice-69846.appspot.com",
     messagingSenderId: "273328326983"
-
   };
 firebase.initializeApp(config);
 
-console.disableYellowBox = true;
+//console.disableYellowBox = true;
 
 const EventStack = createStackNavigator({
     Events : {
@@ -60,7 +59,7 @@ export const TabNav = createBottomTabNavigator(
           navigationOptions : {
           tabBarLabel : "Events",
           tabBarIcon : ({ tintColor }) => (
-            <Icon name="stream" size={20} color="#E64040" />
+            <Icon name="stream" size={20} color="F2F2F2" />
           ),
         },
       },
@@ -69,7 +68,7 @@ export const TabNav = createBottomTabNavigator(
         navigationOptions : {
         tabBarLabel : "Profile",
         tabBarIcon : ({ tintColor }) => (
-          <Icon name="user" size={20} color="#E64040" />
+          <Icon name="user" size={20} color="F2F2F2" />
         ),
         tabBarVisible : true,
       }
@@ -78,8 +77,8 @@ export const TabNav = createBottomTabNavigator(
   {
     order : ['EventStack', 'ProfileStack'],
     tabBarOptions : {
-      activeTintColor : '#E64040',
-      inactiveTintColor : 'gray',
+      activeTintColor : 'black',
+      inactiveTintColor : '#F2F2F2',
       style: {
         backgroundColor : 'white',
       }
@@ -124,7 +123,7 @@ const LoginStack = createStackNavigator({
   },
 })
 
-const App1 = createStackNavigator({
+const App1 = createSwitchNavigator({
   SplashScreen : {
     screen : SplashScreen,
     navigationOptions : {

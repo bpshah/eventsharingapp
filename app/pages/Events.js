@@ -12,6 +12,7 @@ export default class Events extends Component {
     headerTitleStyle : {
        textAlign : 'center',
        flex : 1,
+       fontSize : 20,
      },
     headerStyle : {
       backgroundColor : Colors.tabBarColor,
@@ -20,7 +21,7 @@ export default class Events extends Component {
     headerTintColor : Colors.white,
     headerRight : (
       <View marginRight = {10}>
-        <Icon name="sign-out-alt" size={30} color={Colors.white} onPress = {() => firebase.auth().signOut().then((navigation.navigate('Login')))}/>
+        <Icon name="sign-out-alt" size={20} color={Colors.white} onPress = {() => firebase.auth().signOut().then((navigation.navigate('Login')))}/>
       </View>
 
     ),

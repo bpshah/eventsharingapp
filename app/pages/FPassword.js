@@ -29,7 +29,7 @@ export default class FPassword extends Component{
     return(
       <View style = {styles.container}>
       <StatusBar barStyle = 'light-content'/>
-      <Text style={{color: Colors.textColor, fontSize : 20, marginTop : 100}}>Please enter email address :{"\n"}
+      <Text style={{color: Colors.textColor, fontSize : 20, marginTop : '10%'}}>Forgot Your Password?{"\n"}
       </Text>
       <TextInput style = {styles.input}
             placeholder = 'Username or Email'
@@ -67,8 +67,10 @@ const styles = StyleSheet.create({
   input : {
     height : 40,
     backgroundColor : Colors.inputBackgroundColor,
-    marginBottom : 20,
+    marginBottom : '6%',
+    marginTop : '1%',
     paddingHorizontal : 15,
+    borderBottomWidth : 0.75,
     color : Colors.inputColor,
   },
   buttonContainer : {

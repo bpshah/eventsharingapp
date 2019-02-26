@@ -36,7 +36,7 @@ export default class Ex extends Component {
             source = {require('C:/Users/DELL/Documents/EventSharingSystem/app/assets/cool-one-piece-wallpaper_011523568_277.png')}
             height = {175}
             width = '100%'
-            margin = {10}
+            margin = '2%'
             alignSelf = 'center'
             backgroundColor = '#F2F2F2'
             imageProps = {{resizeMode : 'stretch'}}/>
@@ -47,27 +47,27 @@ export default class Ex extends Component {
             <Icon name="clock"
                   size={20}
                   color='black'
-                  style = {{marginRight : 15, marginLeft : 40,alignSelf : 'center'}}/>
+                  style = {{marginRight : '2.75%', marginLeft : '10%',marginBottom : '1%',alignSelf : 'center'}}/>
             <Text style = {styles.childContainerText}>Monday , 27 Feb 16:30 PM - 18:30 PM</Text>
           </View>
           <View style = {styles.childContainer1}>
             <Icon name="map-marker-alt"
                 size={20}
                 color='black'
-                style = {{marginRight : 15, marginLeft : 40,alignSelf : 'center'}}/>
+                style = {{marginRight : '4%', marginLeft : '10%',marginBottom : '1%',alignSelf : 'center'}}/>
             <Text style = {styles.childContainerText}>SEAS, Ahmedabad University, Navarangpura - 380015, Ahmedabad , India</Text>
           </View>
           <View style = {styles.childContainer1}>
             <Icon name="user"
                 size={20}
                 color='black'
-                style = {{marginRight : 15, marginLeft : 40,alignSelf : 'center'}}/>
+                style = {{marginRight : '4%', marginLeft : '10%',alignSelf : 'center'}}/>
             <Text style = {styles.childContainerText}>Hosted by Bhumit Pratishkumar Shah, Seas Ahmedabad, India ,Gujarat</Text>
           </View>
-          <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'center',marginRight : 50, marginTop : 20}}>
-            <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : 40, fontWeight : 'bold', fontSize : 18}}>8 people are going</Text>
+          <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'center',marginRight : '4%', marginTop : '5%'}}>
+            <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '9%', fontWeight : 'bold', fontSize : 18}}>8 people are going</Text>
           </View>
-          <View style = {{flexDirection : 'row',justifyContent : 'flex-start',alignSelf : 'flex-start',marginLeft : 32, marginRight : 24, marginTop : 12,flexWrap: 'wrap'}}>
+          <View style = {{flexDirection : 'row',justifyContent : 'flex-start',alignSelf : 'flex-start',marginLeft : '8%', marginRight : '6%', marginTop : '3%',flexWrap: 'wrap'}}>
             <Avatar
               size = "small"
               rounded
@@ -99,8 +99,8 @@ export default class Ex extends Component {
               containerStyle = {styles.avatar}
             />
           </View>
-          <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'center',marginRight : 50, marginTop : 20}}>
-            <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : 40, fontWeight : 'normal', fontSize : 15}}>Anime Meet</Text>
+          <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'center',marginRight : '10%', marginTop : '6%'}}>
+            <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '10%', fontWeight : 'normal', fontSize : 15}}>Anime Meet</Text>
           </View>
         </ScrollView>
      )
@@ -138,8 +138,8 @@ export default class Ex extends Component {
     flexDirection : 'row',
     justifyContent: 'space-around',
     alignSelf : 'center',
-    marginRight : 50,
-    marginTop : 20,
+    marginRight : '12%',
+    marginTop : '7%',
   },
   childContainer2 : {
     flex : 1,
@@ -159,9 +159,9 @@ export default class Ex extends Component {
     fontSize : 22,
     alignSelf : 'center',
     textAlign : 'center',
-    marginRight : 15,
-    marginLeft : 15,
-    marginTop : 10,
+    marginRight : '2%',
+    marginLeft : '2%',
+    marginTop : '3%',
     fontWeight : '300',
     color : '#000000',
   },
@@ -173,6 +173,6 @@ export default class Ex extends Component {
     fontWeight : 'normal',
   },
   avatar : {
-    margin : 8,
+    marginRight : '4%',
   }
 });

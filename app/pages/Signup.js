@@ -7,6 +7,8 @@ import ImagePicker from 'react-native-image-picker';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
 import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
+import Icon from 'react-native-vector-icons/FontAwesome5.js';
+
 
 export default class Signup extends Component {
 
@@ -17,27 +19,16 @@ export default class Signup extends Component {
       email : 'bhumit1206@gmail.com',
       password : 'asdf1234',
       confirmPassword : 'asdf1234',
-      firstname : '',
-      lastName : '',
-      date : '',
-      mobileNumber : '',
-      selectedIndex : 1,
-      gender : '',
-      location : '',
+      firstname : 'Bhumit',
+      lastName : 'Shah',
+      mobileNumber : '7359705973',
+      location : 'Ahmedabad',
       imgsrc : '',
       errorMessage: null,
     }
-    const button = ['Male', 'Female','Other'];
   }
 
-  handleSignUp = () => {
-    //if(pwd.length >= 8 ){
-      firebase
-        .auth()
-        .createUserWithEmailAndPassword(this.state.email, this.state.password)
-        .then(() => this.props.navigation.navigate('Events'))
-        .catch(error => {
-          switch (error.code) {
+/* switch (error.code) {
             case 'auth/email-already-in-use':
               console.log(`Email address ${this.state.email} already in use.`);
             case 'auth/invalid-email':
@@ -48,8 +39,15 @@ export default class Signup extends Component {
               console.log('Password is not strong enough. Add additional characters including special characters and numbers.');
             default:
               console.log(error.message);
-        }
-      })
+*/
+  handleSignUp = () => {
+    //if(pwd.length >= 8 ){
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(this.state.email, this.state.password)
+        .then(() => this.props.navigation.navigate('Events'))
+        .catch(error => { console.log(error);})
+      console.log("Sign");
   }
 
   uploadImage = (uri, imageName, mime = 'image/png') => {
@@ -93,8 +91,6 @@ export default class Signup extends Component {
       let firstname = this.state.firstname;
       let lastname = this.state.lastName;
       let mobileno = this.state.mobileNumber;
-      let birthdate = this.state.date;
-      let gender = this.state.gender;
       let email = this.state.email;
       let location = this.state.location;
       let imgsrc = this.state.imgsrc;
@@ -109,7 +105,7 @@ export default class Signup extends Component {
       firebase
         .database()
         .ref('Users/' + temail)
-        .set({ firstname, lastname, mobileno, birthdate, gender, location , imgsrc})
+        .set({ firstname, lastname, mobileno, location , imgsrc})
         .catch(error => this.setState({ errorMessage: error.message }))
 
   }
@@ -125,7 +121,7 @@ export default class Signup extends Component {
           path: 'images',
         },
       };
-      ImagePicker.showImagePicker(options, response => {
+      ImagePicker.showImagePicker( response => {
         console.log('Response = ', response);
 
         if (response.didCancel) {
@@ -137,11 +133,8 @@ export default class Signup extends Component {
           let source = response;
           // You can also display the image using data:
           // let source = { uri: 'data:image/jpeg;base64,' + response.data };
-
           this.setState({
             filePath : response.uri,
-            imageHeight : response.height,
-            imageWidth : response.width,
           });
 
         }
@@ -160,9 +153,10 @@ export default class Signup extends Component {
       console.log("Password don't match");
     }
     else {
-        this.uploadImage(this.state.filePath, temail + '.png')
-        .then(() => { this.handleProfileData(); });
-        this.handleSignUp();
+      this.uploadImage(this.state.filePath, temail + '.png')
+      .then(() => { this.handleProfileData(); });
+      this.handleSignUp();
+      console.log("Signed Up");
     }
   }
 
@@ -181,117 +175,113 @@ export default class Signup extends Component {
             alignSelf = 'center'
             onEditPress = {this.chooseFile.bind(this)}
           />
-        <TextInput style = {styles.input}
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '5%',marginRight : '8%',marginLeft : '2%'}}>
+            <Icon name="user-alt"
+              size={22}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
               title = 'First Name'
-              placeholder = 'First Name'
-              placeholderTextColor = 'rgba(255,255,255,0.7)'
+              placeholder = {this.state.firstname}
+              placeholderTextColor = 'black'
               returnKeyType = 'next'
               autoCapitalize = 'none'
               autoCorrect = {false}
               onChangeText = {firstname => this.setState({ firstname })}
               value = {this.state.firstname}
-              autoFocus = {true}
-              blurOnSubmit = {true}
-              //clearTextOnFocus = {true}
-        />
-        <TextInput style = {styles.input}
-              placeholder = 'Last Name'
-              placeholderTextColor = 'rgba(255,255,255,0.7)'
+              autoFocus = {false}/>
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+            <Icon name="user-alt"
+              size={22}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
+              placeholder = {this.state.lastName}
+              placeholderTextColor = 'black'
               returnKeyType = 'next'
               autoCapitalize = 'none'
               autoCorrect = {false}
-              blurOnSubmit = {true}
               onChangeText = {lastName => this.setState({ lastName })}
-              value = {this.state.lastName}
-        />
-        <DatePicker
-              style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : Colors.inputBackgroundColor,}}
-              date = {this.state.date}
-              mode = "date"
-              placeholder = "Select Your Birthdate"
-              format = "DD-MM-YYYY"
-              minDate = "01-01-1950"
-              maxDate = "01-01-2020"
-              confirmBtnText = "Confirm"
-              cancelBtnText = "Cancel"
-              customStyles = {{
-                dateIcon : {
-                  position : 'absolute',
-                  left : 292,
-                  top : 4,
-                  marginLeft : 0
-                },
-                dateInput : {
-                  marginRight : 44
-                }
-              }}
-              onDateChange = {(date) => {this.setState({date : date})}}
-        />
-        <Picker
-            selectedValue = {this.state.gender}
-            style = {styles.input}
-            itemStyle = {{fontSize : 12,paddingHorizontal : 15,}}
-            mode = 'dropdown'
-            onValueChange = {(itemValue, itemIndex) => this.setState({gender : itemValue})}>
-            <Picker.Item label = 'Male' value = 'male'/>
-            <Picker.Item label = 'Female' value = 'female'/>
-            <Picker.Item label = 'Other' value = 'other'/>
-        </Picker>
-        <TextInput style = {styles.input}
-              placeholder = 'Mobile Number'
-              placeholderTextColor = 'rgba(255,255,255,0.7)'
+              value = {this.state.lastName}/>
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+            <Icon name="phone"
+              size={22}
+              color='black'
+              style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
+              placeholder = {this.state.mobileNumber}
+              placeholderTextColor = 'black'
               returnKeyType = 'next'
               keyBoardType = 'phone-pad'
               autoCapitalize = 'none'
               autoCorrect = {false}
               dataDetectorTypes = 'phoneNumber'
               maxLength = {13}
-              blurOnSubmit = {true}
               onChangeText = {mobileNumber => this.setState({ mobileNumber })}
-              value = {this.state.mobileNumber}
-        />
-        <TextInput style = {styles.input}
-              placeholder = 'City'
-              placeholderTextColor = 'rgba(255,255,255,0.7)'
+              value = {this.state.mobileNumber}/>
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+            <Icon name="map-marker-alt"
+              size={22}
+              color='black'
+              style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
+              placeholder = {this.state.location}
+              placeholderTextColor = 'black'
               returnKeyType = 'next'
               autoCapitalize = 'none'
               autoCorrect = {false}
-              blurOnSubmit = {true}
               onChangeText = {location => this.setState({ location })}
-              value = {this.state.location}
-        />
-        <TextInput style = {styles.input}
-              placeholder = 'Email'
-              placeholderTextColor = 'rgba(255,255,255,0.7)'
-              returnKeyType = 'next'
-              keyBoardType = 'email-address'
-              autoCapitalize = 'none'
-              autoCorrect = {false}
-              blurOnSubmit = {true}
-              onChangeText = {email => this.setState({ email })}
-              value = {this.state.email}
+              value = {this.state.location}/>
+        </View>
+        <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+          <Icon name="envelope"
+            size={22}
+            color='black'
+            style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+          <TextInput style = {styles.input}
+            placeholder = {this.state.email}
+            placeholderTextColor = 'black'
+            returnKeyType = 'next'
+            keyBoardType = 'email-address'
+            autoCapitalize = 'none'
+            autoCorrect = {false}
+            onChangeText = {email => this.setState({ email })}
+            value = {this.state.email}/>
+        </View>
+        <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+          <Icon name="lock"
+            size={22}
+            color='black'
+            style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+          <TextInput style = {styles.input}
+            placeholder = 'Password'
+            secureTextEntry = {true}
+            returnKeyType = 'go'
+            placeholderTextColor = 'rgba(255,255,255,0.7)'
+            minLength = {8}
+            blurOnSubmit = {true}
+            onChangeText = {password => this.setState({ password })}
+            value = {this.state.password}/>
+        </View>
+        <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+          <Icon name="lock"
+            size={22}
+            color='black'
+            style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+          <TextInput style = {styles.input}
+            placeholder = 'Confirm Password'
+            secureTextEntry = {true}
+            returnKeyType = 'go'
+            placeholderTextColor = 'rgba(255,255,255,0.7)'
+            minLength = {20}
+            blurOnSubmit = {true}
+            onChangeText = {confirmPassword => this.setState({ confirmPassword })}
+            value = {this.state.confirmPassword}/>
+        </View>
 
-        />
-        <TextInput style = {styles.input}
-              placeholder = 'Password'
-              secureTextEntry = {true}
-              returnKeyType = 'go'
-              placeholderTextColor = 'rgba(255,255,255,0.7)'
-              minLength = {8}
-              blurOnSubmit = {true}
-              onChangeText = {password => this.setState({ password })}
-              value = {this.state.password}
-        />
-        <TextInput style = {styles.input}
-              placeholder = 'Confirm Password'
-              secureTextEntry = {true}
-              returnKeyType = 'go'
-              placeholderTextColor = 'rgba(255,255,255,0.7)'
-              minLength = {20}
-              blurOnSubmit = {true}
-              onChangeText = {confirmPassword => this.setState({ confirmPassword })}
-              value = {this.state.confirmPassword}
-        />
         <TouchableOpacity style = {styles.buttonContainer}
                           onPress = {this.handle}>
               <Text style = {styles.buttonText}>Submit</Text>
@@ -310,7 +300,7 @@ const styles = StyleSheet.create({
     flexDirection : 'column',
     alignItems: 'center',
     justifyContent : 'flex-start',
-    height : 850,
+    height : 675,
     width : '100%'
     //width: 100,
     //height: 100,
@@ -318,11 +308,12 @@ const styles = StyleSheet.create({
   input : {
     height : 40,
     backgroundColor : Colors.inputBackgroundColor,
-    marginBottom : 20,
+    marginBottom : '2%',
     alignSelf : 'center',
     width : '80%',
-    paddingHorizontal : 15,
+    paddingHorizontal : '3%',
     paddingVertical : 0,
+    borderBottomWidth : 0.75,
     color : Colors.white
   },
   buttonContainer : {
@@ -330,6 +321,7 @@ const styles = StyleSheet.create({
     backgroundColor : Colors.primaryAppColor,
     paddingVertical : 20,
     bottom : 5,
+    marginTop : '3%',
     alignSelf : 'stretch',
     width : '80%',
     alignSelf : 'center',

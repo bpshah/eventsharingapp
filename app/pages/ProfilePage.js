@@ -17,24 +17,20 @@ export default class ProfilePage extends Component{
       this.state = {
         filePath : {},
         email : '',
-        password : '',
-        confirmPassword : '',
         firstname : '',
         lastName : '',
-        date : '',
         mobileNumber : '',
-        gender : '',
         location : '',
         imgsrc : '',
         errorMessage: null,
       }
-      this.updateIndex = this.updateIndex.bind(this);
   }
 
   static navigationOptions = ({navigation}) => ({
       headerTitleStyle : {
          textAlign : 'justify',
          flex : 1,
+         fontSize : 20,
          },
          headerStyle : {
            backgroundColor : Colors.tabBarColor,
@@ -48,7 +44,7 @@ export default class ProfilePage extends Component{
       ),*/
       headerLeft : (
         <View marginLeft = {10}>
-          <Icon name="angle-left" size={30} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
+          <Icon name="angle-left" size={25} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
         </View>
       )
   });
@@ -76,9 +72,7 @@ export default class ProfilePage extends Component{
           location : snapshot.val().location,
           imgsrc : snapshot.val().imgsrc,
         })
-        //console.log("In read :" + this.setState.imgsrc);
       });
-    //console.log("After Read");
     }
 
   /*shouldComponentUpdate(nextProps){
@@ -93,6 +87,43 @@ export default class ProfilePage extends Component{
       })
     }
   }*/
+
+  uploadImage = (uri, imageName, mime = 'image/png') => {
+    const Blob = RNFetchBlob.polyfill.Blob;
+    const fs = RNFetchBlob.fs;
+    window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
+    window.Blob = Blob;
+    return new Promise((resolve, reject) => {
+        //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+        const uploadUri = uri;
+        let uploadBlob = null;
+        const imageRef = firebase.storage().ref('images').child(imageName);
+        //console.log("In UI : " + uploadUri + imageName);
+        fs.readFile(uploadUri, 'base64')
+        .then((data) => {
+          return Blob.build(data, { type: `${mime};BASE64` })
+        })
+        .then((blob) => {
+          uploadBlob = blob
+          return imageRef.put(uri, { contentType: mime })
+        })
+        .then(() => {
+          uploadBlob.close()
+          return imageRef.getDownloadURL()
+        })
+        .then((url) => {
+          this.setState({
+            imgsrc : url,
+          });
+          console.log("In Ui :" + this.state.imgsrc);
+          resolve(url)
+        })
+        .catch((error) => {
+          reject(error)
+        });
+
+    })
+  }
 
   chooseFile = () => {
         var options = {
@@ -134,33 +165,59 @@ export default class ProfilePage extends Component{
   let firstname = this.state.firstname;
   let lastname = this.state.lastName;
   let mobileno = this.state.mobileNumber;
-  let birthdate = this.state.date;
-  let gender = this.state.gender;
   let location = this.state.location;
   let imgsrc = this.state.imgsrc;
 
   console.log("Before Update");
 
   //console.log(temail);
-  firebase.database().ref('Users/' + temail).update({firstname,lastname,birthdate,mobileno,gender,location,imgsrc});
+  firebase.database().ref('Users/' + temail).update({firstname,lastname,mobileno,location,imgsrc});
   console.log("Updated");
 };
 
   updateDP = () => {
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
-    //console.log("In DP:");
+    console.log("In DP:");
     console.log("FilePath : " + this.state.filePath);
-    ui.uploadImage(this.state.filePath,temail + '.png').then( () => { this.handleUpdate() });
-    //console.log("T:" + timgsrc);
-    /*this.setState({
-      imgsrc : timgsrc,
-    });*/
+    this.uploadImage(this.state.filePath,temail + '.png').then( () => { this.handleUpdate() });
+    console.log("After Update");
   }
 
-  updateIndex (selectedIndex) {
-    this.setState({selectedIndex})
-  }
+  /*  <DatePicker
+                  style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : Colors.white,}}
+                  date = {this.state.date}
+                  mode = "datetime"
+                  placeholder = ""
+                  placeholderTextColor = 'rgba(255,255,255,0.7)'
+                  format = "DD-MM-YYYY"
+                  minDate = "01-01-1950"
+                  maxDate = "01-01-2020"
+                  confirmBtnText = "Confirm"
+                  cancelBtnText = "Cancel"
+                  customStyles = {{
+                    dateIcon : {
+                      position : 'absolute',
+                      left : 292,
+                      top : 4,
+                      marginLeft : 0
+                    },
+                    dateInput : {
+                      marginRight : 44
+                    }
+                  }}
+                  onDateChange = {(date) => {this.setState({date : date})}}
+            />
+            <Picker
+                selectedValue = {this.state.gender}
+                style = {styles.input}
+                itemStyle = {{fontSize : 12,paddingHorizontal : 15,}}
+                mode = 'dropdown'
+                onValueChange = {(itemValue, itemIndex) => this.setState({gender : itemValue})}>
+                <Picker.Item label = 'Female' value = 'female'/>
+                <Picker.Item label = 'Male' value = 'male'/>
+                <Picker.Item label = 'Other' value = 'other'/>
+ </Picker>*/
 
   render(){
     const { selectedIndex } = this.state;
@@ -178,98 +235,88 @@ export default class ProfilePage extends Component{
               alignSelf = 'center'
               onEditPress = {this.chooseFile.bind(this)}
           />
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '5%',marginRight : '8%',marginLeft : '2%'}}>
+            <Icon name="user-alt"
+              size={22}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
+              title = 'First Name'
+              placeholder = {this.state.firstname}
+              placeholderTextColor = 'black'
+              returnKeyType = 'next'
+              autoCapitalize = 'none'
+              autoCorrect = {false}
+              onChangeText = {firstname => this.setState({ firstname })}
+              value = {this.state.firstname}
+              autoFocus = {false}/>
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+            <Icon name="user-alt"
+              size={22}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
+              placeholder = {this.state.lastName}
+              placeholderTextColor = 'black'
+              returnKeyType = 'next'
+              autoCapitalize = 'none'
+              autoCorrect = {false}
+              onChangeText = {lastName => this.setState({ lastName })}
+              value = {this.state.lastName}/>
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+            <Icon name="phone"
+              size={22}
+              color='black'
+              style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
+              placeholder = {this.state.mobileNumber}
+              placeholderTextColor = 'black'
+              returnKeyType = 'next'
+              keyBoardType = 'phone-pad'
+              autoCapitalize = 'none'
+              autoCorrect = {false}
+              dataDetectorTypes = 'phoneNumber'
+              maxLength = {13}
+              onChangeText = {mobileNumber => this.setState({ mobileNumber })}
+              value = {this.state.mobileNumber}/>
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+            <Icon name="map-marker-alt"
+              size={22}
+              color='black'
+              style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
+              placeholder = {this.state.location}
+              placeholderTextColor = 'black'
+              returnKeyType = 'next'
+              autoCapitalize = 'none'
+              autoCorrect = {false}
+              onChangeText = {location => this.setState({ location })}
+              value = {this.state.location}/>
+        </View>
+        <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+          <Icon name="envelope"
+            size={22}
+            color='black'
+            style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
           <TextInput style = {styles.input}
-                title = 'First Name'
-                placeholder = {this.state.firstname}
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
-                returnKeyType = 'next'
-                autoCapitalize = 'none'
-                autoCorrect = {false}
-                onChangeText = {firstname => this.setState({ firstname })}
-                value = {this.state.firstname}
-                autoFocus = {false}
-                //clearTextOnFocus = {true}
-          />
-          <TextInput style = {styles.input}
-                placeholder = {this.state.lastName}
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
-                returnKeyType = 'next'
-                autoCapitalize = 'none'
-                autoCorrect = {false}
-                onChangeText = {lastName => this.setState({ lastName })}
-                value = {this.state.lastName}
-          />
-          <DatePicker
-                style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : Colors.white,}}
-                date = {this.state.date}
-                mode = "datetime"
-                placeholder = ""
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
-                format = "DD-MM-YYYY"
-                minDate = "01-01-1950"
-                maxDate = "01-01-2020"
-                confirmBtnText = "Confirm"
-                cancelBtnText = "Cancel"
-                customStyles = {{
-                  dateIcon : {
-                    position : 'absolute',
-                    left : 292,
-                    top : 4,
-                    marginLeft : 0
-                  },
-                  dateInput : {
-                    marginRight : 44
-                  }
-                }}
-                onDateChange = {(date) => {this.setState({date : date})}}
-          />
-          <Picker
-              selectedValue = {this.state.gender}
-              style = {styles.input}
-              itemStyle = {{fontSize : 12,paddingHorizontal : 15,}}
-              mode = 'dropdown'
-              onValueChange = {(itemValue, itemIndex) => this.setState({gender : itemValue})}>
-              <Picker.Item label = 'Female' value = 'female'/>
-              <Picker.Item label = 'Male' value = 'male'/>
-              <Picker.Item label = 'Other' value = 'other'/>
-          </Picker>
-          <TextInput style = {styles.input}
-                placeholder = {this.state.mobileNumber}
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
-                returnKeyType = 'next'
-                keyBoardType = 'phone-pad'
-                autoCapitalize = 'none'
-                autoCorrect = {false}
-                dataDetectorTypes = 'phoneNumber'
-                maxLength = {13}
-                onChangeText = {mobileNumber => this.setState({ mobileNumber })}
-                value = {this.state.mobileNumber}
-          />
-          <TextInput style = {styles.input}
-                placeholder = {this.state.location}
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
-                returnKeyType = 'next'
-                autoCapitalize = 'none'
-                autoCorrect = {false}
-                onChangeText = {location => this.setState({ location })}
-                value = {this.state.location}
-          />
-          <TextInput style = {styles.input}
-                placeholder = {this.state.email}
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
-                returnKeyType = 'next'
-                keyBoardType = 'email-address'
-                autoCapitalize = 'none'
-                autoCorrect = {false}
-                onChangeText = {email => this.setState({ email })}
-                value = {this.state.email}
+            placeholder = {this.state.email}
+            placeholderTextColor = 'black'
+            returnKeyType = 'next'
+            keyBoardType = 'email-address'
+            autoCapitalize = 'none'
+            autoCorrect = {false}
+            onChangeText = {email => this.setState({ email })}
+            value = {this.state.email}/>
+        </View>
+        <TouchableOpacity style = {styles.buttonContainer}
+                          onPress = {this.updateDP}>
 
-          />
-          <TouchableOpacity style = {styles.buttonContainer}
-                            onPress = {this.updateDP}>
+              <Text style = {styles.buttonText}>Profile Ok</Text>
+        </TouchableOpacity>
 
-                <Text style = {styles.buttonText}>Profile Ok</Text>
-          </TouchableOpacity>
           </ScrollView>
 
     );
@@ -283,7 +330,7 @@ const styles = StyleSheet.create({
     flexDirection : 'column',
     alignItems: 'center',
     justifyContent : 'flex-start',
-    height : 725,
+    height : 610,
     width : '100%'
   },
   childContainer1 : {
@@ -320,23 +367,24 @@ const styles = StyleSheet.create({
     alignSelf : 'center',
     backgroundColor : Colors.inputBackgroundColor,
     marginBottom : 20,
-    paddingHorizontal : 15,
+    paddingHorizontal : 10,
     color : Colors.inputColor,
     borderBottomColor : Colors.borderColor,
     borderBottomWidth : 1,
   },
   buttonContainer : {
     //position: 'absolute',
-    backgroundColor : Colors.backgroundColor,
+    backgroundColor : Colors.primaryBackGourndColor,
     paddingVertical : 20,
     bottom : 5,
-    alignSelf : 'stretch',
-    width : '80%',
+    marginLeft : '2%',
     alignSelf : 'center',
+    width : '80%',
+
   },
   buttonText : {
     textAlign : 'center',
-    backgroundColor : Colors.buttonTextColor,
+    backgroundColor : Colors.primaryAppColor,
     paddingVertical : 15,
     fontWeight : '700'
   },

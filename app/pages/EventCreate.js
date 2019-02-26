@@ -21,7 +21,8 @@ export default class EventCreate extends Component{
     headerTitleStyle : {
        textAlign : 'justify',
        flex : 1,
-       },
+       fontSize : 20,
+     },
     title : 'New Event',
     headerStyle : {
       backgroundColor : Colors.primaryAppColor,
@@ -37,7 +38,7 @@ export default class EventCreate extends Component{
     ),*/
     headerLeft : (
       <View marginLeft = {10}>
-        <Icon name="angle-left" size={30} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
+        <Icon name="angle-left" size={25} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
       </View>
     )
   })
@@ -148,6 +149,39 @@ export default class EventCreate extends Component{
     //this.handleEvent();
   }
 
+  /*customStyles = {{
+    dateIcon : {
+      position : 'relative',
+      left : 0,
+      top : 0,
+      right : 50,
+      bottom : 20,
+      marginLeft : 0,
+      //borderColor : Colors.primaryBackGourndColor,
+      borderBottomColor : Colors.primaryAppColor,
+      borderBottomWidth : 1
+    },
+    dateInput : {
+      marginRight : 44,
+      borderBottomColor : 'black',
+      borderBottomWidth : 1
+    }
+  }}*/
+  /*<DatePicker
+        style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : Colors.inputBackgroundColor,  borderBottomColor : 'black',
+          borderBottomWidth : 1}}
+        date = {this.state.time}
+        mode = "date"
+        placeholder = "Select Event Date"
+        format = "DD-MM-YYYY"
+        minDate = "01-01-1950"
+        maxDate = "01-01-2020"
+        confirmBtnText = "Confirm"
+        cancelBtnText = "Cancel"
+
+        onDateChange = {(time) => {this.setState({date : time})}}
+  />*/
+
   render(){
 
     return(
@@ -160,107 +194,120 @@ export default class EventCreate extends Component{
             showEditButton
             height = {175}
             width = '80%'
-            margin = {30}
+            marginTop = '5%'
+            marginLeft = '5%'
             alignSelf = 'center'
             backgroundColor = '#F2F2F2'
             imageProps = {{resizeMode : 'stretch'}}
-            editButton = {{size : 40}}
+            editButton = {{size : 30}}
             onEditPress = {this.chooseFile.bind(this)}
           />
-          <TextInput style = {styles.input}
-                title = 'Event Name'
-                placeholder = 'Name of Event'
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
-                returnKeyType = 'next'
-                //keyBoardType = 'email-address'
-                autoCapitalize = 'none'
-                autoCorrect = {false}
-                onChangeText = { eventname => this.setState({ eventname })}
-                value = {this.state.eventname}
-          />
-          <DatePicker
-                style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : Colors.inputBackgroundColor,  borderBottomColor : Colors.borderColor,
-                  borderBottomWidth : 1}}
-                date = {this.state.time}
-                mode = "date"
-                placeholder = "Select Event Date"
-                format = "DD-MM-YYYY"
-                minDate = "01-01-1950"
-                maxDate = "01-01-2020"
-                confirmBtnText = "Confirm"
-                cancelBtnText = "Cancel"
-                customStyles = {{
-                  dateIcon : {
-                    position : 'absolute',
-                    left : 292,
-                    top : 4,
-                    marginLeft : 0,
-                    borderColor : Colors.primaryBackGourndColor,
-                    borderBottomColor : Colors.primaryAppColor,
-                    borderBottomWidth : 1
-                  },
-                  dateInput : {
-                    marginRight : 44,
-                    borderBottomColor : Colors.primaryAppColor,
-                    borderBottomWidth : 1
-                  }
-                }}
-                onDateChange = {(time) => {this.setState({date : time})}}
-          />
-          <TextInput style = {styles.input}
-                title = 'Place'
-                placeholder = 'Place of Event'
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
-                returnKeyType = 'next'
-                autoCapitalize = 'none'
-                autoCorrect = {false}
-                value={this.state.text}
-                onChangeText = { place => this.setState({ place })}
-                value = {this.state.place}
-          />
-          <TextInput style = {styles.input}
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '5%',marginRight : '8%',marginLeft : '2%'}}>
+            <Icon name="user-alt"
+              size={22}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
+              title = 'Event Name'
+              placeholder = 'Name of Event'
+              placeholderTextColor = 'black'
+              returnKeyType = 'next'
+              //keyBoardType = 'email-address'
+              autoCapitalize = 'none'
+              autoCorrect = {false}
+              onChangeText = { eventname => this.setState({ eventname })}
+              value = {this.state.eventname}/>
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+            <Icon name="map-marker-alt"
+              size={22}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
+              title = 'Place'
+              placeholder = 'Place of Event'
+              placeholderTextColor = 'black'
+              returnKeyType = 'next'
+              autoCapitalize = 'none'
+              autoCorrect = {false}
+              value={this.state.text}
+              onChangeText = { place => this.setState({ place })}
+              value = {this.state.place}/>
+            </View>
+            <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+              <Icon name="landmark"
+                size={22}
+                color='black'
+                style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+              <TextInput style = {styles.input}
                 title = 'Organizer Name'
                 placeholder = 'Organizer of Event'
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
+                placeholderTextColor = 'black'
                 returnKeyType = 'next'
                 //keyBoardType = 'email-address'
                 autoCapitalize = 'none'
                 autoCorrect = {false}
                 onChangeText = { organizer => this.setState({ organizer })}
-                value = {this.state.organizer}
-          />
-          <TextInput style = {styles.input}
+                value = {this.state.organizer}/>
+            </View>
+            <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+              <Icon name="phone"
+                size={22}
+                color='black'
+                style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+              <TextInput style = {styles.input}
                 title = 'Contact'
                 placeholder = 'Contact of Organizer'
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
+                placeholderTextColor = 'black'
                 returnKeyType = 'next'
                 keyBoardType = 'email-address'
                 autoCapitalize = 'none'
                 autoCorrect = {false}
                 nChangeText = { contact => this.setState({ contact })}
-                value = {this.state.contact}
-
-          />
+                value = {this.state.contact}/>
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+            <Icon name="scroll"
+              size={22}
+              color='black'
+              style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
+              title = 'Description'
+              placeholder = 'Description of Event'
+              placeholderTextColor = 'black'
+              returnKeyType = 'next'
+              //keyBoardType = 'email-address'
+              multiline = {true}
+              autoCapitalize = 'none'
+              autoCorrect = {false}
+              onContentSizeChange={(event) => {
+                  this.setState({height: event.nativeEvent.contentSize.height});
+                }}
+                onChangeText = { description => this.setState({ description })}
+                value = {this.state.description}
+            />
+        </View>
+        <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+          <Icon name="phone"
+            size={22}
+            color='black'
+            style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
           <TextInput style = {styles.input}
-                title = 'Description'
-                placeholder = 'Description of Event'
-                placeholderTextColor = 'rgba(255,255,255,0.7)'
-                returnKeyType = 'next'
-                //keyBoardType = 'email-address'
-                multiline = {true}
-                autoCapitalize = 'none'
-                autoCorrect = {false}
-                onContentSizeChange={(event) => {
-                    this.setState({height: event.nativeEvent.contentSize.height});
-                  }}
-                  onChangeText = { description => this.setState({ description })}
-                  value = {this.state.description}
-          />
-          <TouchableOpacity style = {styles.buttonContainer}
-                            onPress = {this.handle}>
+            title = 'Event Category'
+            placeholder = 'Event Category'
+            placeholderTextColor = 'black'
+            returnKeyType = 'next'
+            keyBoardType = 'email-address'
+            autoCapitalize = 'none'
+            autoCorrect = {false}
+            nChangeText = { contact => this.setState({ contact })}
+            value = {this.state.contact}/>
+      </View>
+      <TouchableOpacity style = {styles.buttonContainer}
+                          onPress = {this.handle}>
 
-                <Text style = {styles.buttonText}>Create Event</Text>
-          </TouchableOpacity>
+              <Text style = {styles.buttonText}>Create Event</Text>
+        </TouchableOpacity>
 
       </ScrollView>
     )
@@ -275,7 +322,7 @@ const styles = StyleSheet.create({
     flexDirection : 'column',
     alignItems: 'flex-start',
     justifyContent : 'flex-start',
-    height : 675,
+    height : 700,
     width : '100%'
     //width: 100,
     //height: 100,
@@ -284,12 +331,11 @@ const styles = StyleSheet.create({
     height : 40,
     width : '80%',
     alignSelf : 'center',
-    backgroundColor : Colors.inputBackgroundColor,
-    marginBottom : 20,
-
+    backgroundColor : 'rgba(255,255,255,0)',
+    marginBottom : '5%',
     paddingHorizontal : 15,
-    color : '#000',
-    borderBottomColor : Colors.primaryAppColor,
+    color : '#FFFFFF',
+    borderBottomColor : 'black',
     borderBottomWidth : 1,
   },
   ImageContainer: {
@@ -311,13 +357,14 @@ const styles = StyleSheet.create({
       backgroundColor : Colors.primaryBackGourndColor,
       paddingVertical : 20,
       bottom : 5,
-      alignSelf : 'stretch',
+      marginLeft : '2%',
+      alignSelf : 'center',
       width : '80%',
-      
+
     },
     buttonText : {
       textAlign : 'center',
-      backgroundColor : Colors.buttonTextColor,
+      backgroundColor : Colors.primaryAppColor,
       paddingVertical : 15,
       fontWeight : '700'
     },
