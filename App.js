@@ -59,7 +59,7 @@ export const TabNav = createBottomTabNavigator(
           navigationOptions : {
           tabBarLabel : "Events",
           tabBarIcon : ({ tintColor }) => (
-            <Icon name="stream" size={20} color="F2F2F2" />
+            <Icon name="stream" size={20} color="#F2F2F2" />
           ),
         },
       },
@@ -68,7 +68,7 @@ export const TabNav = createBottomTabNavigator(
         navigationOptions : {
         tabBarLabel : "Profile",
         tabBarIcon : ({ tintColor }) => (
-          <Icon name="user" size={20} color="F2F2F2" />
+          <Icon name="user" size={20} color="#F2F2F2" />
         ),
         tabBarVisible : true,
       }

@@ -1,5 +1,5 @@
 import React, {Component}  from 'react';
-import {PixelRatio,View, ScrollView ,Text, Image, StyleSheet, TextInput, KeyboardAvoidingView, TouchableOpacity} from 'react-native';
+import {PixelRatio,View, ScrollView ,Text, Image, StyleSheet, TextInput, KeyboardAvoidingView, TouchableOpacity, Picker} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import ImagePicker from 'react-native-image-picker';
 //import ImageSlider from 'react-native-image-slider';
@@ -45,15 +45,18 @@ export default class EventCreate extends Component{
 
   constructor(props){
     super(props);
-    this.state= {
+    this.state = {
       avatarSource : null,
       filePath : '',
-      time : '',
+      eventname : '',
       place : '',
       organizer : '',
       contact : '',
       description : '',
-      name : '',
+      category : '',
+      time : 'At 5:00 PM, Thu, 27-Feb 19',
+      imgsrc : '',
+      selectedValue : 0,
     };
   }
 
@@ -66,7 +69,7 @@ export default class EventCreate extends Component{
       //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
         const uploadUri = uri;
         let uploadBlob = null
-        const imageRef = firebase.storage().ref('events').child(this.state.name).child(imageName)
+        const imageRef = firebase.storage().ref('events').child(this.state.eventname).child(imageName)
         fs.readFile(uploadUri, 'base64')
         .then((data) => {
           return Blob.build(data, { type: `${mime};BASE64` })
@@ -80,6 +83,11 @@ export default class EventCreate extends Component{
           return imageRef.getDownloadURL()
         })
         .then((url) => {
+          console.log("Image Uploaded");
+          this.setState({
+            imgsrc : url,
+          });
+          console.log("In Ui :" + this.state.imgsrc);
           resolve(url)
         })
         .catch((error) => {
@@ -110,7 +118,7 @@ export default class EventCreate extends Component{
             path: 'images',
           },
         };
-        ImagePicker.showImagePicker(options, response => {
+        ImagePicker.showImagePicker(response => {
           console.log('Response = ', response);
 
           if (response.didCancel) {
@@ -122,30 +130,40 @@ export default class EventCreate extends Component{
             // You can also display the image using data:
             // let source = { uri: 'data:image/jpeg;base64,' + response.data };
             this.setState({
-              filePath : response.uri,
+              filePath : source.uri,
             });
           }
         });
     };
 
   handleEvent = () => {
+
+      let user = firebase.auth().currentUser;
+
+      const email = user.email;
+      //const temail = email.slice(0,user.email.indexOf('@'));
+
       let time = this.state.time;
       let place = this.state.place;
       let mobileno = this.state.contact;
       let description = this.state.description;
-      let name = this.state.organizer;
-      let eventname = this.state.name;
+      let org = this.state.organizer;
+      let eventname = this.state.eventname;
+      let category = this.state.category;
 
+      let uid  = email.slice(0,user.email.indexOf('@'));
+      console.log("Before Upload");
       firebase
         .database()
-        .ref('Events/' + name)
-        .set({ time, place, mobileno, description, name,eventname})
+        .ref('Events/'+ this.state.eventname)
+        .set({ eventname, place, org, mobileno, description,category,time,uid})
         .then(() => this.props.navigation.navigate('Events'))
         .catch(error => this.setState({ errorMessage: error.message }))
+      console.log("Event Upload");
     }
 
   handle = () => {
-    this.uploadImage(this.state.filePath, this.state.name + '.png').then(() => this.handleEvent());
+    this.uploadImage(this.state.filePath, this.state.eventname + '.png').then(() => this.handleEvent());
     //this.handleEvent();
   }
 
@@ -192,13 +210,14 @@ export default class EventCreate extends Component{
             rectangle
             source = {{uri: this.state.filePath}}
             showEditButton
+            //size = 'xlarge'
             height = {175}
             width = '80%'
             marginTop = '5%'
             marginLeft = '5%'
             alignSelf = 'center'
             backgroundColor = '#F2F2F2'
-            imageProps = {{resizeMode : 'stretch'}}
+            //imageProps = {{resizeMode : 'contain'}}
             editButton = {{size : 30}}
             onEditPress = {this.chooseFile.bind(this)}
           />
@@ -209,8 +228,8 @@ export default class EventCreate extends Component{
               style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
             <TextInput style = {styles.input}
               title = 'Event Name'
-              placeholder = 'Name of Event'
-              placeholderTextColor = 'black'
+              placeholder = {this.state.eventname}
+              //placeholderTextColor = 'black'
               returnKeyType = 'next'
               //keyBoardType = 'email-address'
               autoCapitalize = 'none'
@@ -226,15 +245,14 @@ export default class EventCreate extends Component{
             <TextInput style = {styles.input}
               title = 'Place'
               placeholder = 'Place of Event'
-              placeholderTextColor = 'black'
+              //placeholderTextColor = 'black'
               returnKeyType = 'next'
               autoCapitalize = 'none'
               autoCorrect = {false}
-              value={this.state.text}
               onChangeText = { place => this.setState({ place })}
               value = {this.state.place}/>
-            </View>
-            <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
               <Icon name="landmark"
                 size={22}
                 color='black'
@@ -242,15 +260,15 @@ export default class EventCreate extends Component{
               <TextInput style = {styles.input}
                 title = 'Organizer Name'
                 placeholder = 'Organizer of Event'
-                placeholderTextColor = 'black'
+                //placeholderTextColor = 'black'
                 returnKeyType = 'next'
                 //keyBoardType = 'email-address'
                 autoCapitalize = 'none'
                 autoCorrect = {false}
                 onChangeText = { organizer => this.setState({ organizer })}
                 value = {this.state.organizer}/>
-            </View>
-            <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
               <Icon name="phone"
                 size={22}
                 color='black'
@@ -258,12 +276,12 @@ export default class EventCreate extends Component{
               <TextInput style = {styles.input}
                 title = 'Contact'
                 placeholder = 'Contact of Organizer'
-                placeholderTextColor = 'black'
+                //placeholderTextColor = 'black'
                 returnKeyType = 'next'
-                keyBoardType = 'email-address'
+                //keyBoardType = 'email-address'
                 autoCapitalize = 'none'
                 autoCorrect = {false}
-                nChangeText = { contact => this.setState({ contact })}
+                onChangeText = { contact => this.setState({ contact })}
                 value = {this.state.contact}/>
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
@@ -274,7 +292,7 @@ export default class EventCreate extends Component{
             <TextInput style = {styles.input}
               title = 'Description'
               placeholder = 'Description of Event'
-              placeholderTextColor = 'black'
+              //placeholderTextColor = 'black'
               returnKeyType = 'next'
               //keyBoardType = 'email-address'
               multiline = {true}
@@ -286,33 +304,53 @@ export default class EventCreate extends Component{
                 onChangeText = { description => this.setState({ description })}
                 value = {this.state.description}
             />
-        </View>
-        <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
-          <Icon name="phone"
-            size={22}
-            color='black'
-            style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
-          <TextInput style = {styles.input}
-            title = 'Event Category'
-            placeholder = 'Event Category'
-            placeholderTextColor = 'black'
-            returnKeyType = 'next'
-            keyBoardType = 'email-address'
-            autoCapitalize = 'none'
-            autoCorrect = {false}
-            nChangeText = { contact => this.setState({ contact })}
-            value = {this.state.contact}/>
-      </View>
-      <TouchableOpacity style = {styles.buttonContainer}
-                          onPress = {this.handle}>
-
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%',marginBottom : '2%'}}>
+            <Icon name="phone"
+              size={22}
+              color='black'
+              style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
+            <View style = {{ borderBottomColor : 'black',paddingHorizontal : 10,borderBottomWidth : 1,width : '80%',marginBottom : '2%',backgroundColor : 'rgba(255,255,255,0)',}}>
+            <Picker
+              selectedValue = {this.state.category}
+              mode = 'dropdown'
+              onValueChange = {(itemValue, itemIndex) =>
+                this.setState({ category : itemValue,selectedValue : itemIndex})}>
+              <Picker.Item label = "Event Category" value = "event" />
+              <Picker.Item label = "Tech" value = "tech" />
+              <Picker.Item label = "Cultural" value = "Cultural" />
+            </Picker>
+            </View>
+          </View>
+          <TouchableOpacity style = {styles.buttonContainer}
+                            onPress = {this.handle}>
               <Text style = {styles.buttonText}>Create Event</Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
 
       </ScrollView>
     )
   }
 }
+/*<TextInput style = {styles.input}
+  title = 'Event Category'
+  placeholder = 'Event Category'
+  placeholderTextColor = 'black'
+  returnKeyType = 'next'
+  keyBoardType = 'email-address'
+  autoCapitalize = 'none'
+  autoCorrect = {false}
+  nChangeText = { contact => this.setState({ contact })}
+  value = {this.state.contact}/>*/
+  /*<Picker
+    selectedValue = {this.state.category}
+    style = {styles.input}
+    mode = 'dropdown'
+    onValueChange = {(itemValue, itemIndex) =>
+      this.setState({ category : itemValue})}>
+    <Picker.Item label = "Tech" value = "tech" />
+    <Picker.Item label = "Cultural" value = "Cultural" />
+  </Picker>*/
+
 
 const styles = StyleSheet.create({
 
@@ -334,7 +372,7 @@ const styles = StyleSheet.create({
     backgroundColor : 'rgba(255,255,255,0)',
     marginBottom : '5%',
     paddingHorizontal : 15,
-    color : '#FFFFFF',
+    color : '#000000',
     borderBottomColor : 'black',
     borderBottomWidth : 1,
   },
@@ -357,6 +395,7 @@ const styles = StyleSheet.create({
       backgroundColor : Colors.primaryBackGourndColor,
       paddingVertical : 20,
       bottom : 5,
+      marginTop : '1%',
       marginLeft : '2%',
       alignSelf : 'center',
       width : '80%',

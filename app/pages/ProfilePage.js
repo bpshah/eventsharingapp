@@ -313,11 +313,10 @@ export default class ProfilePage extends Component{
         </View>
         <TouchableOpacity style = {styles.buttonContainer}
                           onPress = {this.updateDP}>
-
               <Text style = {styles.buttonText}>Profile Ok</Text>
         </TouchableOpacity>
 
-          </ScrollView>
+      </ScrollView>
 
     );
   }
