@@ -40,7 +40,7 @@ export default class Login extends Component {
       .then(() => {this.props.navigation.navigate('Events')})
       .catch(error => {this.setState({ errorMessage: error.message });
             console.log(error)})
-    //console.log("Logged In");
+    console.log("Logged In");
   }
 // {minHeight : this.height || heightOfDeviceScreen}
 /*<View style = {styles.childcontainer1}>

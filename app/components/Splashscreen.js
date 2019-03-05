@@ -9,7 +9,7 @@ export default class SplashScreen extends Component {
 
   componentDidMount(){
       setTimeout(() => {firebase.auth().onAuthStateChanged(user => {
-      this.props.navigation.navigate(user ? 'TabNav' : 'Login')
+      this.props.navigation.navigate(user ? 'Drawer' : 'Login')
     })},500);
   }
 

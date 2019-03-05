@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { FlatList, Image, StyleSheet, View, Text, TouchableWithoutFeedback, BackHandler, Alert} from 'react-native';
 import { List, ListItem, Card } from 'react-native-elements';
-import { createStackNavigator, createBottomTabNavigator, createAppContainer, withNavigationFocus } from 'react-navigation';
+import { createStackNavigator, createBottomTabNavigator, createAppContainer, withNavigationFocus, DrawerActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import firebase from 'react-native-firebase';
 import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
@@ -17,14 +17,14 @@ export default class Events extends Component {
     ]
   };*/
     this.state = {
-      events : {},
+      events : null,
       refreshing : false,
     }
   }
 
   static navigationOptions = ({navigation}) => ({
     headerTitleStyle : {
-       textAlign : 'center',
+       textAlign : 'justify',
        flex : 1,
        fontSize : 20,
      },
@@ -33,17 +33,9 @@ export default class Events extends Component {
     },
     title : 'Events',
     headerTintColor : Colors.white,
-    headerRight : (
-      <View marginRight = {10}>
-        <Icon name="sign-out-alt" size={20} color={Colors.white} onPress = {() => firebase.auth().signOut().then((navigation.navigate('Login')))}/>
-      </View>
-
-    ),
     headerLeft : (
       <View marginLeft = {10}>
-        <TouchableWithoutFeedback onPress={() => navigation.navigate('EventCreate')} >
-          <Icon id = {1} name="plus" size={20} color={Colors.white} />
-        </TouchableWithoutFeedback>
+          <Icon name="bars" size={20} color={Colors.white} onPress={() => navigation.toggleDrawer()}/>
       </View>
     )
   })
@@ -77,11 +69,19 @@ export default class Events extends Component {
         this.setState({
           events : data,
         });
-        console.log("E1 : ",this.state.events);
-      })
+        console.log("Events : ",this.state.events);
+      });
       console.log("After Fetch");
       data = [];
     }
+
+  /*componentDidMount(){
+    this.setState({
+      events : {}
+    })
+    this.handleRefresh();
+  }*/
+
   /*componentDidMount(prevProps){
     if (prevProps.isFocused !== this.props.isFocused) {
       // Use the `this.props.isFocused` boolean
@@ -96,10 +96,11 @@ export default class Events extends Component {
       events : {},
     })
   }*/
+
   handleRefresh = () => {
 
     this.setState({
-      refreshing : true
+      refreshing : true,
     })
 
     let data = [];
@@ -108,18 +109,18 @@ export default class Events extends Component {
       .database()
       .ref('Events/')
       .on('value',(snapshot) => {
-        console.log("Before Parsing");
+        //console.log("Before Parsing");
         snapshot.forEach((csnapshot) => {
             let item = csnapshot.val();
             item.key = csnapshot.key;
             data.push(item)
         })
-        console.log("After Parsing");
+        //console.log("After Parsing");
         this.setState({
           events : data,
           refreshing : false,
         });
-        console.log("E1 : ",this.state.events[0]['uid']);
+        //console.log("E1 : ",this.state.events[0]['uid']);
       })
     }
 

@@ -16,12 +16,13 @@ import Events from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/Events.
 import Ex from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/ex.js';
 import ProfilePage from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/ProfilePage.js';
 import EventCreate from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/EventCreate.js';
-import { createStackNavigator, createAppContainer, createBottomTabNavigator, createDrawerNavigator, createSwitchNavigator,DrawerItems, DrawerActions } from 'react-navigation';
+import SideMenu from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/SideMenu.js';
+import { createStackNavigator, createAppContainer, createBottomTabNavigator, createDrawerNavigator, createSwitchNavigator} from 'react-navigation';
 import firebase from 'react-native-firebase';
 
 type Props = {};
 
-  const config = {
+const config = {
     apiKey: "AIzaSyAmtO-w9eUbDoeqPe-uI1YkgtRdwB45YWI",
     authDomain: "practice-69846.firebaseapp.com",
     databaseURL: "https://practice-69846.firebaseio.com",
@@ -31,7 +32,14 @@ type Props = {};
   };
 firebase.initializeApp(config);
 
-//console.disableYellowBox = true;
+console.disableYellowBox = true;
+
+const ProfileStack = createStackNavigator({
+  ProfilePage : {
+    screen : ProfilePage,
+
+  },
+})
 
 const EventStack = createStackNavigator({
     Events : {
@@ -43,13 +51,14 @@ const EventStack = createStackNavigator({
     EventCreate : {
         screen : EventCreate,
     },
-    initialRouteName : 'Events',
-})
+    ProfileStack : {
+      screen : ProfileStack,
+      navigationOptions :  {
+        header : null,
+      },
+    },
 
-const ProfileStack = createStackNavigator({
-  ProfilePage : {
-    screen : ProfilePage,
-  },
+    initialRouteName : 'Events',
 })
 
 export const TabNav = createBottomTabNavigator(
@@ -70,9 +79,9 @@ export const TabNav = createBottomTabNavigator(
         tabBarIcon : ({ tintColor }) => (
           <Icon name="user" size={20} color="#F2F2F2" />
         ),
-        tabBarVisible : true,
+        tabBarVisible : false,
       }
-    },
+    }
   },
   {
     order : ['EventStack', 'ProfileStack'],
@@ -85,6 +94,16 @@ export const TabNav = createBottomTabNavigator(
     },
   },
 );
+
+const Drawer =  createDrawerNavigator({
+  EventStack : {
+    screen : EventStack,
+  },
+},
+{
+  contentComponent : SideMenu,
+  drawerWidth : 225,
+})
 
 EventStack.navigationOptions = ({ navigation }) => {
   let tabBarVisible = true;
@@ -103,11 +122,17 @@ const LoginStack = createStackNavigator({
       header : null,
     },
   },
-  TabNav : {
+  /*TabNav : {
       screen : TabNav,
       navigationOptions : {
         header : null,
       },
+  },*/
+  Drawer : {
+    screen : Drawer,
+    navigationOptions : {
+      header : null,
+    },
   },
   Signup : {
     screen : Signup,

@@ -228,7 +228,7 @@ export default class EventCreate extends Component{
               style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
             <TextInput style = {styles.input}
               title = 'Event Name'
-              placeholder = {this.state.eventname}
+              placeholder = "Name of Event"
               //placeholderTextColor = 'black'
               returnKeyType = 'next'
               //keyBoardType = 'email-address'
@@ -244,7 +244,7 @@ export default class EventCreate extends Component{
               style = {{marginLeft : '10%',marginRight : '5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
             <TextInput style = {styles.input}
               title = 'Place'
-              placeholder = 'Place of Event'
+              placeholder = 'Place of Event(e.g. Address, City)'
               //placeholderTextColor = 'black'
               returnKeyType = 'next'
               autoCapitalize = 'none'

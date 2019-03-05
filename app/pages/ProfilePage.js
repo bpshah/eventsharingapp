@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, FlatList, StatusBar, View, Dimensions, KeyboardAvoidingView, Picker} from 'react-native';
+import { Button, TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, FlatList, StatusBar, View, Dimensions, KeyboardAvoidingView, Picker, ActivityIndicator} from 'react-native';
 import { Avatar,CheckBox, ButtonGroup } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import DatePicker from 'react-native-datepicker'
@@ -9,6 +9,7 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import ui from 'C:/Users/DELL/Documents/EventSharingSystem/app/utils/uploadImage.js';
 import cfile from 'C:/Users/DELL/Documents/EventSharingSystem/app/utils/chooseFile.js';
 import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
+import activityIndicator from 'C:/Users/DELL/Documents/EventSharingSystem/app/components/activityIndicator.js'
 
 export default class ProfilePage extends Component{
 
@@ -23,6 +24,7 @@ export default class ProfilePage extends Component{
         location : '',
         imgsrc : '',
         errorMessage: null,
+        loading : true,
       }
   }
 
@@ -35,6 +37,7 @@ export default class ProfilePage extends Component{
          headerStyle : {
            backgroundColor : Colors.tabBarColor,
          },
+      //header : null,
       title : 'My Profile',
       headerTintColor : Colors.white,
       /*headerRight : (
@@ -72,8 +75,19 @@ export default class ProfilePage extends Component{
           location : snapshot.val().location,
           imgsrc : snapshot.val().imgsrc,
         })
+      }).then( () => {
+        this.setState({
+          loading : false,
+        })
       });
     }
+
+  /*componentDidMount(){
+    this.setState({
+      loading : false,
+
+    })
+  }*/
 
   /*shouldComponentUpdate(nextProps){
     return nextState.filePath != this.state.filePath;
@@ -221,6 +235,16 @@ export default class ProfilePage extends Component{
 
   render(){
     const { selectedIndex } = this.state;
+
+    if (this.state.loading) {
+      return (
+        <View styles = {styles.Container}>
+          <ActivityIndicator size = "large" color = {Colors.primaryAppColor} />
+        </View>
+      );
+    }
+
+
     return(
         <ScrollView contentContainerStyle = {styles.Container}
                     behaviour = 'height'
