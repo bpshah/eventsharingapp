@@ -8,32 +8,49 @@ import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors
 
 
 export default class Ex extends Component {
+
+  constructor(props){
+    super(props);
+    this.state = ({
+      imgsrc : this.props.navigation.state.params.imgsrc,
+      fromtime : this.props.navigation.state.params.fromtime,
+      totime : this.props.navigation.state.params.totime,
+      place : this.props.navigation.state.params.place,
+      org : this.props.navigation.state.params.organizer,
+      description : this.props.navigation.state.params.desc,
+      title : this.props.navigation.state.params.title,
+      contact : this.props.navigation.state.params.contact,
+    })
+
+  }
+
   static navigationOptions = ({navigation}) =>({
     headerTitleStyle : {
        textAlign : 'justify',
        flex : 1,
        },
-    title : 'Events',
-    headerTintColor : Colors.white,
+    //title : Ex.state.title,
+    //headerTintColor : Colors.white,
     headerStyle : {
       backgroundColor : Colors.tabBarColor,
     },
     headerLeft : (
       <View marginLeft = {10}>
-        <Icon name="angle-left" size={30} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
+        <Icon name="times" size={25} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
       </View>
     )
   })
+
   render(){
        return(
        <ScrollView contentContainerStyle = {styles.Container}
                    behaviour = 'height'>
           <View containerStyle = {styles.childContainer1}>
-            <Text style = {styles.title}>Anime Meet</Text>
+            <Text style = {styles.title}>{this.state.title}</Text>
           </View>
           <Avatar
             rectangle
-            source = {require('C:/Users/DELL/Documents/EventSharingSystem/app/assets/cool-one-piece-wallpaper_011523568_277.png')}
+            source = {{uri : this.state.imgsrc}}
             height = {175}
             width = '100%'
             margin = '2%'
@@ -48,21 +65,21 @@ export default class Ex extends Component {
                   size={20}
                   color='black'
                   style = {{marginRight : '2.75%', marginLeft : '10%',marginBottom : '1%',alignSelf : 'center'}}/>
-            <Text style = {styles.childContainerText}>Monday , 27 Feb 16:30 PM - 18:30 PM</Text>
+            <Text style = {styles.childContainerText}>From : {this.state.fromtime} {'\n'} To : {this.state.totime}</Text>
           </View>
           <View style = {styles.childContainer1}>
             <Icon name="map-marker-alt"
                 size={20}
                 color='black'
                 style = {{marginRight : '4%', marginLeft : '10%',marginBottom : '1%',alignSelf : 'center'}}/>
-            <Text style = {styles.childContainerText}>SEAS, Ahmedabad University, Navarangpura - 380015, Ahmedabad , India</Text>
+            <Text style = {styles.childContainerText}>{this.state.place}</Text>
           </View>
           <View style = {styles.childContainer1}>
             <Icon name="user"
                 size={20}
                 color='black'
                 style = {{marginRight : '4%', marginLeft : '10%',alignSelf : 'center'}}/>
-            <Text style = {styles.childContainerText}>Hosted by Bhumit Pratishkumar Shah, Seas Ahmedabad, India ,Gujarat</Text>
+            <Text style = {styles.childContainerText}>Organizer : {this.state.org} {'\n'} Contact No. : {this.state.contact}</Text>
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'center',marginRight : '4%', marginTop : '5%'}}>
             <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '9%', fontWeight : 'bold', fontSize : 18}}>8 people are going</Text>
@@ -100,7 +117,7 @@ export default class Ex extends Component {
             />
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'center',marginRight : '10%', marginTop : '6%'}}>
-            <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '10%', fontWeight : 'normal', fontSize : 15}}>Anime Meet</Text>
+            <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '10%', fontWeight : 'normal', fontSize : 15}}>{this.state.description}</Text>
           </View>
         </ScrollView>
      )

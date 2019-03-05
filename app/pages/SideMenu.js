@@ -72,10 +72,18 @@ componentWillMount() {
             <Text style = {{marginLeft : '12%',marginBottom : '1%',marginTop : '0%',fontSize : 17,alignSelf : 'flex-start'}}>{this.state.firsname} {this.state.lastname}</Text>
           </View>
         </View>
-        <View style = {{backgroundColor : Colors.primaryBackGourndColor,height : 225}}>
+        <View style = {{backgroundColor : Colors.primaryBackGourndColor,height : 275}}>
           <View style = {{ flex : 1,justifyContent : 'flex-start',marginTop : '8%',marginBottom : '8%'}}>
             <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%'}}
                   onPress={this.navigateToScreen('EventCreate')}>Create Event</Text>
+          </View>
+          <View style = {{ flex : 1,justifyContent : 'flex-start',marginBottom : '8%'}}>
+            <Text style = {{justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17}}
+                  onPress={this.navigateToScreen('ProfilePage')}>Create Group</Text>
+          </View>
+          <View style = {{ flex : 1,justifyContent : 'flex-start',marginBottom : '8%'}}>
+            <Text style = {{justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17}}
+                  onPress={this.navigateToScreen('ProfilePage')}>Join Group</Text>
           </View>
           <View style = {{ flex : 1,justifyContent : 'flex-start',marginBottom : '8%'}}>
             <Text style = {{justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17}}
@@ -94,21 +102,3 @@ componentWillMount() {
     );
   }
 }
-/*<View style = {{backgroundColor : Colors.primaryBackGourndColor,height : 215}}>
-  <View style = {{ justifyContent : 'flex-start'}}>
-    <Text style = {{flex : 1, justifyContent : 'flex-start',marginTop : '8%',fontSize : 17,marginLeft : '12%',marginBottom : '8%'}}
-          onPress={this.navigateToScreen('EventCreate')}>Create Event</Text>
-  </View>
-  <View style = {{ justifyContent : 'flex-start'}}>
-    <Text style = {{flex : 1,justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17,marginBottom : '8%'}}
-          onPress={this.navigateToScreen('ProfilePage')}>Profile</Text>
-  </View>
-  <View style = {{ justifyContent : 'flex-start'}}>
-    <Text style = {{flex : 1,justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17,marginBottom : '8%'}}
-          onPress={this.navigateToScreen('Ex')}>About Us</Text>
-  </View>
-  <View style = {{ justifyContent : 'flex-start'}}>
-    <Text style = {{flex : 1,justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17,marginBottom : '8%'}}
-          onPress = {() => firebase.auth().signOut().then((this.props.navigation.navigate('Login')))}>Logout</Text>
-  </View>
-</View>*/

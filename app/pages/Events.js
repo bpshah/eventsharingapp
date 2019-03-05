@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { FlatList, Image, StyleSheet, View, Text, TouchableWithoutFeedback, BackHandler, Alert} from 'react-native';
+import { FlatList, Image, StyleSheet, View, Text, TouchableWithoutFeedback, BackHandler, Alert,ActivityIndicator} from 'react-native';
 import { List, ListItem, Card } from 'react-native-elements';
-import { createStackNavigator, createBottomTabNavigator, createAppContainer, withNavigationFocus, DrawerActions } from 'react-navigation';
+import { createStackNavigator, createBottomTabNavigator, createAppContainer, withNavigationFocus, DrawerActions, } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import firebase from 'react-native-firebase';
 import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
+import Activity from 'C:/Users/DELL/Documents/EventSharingSystem/app/components/activityIndicator.js'
 
 export default class Events extends Component {
 
@@ -19,6 +20,7 @@ export default class Events extends Component {
     this.state = {
       events : null,
       refreshing : false,
+      loading : true,
     }
   }
 
@@ -68,9 +70,15 @@ export default class Events extends Component {
         console.log("Data:" + data);
         this.setState({
           events : data,
+          loading : false,
         });
         console.log("Events : ",this.state.events);
-      });
+      })
+      /*.then( () => {
+        this.setState({
+          loading : false,
+        })
+      });*/
       console.log("After Fetch");
       data = [];
     }
@@ -125,26 +133,44 @@ export default class Events extends Component {
     }
 
   render(){
+
+      const {navigate} = this.props.navigation;
+
+      if (this.state.loading) {
+        return (
+          <Activity/>
+        );
+      }
+
       return(
+
         <FlatList
             data = {this.state.events}
             refreshing = {this.state.refreshing}
             onRefresh = {this.handleRefresh}
             renderItem={({item})=>(
-              <View style={{flex : 1,backgroundColor : Colors.primaryBackGourndColor}}>
-                <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Ex')} >
-                  <Card containerStyle = {styles.Container}
-                        dividerStyle = {{backgroundColor : Colors.cardTextColor}}
-                        title = {item.eventname}
-                        titleStyle = {styles.title}
-                        titleNumberOfLines = {2}>
-                    <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : Colors.cardTextColor}}>{item.time} {"\n"}</Text>
-                    <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : Colors.cardTextColor}}>{item.place} {"\n"}</Text>
-                    <Text style = {styles.desc}>Place : {item.org} {"\n"}</Text>
-                    <Text style = {styles.desc}>Contact : {item.mobileno} {"\n"}</Text>
-                  </Card>
-                </TouchableWithoutFeedback>
-              </View>
+            <View style={{flex : 1,backgroundColor : Colors.primaryBackGourndColor}}>
+              <TouchableWithoutFeedback onPress={() => navigate('Ex',{  title : item.eventname,
+                                                                        desc : item.description,
+                                                                        organizer : item.org,
+                                                                        place : item.place,
+                                                                        fromtime : item.fromtime,
+                                                                        totime : item.totime,
+                                                                        imgsrc : item.imgsrc,
+                                                                        contact : item.mobileno,})} >
+                <Card containerStyle = {styles.Container}
+                      dividerStyle = {{backgroundColor : Colors.cardTextColor}}
+                      title = {item.eventname}
+                      titleStyle = {styles.title}
+                      titleNumberOfLines = {2}>
+                  <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : Colors.cardTextColor}}>From : {item.fromtime} {"\n"}</Text>
+                  <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : Colors.cardTextColor}}>To : {item.totime} {"\n"}</Text>
+                  <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : Colors.cardTextColor}}>{item.place} {"\n"}</Text>
+                  <Text style = {styles.desc}>Organizer : {item.org} {"\n"}</Text>
+                  <Text style = {styles.desc}>Contact : {item.mobileno} {"\n"}</Text>
+                </Card>
+              </TouchableWithoutFeedback>
+            </View>
             )}
         />
     );
@@ -152,6 +178,7 @@ export default class Events extends Component {
 }
 
 //export default withNavigationFocus(Events);
+//onPress={() => this.props.navigation.navigate('Ex')}
 
 const styles = StyleSheet.create({
   Container : {

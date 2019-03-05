@@ -9,7 +9,7 @@ import RNFetchBlob from 'react-native-fetch-blob';
 import ui from 'C:/Users/DELL/Documents/EventSharingSystem/app/utils/uploadImage.js';
 import cfile from 'C:/Users/DELL/Documents/EventSharingSystem/app/utils/chooseFile.js';
 import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
-import activityIndicator from 'C:/Users/DELL/Documents/EventSharingSystem/app/components/activityIndicator.js'
+import Activity from 'C:/Users/DELL/Documents/EventSharingSystem/app/components/activityIndicator.js'
 
 export default class ProfilePage extends Component{
 
@@ -194,7 +194,13 @@ export default class ProfilePage extends Component{
     const temail = user.email.slice(0,user.email.indexOf('@'));
     console.log("In DP:");
     console.log("FilePath : " + this.state.filePath);
-    this.uploadImage(this.state.filePath,temail + '.png').then( () => { this.handleUpdate() });
+    this.setState({
+      loading : true,
+    })
+    this.uploadImage(this.state.filePath,temail + '.png').then( () => { this.setState({
+                                                                                    loading : false,
+                                                                                  });
+                                                                                  this.handleUpdate() });
     console.log("After Update");
   }
 
@@ -238,18 +244,13 @@ export default class ProfilePage extends Component{
 
     if (this.state.loading) {
       return (
-        <View styles = {styles.Container}>
-          <ActivityIndicator size = "large" color = {Colors.primaryAppColor} />
-        </View>
+        <Activity />
       );
     }
 
-
     return(
-        <ScrollView contentContainerStyle = {styles.Container}
-                    behaviour = 'height'
-                    keyboardVerticalOffset = {64}
-                    horizontal = {false}>
+        <ScrollView contentContainerStyle = {styles.Container}>
+
           <Avatar
               rounded
               source = {{uri : this.state.imgsrc }}

@@ -54,7 +54,8 @@ export default class EventCreate extends Component{
       contact : '',
       description : '',
       category : '',
-      time : 'At 5:00 PM, Thu, 27-Feb 19',
+      fromtime : '',
+      totime : '',
       imgsrc : '',
       selectedValue : 0,
     };
@@ -143,20 +144,22 @@ export default class EventCreate extends Component{
       const email = user.email;
       //const temail = email.slice(0,user.email.indexOf('@'));
 
-      let time = this.state.time;
+      let fromtime = this.state.fromtime;
+      let totime = this.state.totime;
       let place = this.state.place;
       let mobileno = this.state.contact;
       let description = this.state.description;
       let org = this.state.organizer;
       let eventname = this.state.eventname;
       let category = this.state.category;
+      let imgsrc = this.state.imgsrc;
 
       let uid  = email.slice(0,user.email.indexOf('@'));
       console.log("Before Upload");
       firebase
         .database()
         .ref('Events/'+ this.state.eventname)
-        .set({ eventname, place, org, mobileno, description,category,time,uid})
+        .set({ eventname, place, org, mobileno, description,category,fromtime,totime,uid,imgsrc})
         .then(() => this.props.navigation.navigate('Events'))
         .catch(error => this.setState({ errorMessage: error.message }))
       console.log("Event Upload");
@@ -285,6 +288,36 @@ export default class EventCreate extends Component{
                 value = {this.state.contact}/>
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+            <Text
+              color='black'
+              style = {{marginLeft : '12%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center',fontSize :18}}>From :</Text>
+            <DatePicker
+              style = {{width : '80%',marginBottom : '5%',marginTop : '5%',marginLeft : '6%',}}
+              format = 'LLL'
+              date = {this.state.fromtime}
+              placeholder = "Select Event Date"
+              placeholderStyle = {{alignSelf : 'flex-start'}}
+              mode = "datetime"
+              onDateChange = {(time) => {this.setState({fromtime : time})}}
+
+            />
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
+            <Text
+              color='black'
+              style = {{marginLeft : '14%',marginRight : '9%',marginBottom : '0.25%',alignSelf : 'center',fontSize :18}}>To :</Text>
+            <DatePicker
+              style = {{width : '80%',marginBottom : '5%',marginTop : '5%',marginLeft : '7%',}}
+              format = 'LLL'
+              date = {this.state.totime}
+              placeholder = "Select Event Date"
+              placeholderStyle = {{alignSelf : 'flex-start'}}
+              mode = "datetime"
+              onDateChange = {(time) => {this.setState({totime : time})}}
+            />
+          </View>
+
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
             <Icon name="scroll"
               size={22}
               color='black'
@@ -306,19 +339,21 @@ export default class EventCreate extends Component{
             />
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%',marginBottom : '2%'}}>
-            <Icon name="phone"
+            <Icon name="stream"
               size={22}
               color='black'
               style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
             <View style = {{ borderBottomColor : 'black',paddingHorizontal : 10,borderBottomWidth : 1,width : '80%',marginBottom : '2%',backgroundColor : 'rgba(255,255,255,0)',}}>
             <Picker
+              placeholderTextColor = {Colors.textColor}
               selectedValue = {this.state.category}
               mode = 'dropdown'
               onValueChange = {(itemValue, itemIndex) =>
                 this.setState({ category : itemValue,selectedValue : itemIndex})}>
               <Picker.Item label = "Event Category" value = "event" />
               <Picker.Item label = "Tech" value = "tech" />
-              <Picker.Item label = "Cultural" value = "Cultural" />
+              <Picker.Item label = "Cultural" value = "cultural" />
+              <Picker.Item label = "Sports" value = "sports" />
             </Picker>
             </View>
           </View>
@@ -360,7 +395,7 @@ const styles = StyleSheet.create({
     flexDirection : 'column',
     alignItems: 'flex-start',
     justifyContent : 'flex-start',
-    height : 700,
+    height : 860,
     width : '100%'
     //width: 100,
     //height: 100,
