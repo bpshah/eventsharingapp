@@ -6,7 +6,7 @@
  * @flow
  */
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, Image} from 'react-native';
+import {Platform, StyleSheet, Text, View, Image,AsyncStorage} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Login from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/Login.js';
 import Signup from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/Signup.js';
@@ -19,6 +19,8 @@ import EventCreate from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/Ev
 import SideMenu from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/SideMenu.js';
 import { createStackNavigator, createAppContainer, createBottomTabNavigator, createDrawerNavigator, createSwitchNavigator} from 'react-navigation';
 import firebase from 'react-native-firebase';
+import type { RemoteMessage } from 'react-native-firebase';
+
 
 type Props = {};
 
@@ -32,6 +34,66 @@ const config = {
   };
 firebase.initializeApp(config);
 
+firebase.messaging().hasPermission()
+  .then(enabled => {
+    if(enabled){
+      console.log("Enabled : ", enabled);
+      AsyncStorage.getItem('fcmToken').then( fcmtoken => {
+          if(!fcmtoken) {
+            console.log("Fcmtoken : ", fcmtoken);
+            firebase.messaging().getToken().then( (token) => {
+                if(token){
+                  console.log("Token : ", token);
+                  AsyncStorage.setItem('token',token);
+                }
+              });
+          }
+        });
+    } else {
+      firebase.messaging().requestPermission()
+        .then(() => {
+          AsyncStorage.getItem('fcmToken').then( fcmtoken => {
+              if(!fcmtoken) {
+                firebase.messaging().getToken().then( (token) => {
+                  if(token){
+                    AsyncStorage.setItem('token',token);
+                  }
+                });
+              }
+            });
+          })
+        .catch((error) => {
+            console.log('Permission Rejected');
+      });
+    }
+  });
+
+/*if (enabled) {
+    let token = this.getToken();
+    console.log("Token : "+ token);
+} else {
+    this.requestPermission();
+}*/
+
+/*try {
+    firebase.messaging().requestPermission();
+    // User has authorised
+    this.getToken();
+} catch (error) {
+    // User has rejected permissions
+    console.log('permission rejected');
+}*/
+
+/*let fcmToken = AsyncStorage.getItem('fcmToken');
+if (!fcmToken) {
+    fcmToken = firebase.messaging().getToken();
+    if (fcmToken) {
+        // user has a device token
+        AsyncStorage.setItem('fcmToken', fcmToken);
+    }
+}*/
+
+//checkPermission();
 console.disableYellowBox = true;
 
 const ProfileStack = createStackNavigator({
@@ -61,7 +123,7 @@ const EventStack = createStackNavigator({
     initialRouteName : 'Events',
 })
 
-export const TabNav = createBottomTabNavigator(
+const TabNav = createBottomTabNavigator(
     {
       EventStack : {
           screen : EventStack,

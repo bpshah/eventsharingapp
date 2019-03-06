@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image} from 'react-native';
 import firebase from 'react-native-firebase';
 import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
-
+import type { RemoteMessage } from 'react-native-firebase';
 
 
 export default class SplashScreen extends Component {
@@ -11,6 +11,7 @@ export default class SplashScreen extends Component {
       setTimeout(() => {firebase.auth().onAuthStateChanged(user => {
       this.props.navigation.navigate(user ? 'Drawer' : 'Login')
     })},500);
+
   }
 
   render(){

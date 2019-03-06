@@ -6,6 +6,8 @@ import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import firebase from 'react-native-firebase';
 import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
 import Activity from 'C:/Users/DELL/Documents/EventSharingSystem/app/components/activityIndicator.js'
+import type { RemoteMessage } from 'react-native-firebase';
+import type { Notification } from 'react-native-firebase';
 
 export default class Events extends Component {
 
@@ -83,12 +85,32 @@ export default class Events extends Component {
       data = [];
     }
 
-  /*componentDidMount(){
-    this.setState({
-      events : {}
-    })
-    this.handleRefresh();
-  }*/
+  componentDidMount(){
+    //console.log("In Home : " + firebase.messaging);
+    this.unsubscribeFromNotificationListener = firebase.notifications().onNotification(notification => {
+	     console.log('Notification received!', notification);
+       const localNotification = new firebase.notifications.Notification({
+            sound : 'default',
+            show_in_foreground : true,
+          })
+          .setNotificationId(notification.notificationId)
+          .setTitle(notification.title)
+          .setSubtitle(notification.subtitle)
+          .setBody(notification.body)
+          .setData(notification.data)
+          .android.setChannelId('channelId') // e.g. the id you chose above
+
+        firebase.notifications()
+          .displayNotification(localNotification)
+          .catch(err => console.log(err));
+      })
+
+
+    }
+
+  componentWillUnmount(){
+    this.unsubscribeFromNotificationListener();
+  }
 
   /*componentDidMount(prevProps){
     if (prevProps.isFocused !== this.props.isFocused) {

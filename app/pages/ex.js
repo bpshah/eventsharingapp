@@ -3,8 +3,11 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView} from 'reac
 //import Ev from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/Events.js';
 import { Button, Avatar, Divider } from 'react-native-elements';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
+import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
+import Fonts from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/fonts.js';
+
 
 
 export default class Ex extends Component {
@@ -26,17 +29,24 @@ export default class Ex extends Component {
 
   static navigationOptions = ({navigation}) =>({
     headerTitleStyle : {
-       textAlign : 'justify',
+       textAlign : 'center',
        flex : 1,
+       color : Colors.white,
+       fontWeight : '100',
+       fontFamily : Fonts.headerStyle,
        },
-    //title : Ex.state.title,
+    title : navigation.state.params.title,
     //headerTintColor : Colors.white,
     headerStyle : {
       backgroundColor : Colors.tabBarColor,
     },
     headerLeft : (
       <View marginLeft = {10}>
-        <Icon name="times" size={25} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
+        <Icon1 name="ios-arrow-back" size={25} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
+      </View>
+    ),
+    headerRight : (
+      <View marginRight = {10}>
       </View>
     )
   })
@@ -45,18 +55,16 @@ export default class Ex extends Component {
        return(
        <ScrollView contentContainerStyle = {styles.Container}
                    behaviour = 'height'>
-          <View containerStyle = {styles.childContainer1}>
-            <Text style = {styles.title}>{this.state.title}</Text>
+          <View style = {{flex : 0.5,marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '2%',width : '100%'}}>
+            <Avatar
+              rectangle
+              source = {{uri : this.state.imgsrc}}
+              height = {175}
+              width = '90%'
+              alignSelf = 'center'
+              backgroundColor = '#F2F2F2'
+              imageProps = {{resizeMode : 'stretch',borderRadius : 10}}/>
           </View>
-          <Avatar
-            rectangle
-            source = {{uri : this.state.imgsrc}}
-            height = {175}
-            width = '100%'
-            margin = '2%'
-            alignSelf = 'center'
-            backgroundColor = '#F2F2F2'
-            imageProps = {{resizeMode : 'stretch'}}/>
           <Divider containerStyle = {{backgroundColor : Colors.primaryAppColor,borderWidth : 1}}/>
           <Button title = 'JOIN AND RSVP'
                     containerStyle = {styles.buttonContainer}/>
@@ -133,7 +141,7 @@ export default class Ex extends Component {
     justifyContent : 'flex-start',
     alignItems : 'center',
     width : '100%',
-    height : 800,
+    paddingBottom : 40,
   },
   buttonContainer : {
     //backgroundColor : Colors.primaryAppColor,
