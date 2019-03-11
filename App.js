@@ -184,18 +184,6 @@ const LoginStack = createStackNavigator({
       header : null,
     },
   },
-  /*TabNav : {
-      screen : TabNav,
-      navigationOptions : {
-        header : null,
-      },
-  },*/
-  Drawer : {
-    screen : Drawer,
-    navigationOptions : {
-      header : null,
-    },
-  },
   Signup : {
     screen : Signup,
     navigationOptions : {
@@ -219,6 +207,12 @@ const App1 = createSwitchNavigator({
   },
   LoginStack : {
     screen : LoginStack,
+    navigationOptions : {
+      header : null,
+    },
+  },
+  Drawer : {
+    screen : Drawer,
     navigationOptions : {
       header : null,
     },

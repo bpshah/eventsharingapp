@@ -104,7 +104,7 @@ export default class Events extends Component {
           .displayNotification(localNotification)
           .catch(err => console.log(err));
       })
-
+    this.handleRefresh();
 
     }
 
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
     flexDirection : 'column',
     justifyContent : 'flex-start',
     backgroundColor : Colors.primaryBackGourndColor,
-    marginBottom : 1,
+    marginBottom : 10,
   },
   title : {
     fontSize : 20,

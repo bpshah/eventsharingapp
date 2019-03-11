@@ -17,7 +17,7 @@ export default class SplashScreen extends Component {
   render(){
     return(
       <View  style = {styles.Container}>
-        <Image source={require('C:/Users/DELL/Documents/EventSharingSystem/app/assets/logo.png')} style = {styles.imageContainer} />
+        <Image source = {require('C:/Users/DELL/Documents/EventSharingSystem/app/assets/logo.png')} style = {styles.imageContainer} />
       </View>
     );
   }

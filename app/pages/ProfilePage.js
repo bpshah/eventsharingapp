@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     flexDirection : 'column',
     alignItems: 'center',
     justifyContent : 'flex-start',
-    height : 610,
+    //height : 610,
     width : '100%'
   },
   childContainer1 : {

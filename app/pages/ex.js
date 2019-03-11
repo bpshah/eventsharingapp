@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView,TouchableHighlight} from 'react-native';
 //import Ev from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/Events.js';
 import { Button, Avatar, Divider } from 'react-native-elements';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
@@ -7,6 +7,7 @@ import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
 import Fonts from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/fonts.js';
+import ImageSlider from 'react-native-image-slider';
 
 
 
@@ -16,6 +17,7 @@ export default class Ex extends Component {
     super(props);
     this.state = ({
       imgsrc : this.props.navigation.state.params.imgsrc,
+      img : 'C:/Users/DELL/Documents/EventSharingSystem/app/assets/cool-one-piece-wallpaper_011523568_277.png',
       fromtime : this.props.navigation.state.params.fromtime,
       totime : this.props.navigation.state.params.totime,
       place : this.props.navigation.state.params.place,
@@ -52,18 +54,54 @@ export default class Ex extends Component {
   })
 
   render(){
+    const images = ['C:/Users/DELL/Documents/EventSharingSystem/app/assets/cool-one-piece-wallpaper_011523568_277.png',
+    'C:/Users/DELL/Documents/EventSharingSystem/app/assets/logo.png',
+    'C:/Users/DELL/Documents/EventSharingSystem/app/assets/logo.png'
+    ];
        return(
        <ScrollView contentContainerStyle = {styles.Container}
                    behaviour = 'height'>
-          <View style = {{flex : 0.5,marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '2%',width : '100%'}}>
-            <Avatar
-              rectangle
-              source = {{uri : this.state.imgsrc}}
-              height = {175}
-              width = '90%'
-              alignSelf = 'center'
-              backgroundColor = '#F2F2F2'
-              imageProps = {{resizeMode : 'stretch',borderRadius : 10}}/>
+          <View style = {{height : 200,marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%',width : '100%'}}>
+            <ImageSlider
+              loopBothSides
+              images = {this.state.imgsrc}
+              style = {{backgroundColor : Colors.primaryBackGourndColor}}
+              customSlide = {({ index, item, style, width }) => (
+              <View key={index} style={[style, styles.Slide]}>
+                <Avatar
+                  rectangle
+                  source = {{uri : item}}
+                  size = 'xlarge'
+                  //marginTop = '5%'
+                  height = '90%'
+                  width = '90%'
+                  alignSelf = 'center'
+                  backgroundColor = '#000000'
+                  imageProps = {{resizeMode : 'stretch'}}
+                  editButton = {{size : 30}}
+
+                />
+              </View>
+            )}
+              customButtons={(position, move) => (
+                <View style={styles.buttons}>
+                  {images.map((image, index) => {
+                    return (
+                      <TouchableHighlight
+                        key = {index}
+                        underlayColor="#ccc"
+                        onPress = {() => move(index)}
+                        style = {styles.button}
+                      >
+                      <Text style = {position === index && styles.buttonSelected}>
+                       {index + 1}
+                      </Text>
+                    </TouchableHighlight>
+                  );
+                })}
+              </View>
+            )}
+            />
           </View>
           <Divider containerStyle = {{backgroundColor : Colors.primaryAppColor,borderWidth : 1}}/>
           <Button title = 'JOIN AND RSVP'
@@ -131,8 +169,7 @@ export default class Ex extends Component {
      )
   }
 }
- // <Divider style = {{backgroundColor : Colors.primaryAppColor,borderWidth : 1}}/>
-// source = {require('C:/Users/DELL/Documents/EventSharingSystem/app/assets/cool-one-piece-wallpaper_011523568_277.png')}
+
  const styles = StyleSheet.create({
   Container : {
     flexGrow : 1,
@@ -141,6 +178,7 @@ export default class Ex extends Component {
     justifyContent : 'flex-start',
     alignItems : 'center',
     width : '100%',
+    //height : 800,
     paddingBottom : 40,
   },
   buttonContainer : {
@@ -199,5 +237,42 @@ export default class Ex extends Component {
   },
   avatar : {
     marginRight : '4%',
-  }
+  },
+  customImage : {
+    resizeMode : 'stretch',
+  },
+  Slide : {
+    backgroundColor: Colors.primaryBackGourndColor,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius : 10,
+    marginTop : '0%',
+    color : 'white'
+    //height : '25%',
+    //marginLeft : '0.5%'
+  },
+  buttons : {
+    zIndex: 1,
+    height: 15,
+    marginTop: -40,
+    marginBottom: '1%',
+    marginLeft : '2%',
+    marginRight : '2%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor : Colors.inputBackgroundColor,
+  },
+  button : {
+    margin: 3,
+    width: 15,
+    height: 15,
+    opacity: 0.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonSelected : {
+    opacity: 1,
+    color: 'black',
+  },
 });

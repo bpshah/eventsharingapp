@@ -91,7 +91,7 @@ componentWillMount() {
           </View>
           <View style = {{ flex : 1,justifyContent : 'flex-start',marginBottom : '8%'}}>
             <Text style = {{justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17}}
-                  onPress={this.navigateToScreen('Ex')}>About Us</Text>
+                  onPress={this.navigateToScreen('ProfilePage')}>About Us</Text>
           </View>
           <View style = {{ flex : 1,justifyContent : 'flex-start',marginBottom : '8%'}}>
             <Text style = {{justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17,}}
