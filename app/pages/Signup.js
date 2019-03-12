@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, ScrollView, Picker, Platform, Alert} from 'react-native';
+import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, ScrollView, Picker, Platform, Alert,AsyncStorage} from 'react-native';
 import {BackHandler} from 'react-native';
 import { Avatar, CheckBox, ButtonGroup } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
@@ -25,9 +25,19 @@ export default class Signup extends Component {
       location : 'Ahmedabad',
       imgsrc : '',
       errorMessage: null,
+      token : '',
     }
   }
 
+  componentDidMount(){
+    AsyncStorage.getItem('token').then(token => {
+      console.log("Token Signup :" + token);
+      this.setState({
+        token : token,
+      });
+      console.log("State : " + this.state.token);
+    })
+  }
 /* switch (error.code) {
             case 'auth/email-already-in-use':
               console.log(`Email address ${this.state.email} already in use.`);
@@ -94,6 +104,7 @@ export default class Signup extends Component {
       let email = this.state.email;
       let location = this.state.location;
       let imgsrc = this.state.imgsrc;
+      let token = this.state.token;
 
       let temail = email.slice(0,email.indexOf('@'));
 
@@ -105,7 +116,7 @@ export default class Signup extends Component {
       firebase
         .database()
         .ref('Users/' + temail)
-        .set({ firstname, lastname, mobileno, location , imgsrc})
+        .set({ firstname, lastname, mobileno, location , imgsrc,token})
         .catch(error => this.setState({ errorMessage: error.message }))
 
   }

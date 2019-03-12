@@ -60,10 +60,36 @@ export default class EventCreate extends Component{
       totime : '',
       imgsrc : ['','',''],
       selectedValue : 0,
-
+      datasrc : null,
     };
     this.focusNextField = this.focusNextField.bind(this);
     this.inputs = {};
+  }
+
+  componentDidMount(){
+
+    let data = [];
+    let tokens = [];
+    firebase
+      .database()
+      .ref('Users/')
+      .once('value').then((snapshot) => {
+        console.log("Before Parsing");
+        snapshot.forEach((csnapshot) => {
+            let item = csnapshot.val();
+            //item.key = csnapshot.key;
+            data.push(item.token);
+        })
+        console.log("After Parsing Event Create : ");
+        console.log("Data:" + data);
+      })
+      /*.then( () => {
+        this.setState({
+          loading : false,
+        })
+      });*/
+      console.log("After Fetch");
+
   }
 
   uploadImage = (uri, imageName, mime = 'image/png') => {
@@ -187,13 +213,41 @@ export default class EventCreate extends Component{
     .then( () => this.uploadImage(this.state.filePath[1], this.state.eventname + '(2).png'))
     .then( () => this.uploadImage(this.state.filePath[2], this.state.eventname + '(3).png'))
     .then( () => this.handleEvent());
+
+    fetch('https://fcm.googleapis.com/fcm/send',
+            {
+                method: 'POST',
+                headers:
+                {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'key=AAAAP6OjSUc:APA91bGDee_s4YQeGx2pK1-WqjsqG3coAXtAhFRG_lB9A9SGzQB9dGGMasO90_TtbdqNfVW_nkhe3eTAAu8jXy3HyNBofELij1xAx7aHnP7tUk6iDrsDHjkzZidCUiPHoUTCt8ku5sP0'
+                },
+                body: JSON.stringify(
+                {
+                  "notification": {
+                    "title": "Your Title"
+                },
+                "data": {
+                  "title": "Your Title1"
+                },
+                  "registration_ids" : ["cGPoK-Ji0Wo:APA91bFhIqVDHOWNLeMq79Pnh83eG9KTt2xRN4HiMuCxdKVOE4OQkNiawVKCQqh10Ahk1zPm4dHzome0CUVCChEa5jwh2f--1kXamN2fz6ZUkeO-XgSrBUwXEZOIAXwT97bjtDMZ4HDn"]
+                })
+
+            }).then((response) => response.json()).then((responseJsonFromServer) =>
+            {
+                console.log(responseJsonFromServer);
+
+
+            }).catch((error) =>
+            {
+              console.log(error);
+            });
     //this.handleEvent();
   }
 
   focusNextField(id) {
     this.inputs[id].focus();
   }
-
 
   /*customStyles = {{
     dateIcon : {
@@ -270,7 +324,8 @@ export default class EventCreate extends Component{
                   alignSelf = 'center'
                   backgroundColor = '#000000'
                   imageProps = {{resizeMode : 'stretch'}}
-                  editButton = {{size : 30}}
+                  showEditButton = {{size : 30}}
+                  onEditPress = {this.chooseFile.bind(this)}
 
                 />
               </View>

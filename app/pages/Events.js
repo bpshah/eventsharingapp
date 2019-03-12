@@ -6,8 +6,9 @@ import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import firebase from 'react-native-firebase';
 import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
 import Activity from 'C:/Users/DELL/Documents/EventSharingSystem/app/components/activityIndicator.js'
-import type { RemoteMessage } from 'react-native-firebase';
-import type { Notification } from 'react-native-firebase';
+import type { RemoteMessage,Notification } from 'react-native-firebase';
+//import functions from "firebase-functions";
+//eimport admin from "firebase-admin";
 
 export default class Events extends Component {
 
@@ -44,16 +45,6 @@ export default class Events extends Component {
     )
   })
 
-  /*shouldComponentUpdate(nextState){
-    return nextState.events !== this.state.events;
-  }
-
-  componentWillUpdate(nextProps,nextState){
-    if(shouldComponentUpdate(nextState)){
-
-    }
-  }*/
-
   componentWillMount(){
 
     console.log("In Mount");
@@ -65,8 +56,8 @@ export default class Events extends Component {
         console.log("Before Parsing");
         snapshot.forEach((csnapshot) => {
             let item = csnapshot.val();
-            item.key = csnapshot.key;
-            data.push(item)
+            //item.key = csnapshot.key;
+            data.push(item);
         })
         console.log("After Parsing");
         console.log("Data:" + data);
@@ -104,30 +95,10 @@ export default class Events extends Component {
           .displayNotification(localNotification)
           .catch(err => console.log(err));
       })
-    this.handleRefresh();
-
+      this.handleRefresh();
     }
 
-  componentWillUnmount(){
-    this.unsubscribeFromNotificationListener();
-  }
-
-  /*componentDidMount(prevProps){
-    if (prevProps.isFocused !== this.props.isFocused) {
-      // Use the `this.props.isFocused` boolean
-      // Call any action
-      this.setState{
-        events : {},
-      }
-    }
-  }
-  componentWillUnmount(){
-    this.setState({
-      events : {},
-    })
-  }*/
-
-  handleRefresh = () => {
+    handleRefresh = () => {
 
     this.setState({
       refreshing : true,
