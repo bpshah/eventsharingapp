@@ -6,7 +6,7 @@ import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
-import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
+import Colors from '../styles/colors.js';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 
 
@@ -15,7 +15,7 @@ export default class Signup extends Component {
   constructor(){
     super()
     this.state = {
-      filePath : '',
+      filePath : '../app/assets/logo.png',
       email : 'bhumit1206@gmail.com',
       password : 'asdf1234',
       confirmPassword : 'asdf1234',
@@ -55,9 +55,16 @@ export default class Signup extends Component {
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
-        .then(() => this.props.navigation.navigate('Events'))
+        .then(() => {
+          firebase.auth().currentUser.sendEmailVerification().then(() => {
+                console.log("Email verificatioon link sent");
+            }).catch((error) => {
+              console.log(error);
+            })
+          this.props.navigation.navigate('Login')
+        })
         .catch(error => { console.log(error);})
-      console.log("Sign");
+      console.log("Signed Up");
   }
 
   uploadImage = (uri, imageName, mime = 'image/png') => {
@@ -69,6 +76,10 @@ export default class Signup extends Component {
         //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
         const uploadUri = uri;
         let uploadBlob = null;
+        console.log("Imagename : " + imageName);
+        if(imageName == null){
+          imageName = 'Default'
+        }
         const imageRef = firebase.storage().ref('images').child(imageName);
         //console.log("In UI : " + uploadUri + imageName);
         fs.readFile(uploadUri, 'base64')
@@ -84,6 +95,7 @@ export default class Signup extends Component {
           return imageRef.getDownloadURL()
         })
         .then((url) => {
+          console.log("Before setState");
           this.setState({
             imgsrc : url,
           });
@@ -116,7 +128,7 @@ export default class Signup extends Component {
       firebase
         .database()
         .ref('Users/' + temail)
-        .set({ firstname, lastname, mobileno, location , imgsrc,token})
+        .set({ firstname, lastname, mobileno, location , imgsrc , token})
         .catch(error => this.setState({ errorMessage: error.message }))
 
   }
@@ -165,7 +177,7 @@ export default class Signup extends Component {
     }
     else {
       this.uploadImage(this.state.filePath, temail + '.png')
-      .then(() => { this.handleProfileData(); });
+      .then(() =>  this.handleProfileData() );
       this.handleSignUp();
       console.log("Signed Up");
     }

@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView,TouchableHighlight} from 'react-native';
-//import Ev from 'C:/Users/DELL/Documents/EventSharingSystem/Screens/Events.js';
+//import Ev from '../Screens/Events.js';
 import { Button, Avatar, Divider } from 'react-native-elements';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
-import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
-import Fonts from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/fonts.js';
+import Colors from '../styles/colors.js';
+import Fonts from '../styles/fonts.js';
 import ImageSlider from 'react-native-image-slider';
 
 
@@ -17,7 +17,7 @@ export default class Ex extends Component {
     super(props);
     this.state = ({
       imgsrc : this.props.navigation.state.params.imgsrc,
-      img : 'C:/Users/DELL/Documents/EventSharingSystem/app/assets/cool-one-piece-wallpaper_011523568_277.png',
+      img : '../app/assets/cool-one-piece-wallpaper_011523568_277.png',
       fromtime : this.props.navigation.state.params.fromtime,
       totime : this.props.navigation.state.params.totime,
       place : this.props.navigation.state.params.place,
@@ -44,7 +44,9 @@ export default class Ex extends Component {
     },
     headerLeft : (
       <View marginLeft = {10}>
-        <Icon1 name="ios-arrow-back" size={25} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
+        <TouchableOpacity onPress={() => navigation.navigate('Events')}>
+          <Icon1 name="ios-arrow-back" size={25} color={Colors.white} />
+        </TouchableOpacity>
       </View>
     ),
     headerRight : (
@@ -54,9 +56,9 @@ export default class Ex extends Component {
   })
 
   render(){
-    const images = ['C:/Users/DELL/Documents/EventSharingSystem/app/assets/cool-one-piece-wallpaper_011523568_277.png',
-    'C:/Users/DELL/Documents/EventSharingSystem/app/assets/logo.png',
-    'C:/Users/DELL/Documents/EventSharingSystem/app/assets/logo.png'
+    const images = ['../app/assets/cool-one-piece-wallpaper_011523568_277.png',
+    '../app/assets/logo.png',
+    '../app/assets/logo.png'
     ];
        return(
        <ScrollView contentContainerStyle = {styles.Container}

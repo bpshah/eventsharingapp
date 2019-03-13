@@ -2,14 +2,13 @@ import React, { Component } from 'react';
 import { Button, TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, FlatList, StatusBar, View, Dimensions, KeyboardAvoidingView, Picker, ActivityIndicator} from 'react-native';
 import { Avatar,CheckBox, ButtonGroup } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
+import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
-import ui from 'C:/Users/DELL/Documents/EventSharingSystem/app/utils/uploadImage.js';
-import cfile from 'C:/Users/DELL/Documents/EventSharingSystem/app/utils/chooseFile.js';
-import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
-import Activity from 'C:/Users/DELL/Documents/EventSharingSystem/app/components/activityIndicator.js'
+import Colors from '../styles/colors.js';
+import Activity from '../components/activityIndicator.js'
 
 export default class ProfilePage extends Component{
 
@@ -47,7 +46,9 @@ export default class ProfilePage extends Component{
       ),*/
       headerLeft : (
         <View marginLeft = {10}>
-          <Icon name="angle-left" size={25} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
+          <TouchableOpacity onPress={() => navigation.navigate('Events')}>
+            <Icon1 name="ios-arrow-back" size={25} color={Colors.white} />
+          </TouchableOpacity>
         </View>
       )
   });

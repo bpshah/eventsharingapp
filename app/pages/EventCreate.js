@@ -1,13 +1,15 @@
 import React, {Component}  from 'react';
 import {PixelRatio,View, ScrollView ,Text, Image, StyleSheet, TextInput, KeyboardAvoidingView, TouchableOpacity, Picker,TouchableHighlight} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
+import Icon1 from 'react-native-vector-icons/Ionicons.js';
+
 import ImagePicker from 'react-native-image-picker';
 //import ImageSlider from 'react-native-image-slider';
 import { Avatar } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
 import DatePicker from 'react-native-datepicker';
-import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
+import Colors from '../styles/colors.js';
 import ImageSlider from 'react-native-image-slider';
 
 
@@ -40,7 +42,9 @@ export default class EventCreate extends Component{
     ),*/
     headerLeft : (
       <View marginLeft = {10}>
-        <Icon name="angle-left" size={25} color={Colors.white} onPress={() => navigation.navigate('Events')}/>
+        <TouchableOpacity onPress={() => navigation.navigate('Events')}>
+          <Icon1 name="ios-arrow-back" size={25} color={Colors.white} />
+        </TouchableOpacity>
       </View>
     )
   })
@@ -299,9 +303,9 @@ export default class EventCreate extends Component{
 
   render(){
 
-    const images = ['C:/Users/DELL/Documents/EventSharingSystem/app/assets/cool-one-piece-wallpaper_011523568_277.png',
-    'C:/Users/DELL/Documents/EventSharingSystem/app/assets/logo.png',
-    'C:/Users/DELL/Documents/EventSharingSystem/app/assets/logo.png'
+    const images = ['../app/assets/cool-one-piece-wallpaper_011523568_277.png',
+    '../app/assets/logo.png',
+    '../app/assets/logo.png'
     ];
 
     return(

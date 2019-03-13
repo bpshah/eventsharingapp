@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { FlatList, Image, StyleSheet, View, Text, TouchableWithoutFeedback, BackHandler, Alert,ActivityIndicator} from 'react-native';
+import { FlatList, Image, StyleSheet, View, Text,TouchableOpacity,TouchableWithoutFeedback, BackHandler, Alert,ActivityIndicator} from 'react-native';
 import { List, ListItem, Card } from 'react-native-elements';
 import { createStackNavigator, createBottomTabNavigator, createAppContainer, withNavigationFocus, DrawerActions, } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import firebase from 'react-native-firebase';
-import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
-import Activity from 'C:/Users/DELL/Documents/EventSharingSystem/app/components/activityIndicator.js'
+import Colors from '../styles/colors.js';
+import Activity from '../components/activityIndicator.js'
 import type { RemoteMessage,Notification } from 'react-native-firebase';
 //import functions from "firebase-functions";
 //eimport admin from "firebase-admin";
@@ -14,12 +14,6 @@ export default class Events extends Component {
 
   constructor(props) {
     super(props);
-    /*this.state = { ritems : [
-      {key : 'Event',image : require('C:/Users/DELL/Documents/EventSharingSystem/app/assets/logo.png'), time : 'Thu, 24 Feb', place : 'SEAS, AU',org : 'PClub', contact : '9824213232',description : 'This is default event'},
-      {key : 'Event2',image : require('C:/Users/DELL/Documents/EventSharingSystem/app/assets/logo.png'), time : 'default',place : 'default',org : 'default', contact : 'xxxxxxxxxx',description : 'This is default event'},
-      {key : 'Event3',image : require('C:/Users/DELL/Documents/EventSharingSystem/app/assets/logo.png'), time : 'default',place : 'default',org : 'default', contact : 'xxxxxxxxxx',description : 'This is default event'},
-    ]
-  };*/
     this.state = {
       events : null,
       refreshing : false,
@@ -40,7 +34,9 @@ export default class Events extends Component {
     headerTintColor : Colors.white,
     headerLeft : (
       <View marginLeft = {10}>
-          <Icon name="bars" size={20} color={Colors.white} onPress={() => navigation.toggleDrawer()}/>
+          <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+            <Icon name="bars" size={20} color={Colors.white} />
+          </TouchableOpacity>
       </View>
     )
   })
@@ -67,11 +63,6 @@ export default class Events extends Component {
         });
         console.log("Events : ",this.state.events);
       })
-      /*.then( () => {
-        this.setState({
-          loading : false,
-        })
-      });*/
       console.log("After Fetch");
       data = [];
     }
@@ -95,7 +86,7 @@ export default class Events extends Component {
           .displayNotification(localNotification)
           .catch(err => console.log(err));
       })
-      this.handleRefresh();
+
     }
 
     handleRefresh = () => {

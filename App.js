@@ -8,15 +8,17 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, Image,AsyncStorage} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
-import Login from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/Login.js';
-import Signup from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/Signup.js';
-import FPassword from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/FPassword.js';
-import SplashScreen from 'C:/Users/DELL/Documents/EventSharingSystem/app/components/Splashscreen.js';
-import Events from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/Events.js';
-import Ex from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/ex.js';
-import ProfilePage from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/ProfilePage.js';
-import EventCreate from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/EventCreate.js';
-import SideMenu from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/SideMenu.js';
+import Login from './app/pages/Login.js';
+import Signup from './app/pages/Signup.js';
+import FPassword from './app/pages/FPassword.js';
+import SplashScreen from './app/components/Splashscreen.js';
+import Events from './app/pages/Events.js';
+import Ex from './app/pages/ex.js';
+import ProfilePage from './app/pages/ProfilePage.js';
+import EventCreate from './app/pages/EventCreate.js';
+import SideMenu from './app/pages/SideMenu.js';
+import Verification from './app/components/verification.js';
+
 import { createStackNavigator, createAppContainer, createBottomTabNavigator, createDrawerNavigator, createSwitchNavigator} from 'react-navigation';
 import firebase from 'react-native-firebase';
 import type { RemoteMessage } from 'react-native-firebase';
@@ -68,33 +70,7 @@ firebase.messaging().hasPermission()
     }
   });
 
-/*if (enabled) {
-    let token = this.getToken();
-    console.log("Token : "+ token);
-} else {
-    this.requestPermission();
-}*/
-
-/*try {
-    firebase.messaging().requestPermission();
-    // User has authorised
-    this.getToken();
-} catch (error) {
-    // User has rejected permissions
-    console.log('permission rejected');
-}*/
-
-/*let fcmToken = AsyncStorage.getItem('fcmToken');
-if (!fcmToken) {
-    fcmToken = firebase.messaging().getToken();
-    if (fcmToken) {
-        // user has a device token
-        AsyncStorage.setItem('fcmToken', fcmToken);
-    }
-}*/
-
-//checkPermission();
-console.disableYellowBox = true;
+//console.disableYellowBox = true;
 
 const ProfileStack = createStackNavigator({
   ProfilePage : {
@@ -123,7 +99,7 @@ const EventStack = createStackNavigator({
     initialRouteName : 'Events',
 })
 
-const TabNav = createBottomTabNavigator(
+/*const TabNav = createBottomTabNavigator(
     {
       EventStack : {
           screen : EventStack,
@@ -155,7 +131,7 @@ const TabNav = createBottomTabNavigator(
       }
     },
   },
-);
+);*/
 
 const Drawer =  createDrawerNavigator({
   EventStack : {
@@ -193,9 +169,15 @@ const LoginStack = createStackNavigator({
   FPassword : {
     screen : FPassword,
     navigationOptions : {
-    header : null,
+      header : null,
     }
   },
+  Verification : {
+    screen : Verification,
+    navigationOptions : {
+      header : null,
+    }
+  }
 })
 
 const App1 = createSwitchNavigator({

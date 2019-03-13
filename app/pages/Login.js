@@ -1,16 +1,9 @@
 import React, { Component } from 'react';
 import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image, ScrollView, Dimensions} from 'react-native';
-import Events from 'C:/Users/DELL/Documents/EventSharingSystem/app/pages/Events.js';
-import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 import firebase from 'react-native-firebase';
-import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
-import activityIndicator from 'C:/Users/DELL/Documents/EventSharingSystem/app/components/activityIndicator.js'
+import Colors from '../styles/colors.js';
+import Activity from '../components/activityIndicator.js'
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
-
-
-//import {exitAlert} from './ExitAlert';
-//import { BackAndroid } from 'react-native';
-//AndroidKeyboardAdjust.setAdjustNothing();
 
 export default class Login extends Component {
 
@@ -44,7 +37,7 @@ export default class Login extends Component {
   }
 // {minHeight : this.height || heightOfDeviceScreen}
 /*<View style = {styles.childcontainer1}>
-  <Image source={require('C:/Users/DELL/Documents/EventSharingSystem/app/assets/logo.png')} style = {{height : 100, width : 100,}} />
+  <Image source={require('../app/assets/logo.png')} style = {{height : 100, width : 100,}} />
 </View >*/
 /*<TextInput style = {styles.input}
       title = 'Username'

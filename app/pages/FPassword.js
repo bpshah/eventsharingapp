@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar} from 'react-native';
 import firebase from 'react-native-firebase';
-import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
+import Colors from '../styles/colors.js';
 
 export default class FPassword extends Component{
 
