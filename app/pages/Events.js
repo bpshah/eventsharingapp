@@ -9,16 +9,17 @@ import Activity from '../components/activityIndicator.js'
 import type { RemoteMessage,Notification } from 'react-native-firebase';
 //import functions from "firebase-functions";
 //eimport admin from "firebase-admin";
-
+//let data = []
 export default class Events extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      events : null,
+      datasrc : null,
       refreshing : false,
-      loading : true,
+      loading : false,
     }
+
   }
 
   static navigationOptions = ({navigation}) => ({
@@ -42,33 +43,12 @@ export default class Events extends Component {
   })
 
   componentWillMount(){
-
-    console.log("In Mount");
-    let data = [];
-    firebase
-      .database()
-      .ref('Events/')
-      .on('value',(snapshot) => {
-        console.log("Before Parsing");
-        snapshot.forEach((csnapshot) => {
-            let item = csnapshot.val();
-            //item.key = csnapshot.key;
-            data.push(item);
-        })
-        console.log("After Parsing");
-        console.log("Data:" + data);
-        this.setState({
-          events : data,
-          loading : false,
-        });
-        console.log("Events : ",this.state.events);
-      })
-      console.log("After Fetch");
-      data = [];
-    }
+    this.set
+  }
 
   componentDidMount(){
-    //console.log("In Home : " + firebase.messaging);
+    this.handleRefresh();
+
     this.unsubscribeFromNotificationListener = firebase.notifications().onNotification(notification => {
 	     console.log('Notification received!', notification);
        const localNotification = new firebase.notifications.Notification({
@@ -88,31 +68,37 @@ export default class Events extends Component {
       })
 
     }
+    componentWillUnmount(){
+      this.handleRefresh();
+    }
 
-    handleRefresh = () => {
+  handleRefresh = () => {
 
     this.setState({
+      //datasrc : null,
       refreshing : true,
+      loading : true,
     })
-
-    let data = [];
-
+    //console.log("data src null :" + this.state.datasrc);
+    let data1 = [];
     firebase
       .database()
       .ref('Events/')
       .on('value',(snapshot) => {
         //console.log("Before Parsing");
+        //console.log("New Snapshot : " + snapshot);
         snapshot.forEach((csnapshot) => {
             let item = csnapshot.val();
-            item.key = csnapshot.key;
-            data.push(item)
+            //item.key = csnapshot.key;
+            data1.push(item)
         })
         //console.log("After Parsing");
         this.setState({
-          events : data,
+          datasrc : data1,
           refreshing : false,
+          loading : false,
         });
-        //console.log("E1 : ",this.state.events[0]['uid']);
+        //console.log("Refreshed : " + this.state.datasrc);
       })
     }
 
@@ -129,7 +115,7 @@ export default class Events extends Component {
       return(
 
         <FlatList
-            data = {this.state.events}
+            data = {this.state.datasrc}
             refreshing = {this.state.refreshing}
             onRefresh = {this.handleRefresh}
             renderItem={({item})=>(
@@ -160,9 +146,6 @@ export default class Events extends Component {
     );
   }
 }
-
-//export default withNavigationFocus(Events);
-//onPress={() => this.props.navigation.navigate('Ex')}
 
 const styles = StyleSheet.create({
   Container : {

@@ -39,12 +39,13 @@ firebase.initializeApp(config);
 firebase.messaging().hasPermission()
   .then(enabled => {
     if(enabled){
-      console.log("Enabled : ", enabled);
+      //console.log("Enabled : ", enabled);
       AsyncStorage.getItem('fcmToken').then( fcmtoken => {
           if(!fcmtoken) {
-            console.log("Fcmtoken : ", fcmtoken);
+            //console.log("Fcmtoken : ", fcmtoken);
             firebase.messaging().getToken().then( (token) => {
                 if(token){
+                  console.log("hello");
                   console.log("Token : ", token);
                   AsyncStorage.setItem('token',token);
                 }

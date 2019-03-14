@@ -103,6 +103,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        vectorDrawables.useSupportLibrary = true
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
@@ -137,18 +138,20 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-push-notification')
-    compile project(':react-native-vector-icons')
-    compile project(':react-native-splash-screen')
-    compile project(':react-native-image-picker')
-    compile project(':react-native-gesture-handler')
-    compile project(':react-native-firebase')
-    compile project(':react-native-fetch-blob')
-    compile project(':react-native-android-keyboard-adjust')
+    compile project(':react-native-image-crop-picker')
+    //compile project('com.github.yalantis:ucrop:2.2.2')
+    implementation project(':react-native-push-notification')
+    implementation project(':react-native-vector-icons')
+    //compile project(':react-native-splash-screen')
+    //compile project(':react-native-image-picker')
+    //compile project(':react-native-gesture-handler')
+    //compile project(':react-native-firebase')
+    implementation project(':react-native-fetch-blob')
+    //compile project(':react-native-android-keyboard-adjust')
     implementation project(':react-native-firebase')
     implementation project(':react-native-image-picker')
     implementation project(':react-native-vector-icons')
-    implementation project(':react-native-splash-screen')
+    //implementation project(':react-native-splash-screen')
     implementation project(':react-native-gesture-handler')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"

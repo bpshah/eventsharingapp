@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image, ScrollView, Dimensions} from 'react-native';
+import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image, ScrollView, Dimensions,AsyncStorage} from 'react-native';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
 import Activity from '../components/activityIndicator.js'
@@ -30,26 +30,24 @@ export default class Login extends Component {
       .auth()
       .signInWithEmailAndPassword(this.state.email, this.state.password)
       .then((res) => {console.log(res)})
+      .then(() => {this.updateToken()})
       .then(() => {this.props.navigation.navigate('Events')})
       .catch(error => {this.setState({ errorMessage: error.message });
             console.log(error)})
     console.log("Logged In");
   }
-// {minHeight : this.height || heightOfDeviceScreen}
-/*<View style = {styles.childcontainer1}>
-  <Image source={require('../app/assets/logo.png')} style = {{height : 100, width : 100,}} />
-</View >*/
-/*<TextInput style = {styles.input}
-      title = 'Username'
-      placeholder = 'Username or Email'
-      placeholderTextColor = 'rgba(255,255,255,0.7)'
-      returnKeyType = 'next'
-      keyBoardType = 'email-address'
-      autoCapitalize = 'none'
-      onChangeText={email => this.setState({ email })}
-      value={this.state.email}
 
-/>*/
+  updateToken = () => {
+    let user = firebase.auth().currentUser;
+
+    const email = user.email;
+    const temail = email.slice(0,user.email.indexOf('@'));
+    let token = AsyncStorage.getItem('token')
+    let t = []
+    t.push(token)
+    console.log("In login token : " + t.token);
+  }
+
   render(){
     const {height : heightOfDeviceScreen} = Dimensions.get('window');
     return(
