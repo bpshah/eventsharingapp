@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, ScrollView, Picker, Platform, Alert,AsyncStorage} from 'react-native';
+import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, ScrollView, Picker, Platform, Alert,AsyncStorage,ToastAndroid} from 'react-native';
 import {BackHandler} from 'react-native';
 import { Avatar, CheckBox, ButtonGroup } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
@@ -15,11 +15,11 @@ export default class Signup extends Component {
   constructor(){
     super()
     this.state = {
-      filePath : '../app/assets/logo.png',
+      filePath : '',
       email : 'bhumit1206@gmail.com',
       password : 'asdf1234',
       confirmPassword : 'asdf1234',
-      firstname : 'Bhumit',
+      firstname : 'Bhumit ',
       lastName : 'Shah',
       mobileNumber : '7359705973',
       location : 'Ahmedabad',
@@ -27,6 +27,8 @@ export default class Signup extends Component {
       errorMessage: null,
       token : '',
     }
+    this.focusNextField = this.focusNextField.bind(this);
+    this.inputs = {};
   }
 
   componentDidMount(){
@@ -38,20 +40,13 @@ export default class Signup extends Component {
       console.log("State : " + this.state.token);
     })
   }
-/* switch (error.code) {
-            case 'auth/email-already-in-use':
-              console.log(`Email address ${this.state.email} already in use.`);
-            case 'auth/invalid-email':
-              console.log(`Email address ${this.state.email} is invalid.`);
-            case 'auth/operation-not-allowed':
-              console.log(`Error during sign up.`);
-            case 'auth/weak-password':
-              console.log('Password is not strong enough. Add additional characters including special characters and numbers.');
-            default:
-              console.log(error.message);
-*/
+
   handleSignUp = () => {
     //if(pwd.length >= 8 ){
+    let  email = this.state.email;
+    let password  = this.state.password
+    if(email != '' && password != ''){
+      console.log("in if");
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.state.email, this.state.password)
@@ -63,8 +58,29 @@ export default class Signup extends Component {
             })
           this.props.navigation.navigate('Login')
         })
-        .catch(error => { console.log(error);})
-      console.log("Signed Up");
+        .catch(error => {
+          console.log(error);
+          switch(error.code){
+            case 'auth/email-already-in-use':
+              ToastAndroid.showWithGravity( 'Email is already in use.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+              break;
+            case 'auth/invalid-email':
+              ToastAndroid.showWithGravity( 'Email is invalid.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+              break;
+            case 'auth/operation-not-allowed':
+              ToastAndroid.showWithGravity( ' Error signing up',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+              break;
+            case 'auth/weak-password':
+              ToastAndroid.showWithGravity( 'Password is weak',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+              break;
+            default:
+              ToastAndroid.showWithGravity( 'Error signing up',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+          }
+        })
+    }
+    else{
+      ToastAndroid.showWithGravity( 'Email and Password Fields cannot be empty',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+    }
   }
 
   uploadImage = (uri, imageName, mime = 'image/png') => {
@@ -76,10 +92,10 @@ export default class Signup extends Component {
         //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
         const uploadUri = uri;
         let uploadBlob = null;
-        console.log("Imagename : " + imageName);
-        if(imageName == null){
+        //console.log("Imagename : " + imageName);
+        /*if(imageName == null){
           imageName = 'Default'
-        }
+        }*/
         const imageRef = firebase.storage().ref('images').child(imageName);
         //console.log("In UI : " + uploadUri + imageName);
         fs.readFile(uploadUri, 'base64')
@@ -92,14 +108,22 @@ export default class Signup extends Component {
         })
         .then(() => {
           uploadBlob.close()
+          console.log("Image Uploaded");
           return imageRef.getDownloadURL()
         })
         .then((url) => {
-          console.log("Before setState");
+          //console.log("Before setState");
+          console.log("url :" + url);
           this.setState({
             imgsrc : url,
           });
-          console.log("In Ui :" + this.state.imgsrc);
+          let imgsrc = this.state.imgsrc;
+          console.log("In UI :" + this.state.imgsrc);
+          let temail = this.state.email.slice(0,email.indexOf('@'));
+          firebase
+            .database()
+            .ref('Users/'+ temail)
+            .update({imgsrc});
           resolve(url)
         })
         .catch((error) => {
@@ -120,15 +144,10 @@ export default class Signup extends Component {
 
       let temail = email.slice(0,email.indexOf('@'));
 
-      //let url = firebase.storage().ref('images/' + temail + '.png').getDownloadURL();
-      //let imgUrl = url;
-
-      console.log("IMGURL:" + imgsrc);
-
       firebase
         .database()
         .ref('Users/' + temail)
-        .set({ firstname, lastname, mobileno, location , imgsrc , token})
+        .set({ firstname, lastname, mobileno, location , token})
         .catch(error => this.setState({ errorMessage: error.message }))
 
   }
@@ -159,7 +178,7 @@ export default class Signup extends Component {
           this.setState({
             filePath : response.uri,
           });
-
+          console.log(this.state.filePath);
         }
       });
   };
@@ -171,16 +190,40 @@ export default class Signup extends Component {
     let email = this.state.email;
     let temail = email.slice(0,email.indexOf('@'));
 
-    if(password !== confirmPassword ){
-      Alert("Password don't match");
-      console.log("Password don't match");
+    if(password != confirmPassword ){
+      //Alert("Password don't match");
+      //console.log("Password don't match");
+      ToastAndroid.showWithGravity( "Passwords don't match",ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
     }
     else {
-      this.uploadImage(this.state.filePath, temail + '.png')
-      .then(() =>  this.handleProfileData() );
-      this.handleSignUp();
+      if(this.state.firstname != ''
+      && this.state.lastName != ''
+      && this.state.mobileNumber != ''
+      && this.state.location != ''
+      && this.state.email != ''
+      && this.state.password != ''
+      && this.state.confirmPassword != ''){
+        if(this.state.filePath != ''){
+          this.uploadImage(this.state.filePath, temail + '.png')
+          .then(() =>  {this.handleProfileData()
+                        this.handleSignUp(); });
+        }
+        else{
+          ToastAndroid.showWithGravity( 'Profile Picture is compulsory.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+        }
+
+      }
+      else {
+        ToastAndroid.showWithGravity( 'All Fields and compulsory.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+      }
+
+
       console.log("Signed Up");
     }
+  }
+
+  focusNextField(id) {
+    this.inputs[id].focus();
   }
 
   render(){
@@ -196,6 +239,7 @@ export default class Signup extends Component {
             size = "xlarge"
             margin = {20}
             alignSelf = 'center'
+            editButton = {{name : 'camera-alt', type : 'material', color : 'black', underlayColor : 'white'}}
             onEditPress = {this.chooseFile.bind(this)}
           />
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '5%',marginRight : '8%',marginLeft : '2%'}}>
@@ -205,12 +249,18 @@ export default class Signup extends Component {
               style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
             <TextInput style = {styles.input}
               title = 'First Name'
-              placeholder = {this.state.firstname}
-              placeholderTextColor = 'black'
+              placeholder = 'Your First Name'
+              placeholderTextColor = {Colors.placeholderTextSignup}
               returnKeyType = 'next'
               autoCapitalize = 'none'
               autoCorrect = {false}
               onChangeText = {firstname => this.setState({ firstname })}
+              onSubmitEditing = { () => {
+                this.focusNextField('two');
+              }}
+              ref = { input => {
+                this.inputs['one'] = input;
+              }}
               value = {this.state.firstname}
               autoFocus = {false}/>
           </View>
@@ -220,12 +270,18 @@ export default class Signup extends Component {
               color='black'
               style = {{marginLeft : '10%',marginRight : '5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
             <TextInput style = {styles.input}
-              placeholder = {this.state.lastName}
-              placeholderTextColor = 'black'
+              placeholder = 'Your Last Name'
+              placeholderTextColor = {Colors.placeholderTextSignup}
               returnKeyType = 'next'
               autoCapitalize = 'none'
               autoCorrect = {false}
               onChangeText = {lastName => this.setState({ lastName })}
+              onSubmitEditing = { () => {
+                this.focusNextField('three');
+              }}
+              ref = { input => {
+                this.inputs['two'] = input;
+              }}
               value = {this.state.lastName}/>
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
@@ -234,8 +290,8 @@ export default class Signup extends Component {
               color='black'
               style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
             <TextInput style = {styles.input}
-              placeholder = {this.state.mobileNumber}
-              placeholderTextColor = 'black'
+              placeholder = 'Your Mobile Number'
+              placeholderTextColor = {Colors.placeholderTextSignup}
               returnKeyType = 'next'
               keyBoardType = 'phone-pad'
               autoCapitalize = 'none'
@@ -243,6 +299,12 @@ export default class Signup extends Component {
               dataDetectorTypes = 'phoneNumber'
               maxLength = {13}
               onChangeText = {mobileNumber => this.setState({ mobileNumber })}
+              onSubmitEditing = { () => {
+                this.focusNextField('four');
+              }}
+              ref = { input => {
+                this.inputs['three'] = input;
+              }}
               value = {this.state.mobileNumber}/>
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
@@ -251,12 +313,18 @@ export default class Signup extends Component {
               color='black'
               style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
             <TextInput style = {styles.input}
-              placeholder = {this.state.location}
-              placeholderTextColor = 'black'
+              placeholder = 'Your City'
+              placeholderTextColor = {Colors.placeholderTextSignup}
               returnKeyType = 'next'
               autoCapitalize = 'none'
               autoCorrect = {false}
               onChangeText = {location => this.setState({ location })}
+              onSubmitEditing = { () => {
+                this.focusNextField('five');
+              }}
+              ref = { input => {
+                this.inputs['four'] = input;
+              }}
               value = {this.state.location}/>
         </View>
         <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
@@ -265,13 +333,19 @@ export default class Signup extends Component {
             color='black'
             style = {{marginLeft : '9%',marginRight : '4.5%',marginBottom : '0.25%',alignSelf : 'center'}}/>
           <TextInput style = {styles.input}
-            placeholder = {this.state.email}
-            placeholderTextColor = 'black'
+            placeholder = 'Your Email'
+            placeholderTextColor = {Colors.placeholderTextSignup}
             returnKeyType = 'next'
             keyBoardType = 'email-address'
             autoCapitalize = 'none'
             autoCorrect = {false}
             onChangeText = {email => this.setState({ email })}
+            onSubmitEditing = { () => {
+              this.focusNextField('six');
+            }}
+            ref = { input => {
+              this.inputs['five'] = input;
+            }}
             value = {this.state.email}/>
         </View>
         <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
@@ -283,10 +357,16 @@ export default class Signup extends Component {
             placeholder = 'Password'
             secureTextEntry = {true}
             returnKeyType = 'go'
-            placeholderTextColor = 'rgba(255,255,255,0.7)'
+            placeholderTextColor = {Colors.placeholderTextSignup}
             minLength = {8}
             blurOnSubmit = {true}
             onChangeText = {password => this.setState({ password })}
+            onSubmitEditing = { () => {
+              this.focusNextField('seven');
+            }}
+            ref = { input => {
+              this.inputs['six'] = input;
+            }}
             value = {this.state.password}/>
         </View>
         <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
@@ -298,10 +378,13 @@ export default class Signup extends Component {
             placeholder = 'Confirm Password'
             secureTextEntry = {true}
             returnKeyType = 'go'
-            placeholderTextColor = 'rgba(255,255,255,0.7)'
+            placeholderTextColor = {Colors.placeholderTextSignup}
             minLength = {20}
             blurOnSubmit = {true}
             onChangeText = {confirmPassword => this.setState({ confirmPassword })}
+            ref = { input => {
+              this.inputs['seven'] = input;
+            }}
             value = {this.state.confirmPassword}/>
         </View>
 

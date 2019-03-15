@@ -43,7 +43,7 @@ export default class Events extends Component {
   })
 
   componentWillMount(){
-    this.set
+  
   }
 
   componentDidMount(){

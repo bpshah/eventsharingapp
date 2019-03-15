@@ -4,9 +4,6 @@ import {StackActions, NavigationActions} from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import Activity from '../components/activityIndicator.js'
-
-//import ImagePicker from 'react-native-image-picker';
-//import ImageSlider from 'react-native-image-slider';
 import { Avatar } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
@@ -22,6 +19,7 @@ const options = {
 
 let i = 0;
 let j = 0;
+
 
 export default class EventCreate extends Component{
 
@@ -54,18 +52,20 @@ export default class EventCreate extends Component{
   constructor(props){
     super(props);
     this.state = {
-      avatarSource : null,
       filePath : [] ,
       eventname : '',
-      place : '',
+      place : [],
       organizer : '',
       contact : '',
       description : '',
-      category : '',
+      category : [],
       fromtime : '',
       totime : '',
-      imgsrc : null,
-      selectedValue : 0,
+      imgsrc : [],
+      selectedPlace : '',
+      selectedValuePlace : 0,
+      selectedCategory : '',
+      selectedValueCategory : 0,
       datasrc : null,
       loading : false,
     };
@@ -73,11 +73,40 @@ export default class EventCreate extends Component{
     this.inputs = {};
   }
 
+  componentWillMount(){
+    firebase
+      .database()
+      .ref('Locations/')
+      .once('value').then((snapshot) => {
+        //console.log("Before Parsing Locations");
+        snapshot.forEach((csnapshot) => {
+            let item = csnapshot.val();
+            //console.log("Locations : " + item);
+            this.state.place.push(item);
+
+        });
+        console.log("Data 1 : " + this.state.place);
+      })
+    firebase
+      .database()
+      .ref('Catgory/')
+      .once('value').then((snapshot) => {
+        //console.log("Before Parsing Categories");
+        snapshot.forEach((csnapshot) => {
+            let item = csnapshot.val();
+            //console.log("Category : " + item);
+            this.state.category.push(item);
+        });
+        console.log("Data 2 : " + this.state.category);
+      })
+  }
+
   componentDidMount(){
 
     i = 0;
     j = 0;
     let data = [];
+
     firebase
       .database()
       .ref('Users/')
@@ -85,22 +114,13 @@ export default class EventCreate extends Component{
         console.log("Before Parsing");
         snapshot.forEach((csnapshot) => {
             let item = csnapshot.val();
-            //item.key = csnapshot.key;
-            console.log(item.token);
             data.push(item.token);
         });
-        //console.log("After Parsing Event Create : ");
-        //console.log("Data:" + data);
+        //console.log("Tokens : " + data);
         this.setState({
           datasrc : data,
         });
-        console.log("Data src:" + this.state.datasrc[0]);
-        console.log("Data src:" + this.state.datasrc[1]);
-        console.log("Data src:" + this.state.datasrc[2]);
-
       })
-      //console.log("After Fetch");
-
   }
 
   uploadImage = (uri, imageName, mime = 'image/png') => {
@@ -112,7 +132,6 @@ export default class EventCreate extends Component{
       //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
         const uploadUri = uri;
         let uploadBlob = null
-        console.log("UPUri " + uri);
         const imageRef = firebase.storage().ref('events').child(this.state.eventname).child(imageName)
         fs.readFile(uploadUri, 'base64')
         .then((data) => {
@@ -127,9 +146,14 @@ export default class EventCreate extends Component{
           return imageRef.getDownloadURL()
         })
         .then((url) => {
-          console.log("Image Uploaded");
-          this.state.imgsrc[j] = url;
-          j = j + 1;
+          console.log("Image Uploaded : " + url);
+          this.state.imgsrc.push(url);
+          console.log("Imgsrc : " + this.state.imgsrc);
+          let imgsrc = this.state.imgsrc;
+          firebase
+            .database()
+            .ref('Events/'+ this.state.eventname)
+            .update({imgsrc});
           resolve(url)
         })
         .catch((error) => {
@@ -168,52 +192,29 @@ export default class EventCreate extends Component{
           images.forEach((img) => {
             imgs.push(img.path);
           })
-          console.log("in picker");
-          console.log(imgs);
           this.setState({
             filePath : imgs,
           })
           console.log(this.state.filePath);
         });
-        /*ImagePicker.showImagePicker(response => {
-          console.log('Response = ', response);
-
-          if (response.didCancel) {
-            console.log('User cancelled image picker');
-          } else if (response.error) {
-            console.log('ImagePicker Error: ', response.error);
-          } else {
-            let source = response;
-            // You can also display the image using data:
-            // let source = { uri: 'data:image/jpeg;base64,' + response.data };
-            this.state.filePath[i] = source.uri;
-            i = i + 1;
-            //console.log("I", i);
-            console.log("Filepath : " + this.state.filePath[0]);
-            console.log("Filepath : " + this.state.filePath[1]);
-            console.log("Filepath : " + this.state.filePath[2]);
-
-          }
-        });*/
     };
 
   handleEvent = () => {
 
       let user = firebase.auth().currentUser;
       const email = user.email;
-      //const temail = email.slice(0,user.email.indexOf('@'));
       let fromtime = this.state.fromtime;
       let totime = this.state.totime;
-      let place = this.state.place;
+      let place = this.state.selectedPlace;
       let mobileno = this.state.contact;
       let description = this.state.description;
       let org = this.state.organizer;
       let eventname = this.state.eventname;
-      let category = this.state.category;
+      let category = this.state.selectedCategory;
       let imgsrc = this.state.imgsrc;
 
+      console.log("In Handle Event : " + imgsrc);
       let uid  = email.slice(0,user.email.indexOf('@'));
-      console.log("Before Upload");
       firebase
         .database()
         .ref('Events/'+ this.state.eventname)
@@ -228,7 +229,7 @@ export default class EventCreate extends Component{
                     this.props.navigation.dispatch(resetAction);
         })
         .catch(error => this.setState({ errorMessage: error.message }))
-      console.log("Event Upload");
+      //console.log("Event Upload");
     }
 
   uploadImages = async (photos) => {
@@ -237,16 +238,14 @@ export default class EventCreate extends Component{
       console.log("P :" + p);
       this.uploadImage( p, this.state.eventname + index )})
     const urls = await Promise.all(uploadImagePromises)
-    console.log("Urls",urls);
+    //console.log("Urls",urls);
   }
-//  <service android:name="io.invertase.firebase.messaging.RNFirebaseBackgroundMessagingService" />
+// <service android:name="io.invertase.firebase.messaging.RNFirebaseBackgroundMessagingService" />
 
   handle = () => {
     this.setState({
       loading : true,
     })
-    //console.log("Before Handle");
-    //console.log(this.state.filePath);
     this.uploadImages(this.state.filePath)
     .then( () => this.handleEvent())
     .then( () => {
@@ -254,7 +253,6 @@ export default class EventCreate extends Component{
         loading : false,
       })
     });
-    //console.log("After handle");
     fetch('https://fcm.googleapis.com/fcm/send',
             {
                 method: 'POST',
@@ -267,7 +265,7 @@ export default class EventCreate extends Component{
                 {
                   "notification": {
                     "title": this.state.eventname,
-                    "body": this.state.place,
+                    "body": this.state.selectedPlace,
                 },
                 "data": {
                   "title": this.state.eventname,
@@ -295,24 +293,27 @@ export default class EventCreate extends Component{
 
     return(
       <ScrollView contentContainerStyle = {styles.container}
-                  behaviour = 'height'>
+                  behaviour = 'height'
+                  >
 
-          <View style = {{height : 200,marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%',width : '100%'}}>
+          <View style = {{ flex: 1, width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
             <ImageSlider
               loopBothSides
               images = {this.state.filePath}
-              style = {{backgroundColor : Colors.primaryBackGourndColor}}
+              style = {{backgroundColor : 'black',width : '100%',borderRadius : 0}}
               customSlide = {({ index, item, style, width }) => (
               <View key={index} style={[style, styles.Slide]}>
                 <Avatar
                   rectangle
                   source = {{uri : item}}
                   size = 'xlarge'
-                  height = '90%'
-                  width = '90%'
-                  alignSelf = 'center'
-                  backgroundColor = '#000000'
-                  imageProps = {{resizeMode : 'stretch'}}
+                  //avatarStyle = {{height : '100%',width : '100%',alignSelf : 'center'}}
+                  //backgroundColor = 'white'
+                  width = "100%"
+                  imageProps = {{resizeMode : 'contain'}}
+                  //icon = {{name : 'plus', type : 'font-awesome', color : 'black', underlayColor : 'white',size : 40}}
+                  //iconStyle = {{iconSize : 10}}
+                  editButton = {{name : 'camera', type : 'font-awesome', color : 'black', underlayColor : 'white',size : 40}}
                   showEditButton
                   onEditPress = {this.chooseFile.bind(this)}
 
@@ -347,7 +348,7 @@ export default class EventCreate extends Component{
             <TextInput style = {styles.input}
               title = 'Event Name'
               placeholder = "Name of Event"
-              //placeholderTextColor = 'black'
+              placeholderTextColor = {Colors.placeholderText}
               returnKeyType = 'next'
               blurOnSubmit = { false }
               onSubmitEditing = { () => {
@@ -362,27 +363,26 @@ export default class EventCreate extends Component{
                 this.inputs['one'] = input;
               }}/>
           </View>
-          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '4.5%',marginLeft : '2%'}}>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '0.5%',marginRight : '4.5%',marginLeft : '2%'}}>
             <Icon name="map-marker-alt"
               size={22}
               color='black'
               style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
-            <TextInput style = {styles.input}
-              title = 'Place'
-              placeholder = 'Place of Event(e.g. Address, City)'
-              //placeholderTextColor = 'black'
-              returnKeyType = 'next'
-              blurOnSubmit = { false }
-              onSubmitEditing = { () => {
-                this.focusNextField('three');
-              }}
-              autoCapitalize = 'words'
-              autoCorrect = {false}
-              onChangeText = { place => this.setState({ place })}
-              value = {this.state.place}
-              ref = { input => {
-                this.inputs['two'] = input;
-              }}/>
+              <View
+                style = {{flexDirection : 'row', flex : 1, borderBottomWidth : 1, width : '80%', backgroundColor : 'rgba(255,255,255,0)', borderBottomColor : 'black',marginLeft : '0%'}}>
+                <Picker
+                  selectedValue = {this.state.selectedPlace}
+                  mode = 'dropdown'
+                  style = {[styles.pickerStyle,{color : Colors.placeholderText,marginLeft : '3%'}]}
+                  onValueChange = {(itemValue, itemIndex) =>
+                    this.setState({ selectedPlace : itemValue,selectedValuePlace : itemIndex})}
+                >
+                <Picker.Item label="Select Location" value="location"/>
+                { this.state.place.map((item,index) =>
+                  <Picker.Item label={item} value={item}/>
+                )}
+                </Picker>
+              </View>
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '4.5%',marginLeft : '2%'}}>
               <Icon name="landmark"
@@ -392,7 +392,7 @@ export default class EventCreate extends Component{
               <TextInput style = {styles.input}
                 title = 'Organizer Name'
                 placeholder = 'Organizer of Event'
-                //placeholderTextColor = 'black'
+                placeholderTextColor = {Colors.placeholderText}
                 returnKeyType = 'next'
                 blurOnSubmit = { false }
                 onSubmitEditing = { () => {
@@ -415,7 +415,7 @@ export default class EventCreate extends Component{
               <TextInput style = {styles.input}
                 title = 'Contact'
                 placeholder = 'Contact of Organizer'
-                //placeholderTextColor = 'black'
+                placeholderTextColor = {Colors.placeholderText}
                 returnKeyType = 'next'
                 blurOnSubmit = { false }
                 onSubmitEditing = { () => {
@@ -518,7 +518,7 @@ export default class EventCreate extends Component{
             <TextInput style = {styles.input}
               title = 'Description'
               placeholder = 'Description of Event'
-              //placeholderTextColor = 'black'
+              placeholderTextColor = {Colors.placeholderText}
               returnKeyType = 'next'
               blurOnSubmit = { false }
               onSubmitEditing = { () => {
@@ -544,20 +544,18 @@ export default class EventCreate extends Component{
               style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
             <View style = {{flexDirection : 'row', flex : 1, borderBottomWidth : 1, width : '80%', backgroundColor : 'rgba(255,255,255,0)', borderBottomColor : 'black',marginLeft : '0%'}}>
               <Picker
-                selectedValue = {this.state.category}
+                selectedValue = {this.state.selectedCategory}
                 mode = 'dropdown'
                 prompt = "Event Category"
                 blurOnSubmit = { false }
-                style = {[styles.input,{marginLeft : '3%'}]}
+                style = {[styles.pickerStyle,{color : Colors.placeholderText,marginLeft : '3%'}]}
                 onValueChange = {(itemValue, itemIndex) =>
-                  this.setState({ category : itemValue,selectedValue : itemIndex})}
-                  ref = { input => {
-                    this.inputs['eight'] = input;
-                  }}>
-                <Picker.Item label = "Event Category" value = "event" />
-                <Picker.Item label = "Tech" value = "tech" />
-                <Picker.Item label = "Cultural" value = "cultural" />
-                <Picker.Item label = "Sports" value = "sports" />
+                  this.setState({ selectedCategory : itemValue,selectedValueCategory : itemIndex})}
+                  >
+                  <Picker.Item label="Select Category" value="category"/>
+                  { this.state.category.map((item,index) =>
+                    <Picker.Item label={item} value={item}/>
+                  )}
               </Picker>
             </View>
           </View>
@@ -590,9 +588,21 @@ const styles = StyleSheet.create({
     backgroundColor : 'rgba(255,255,255,0)',
     marginBottom : '5%',
     paddingHorizontal : 15,
-    color : 'rgba(0,0,0,0.4)',
+    //color : 'rgba(0,0,0,0.4)',
     borderBottomColor : 'black',
     fontSize : 16,
+    borderBottomWidth : 1,
+  },
+  pickerStyle : {
+    height : 40,
+    width : '80%',
+    alignSelf : 'center',
+    backgroundColor : 'rgba(255,255,255,0)',
+    marginBottom : '5%',
+    paddingHorizontal : 15,
+    //color : 'rgba(0,0,0,0.4)',
+    borderBottomColor : 'black',
+    //fontSize : 16,
     borderBottomWidth : 1,
   },
   buttonContainer : {
@@ -619,12 +629,12 @@ const styles = StyleSheet.create({
   Slide : {
     backgroundColor: Colors.primaryBackGourndColor,
     alignItems: 'center',
+    alignSelf : 'flex-start',
     justifyContent: 'center',
-    borderRadius : 10,
+    borderRadius : 0,
     marginTop : '0%',
-    color : 'white'
-    //height : '25%',
-    //marginLeft : '0.5%'
+    color : 'black',
+    flex : 1
   },
   buttons : {
     zIndex: 1,

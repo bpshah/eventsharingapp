@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image, ScrollView, Dimensions,AsyncStorage} from 'react-native';
+import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image, ScrollView, Dimensions,AsyncStorage,ToastAndroid} from 'react-native';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
 import Activity from '../components/activityIndicator.js'
@@ -13,6 +13,7 @@ export default class Login extends Component {
       email : 'bhumit1206@gmail.com',
       password : 'asdf1234',
       errorMessage : null,
+      errorCode : null,
       loading : false,
     }
   }
@@ -26,26 +27,43 @@ export default class Login extends Component {
 
   handleLogin = () => {
     const { email, password } = this.state
-    firebase
-      .auth()
-      .signInWithEmailAndPassword(this.state.email, this.state.password)
-      .then((res) => {console.log(res)})
-      .then(() => {this.updateToken()})
-      .then(() => {this.props.navigation.navigate('Events')})
-      .catch(error => {this.setState({ errorMessage: error.message });
-            console.log(error)})
+    if(email != '' && password != ''){
+      firebase
+        .auth()
+        .signInWithEmailAndPassword(this.state.email, this.state.password)
+        .then((res) => {
+          console.log(res)
+          return res;
+        })
+        .then((res) => {
+            this.props.navigation.navigate('Events')
+          })
+        .then(() => {this.updateToken()})
+        .catch(error => {
+              this.setState({ errorMessage : error.message,
+                              errorCode : error.code,
+                });
+              console.log(error.code);
+              if (this.state.errorCode === 'auth/wrong-password'
+                  || this.state.errorCode === 'auth/invalid-email'
+                  || this.state.errorCode === 'auth/user-not-found'){
+                ToastAndroid.showWithGravity( 'Email/Password is invalid.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+              }
+            })
+    }
+    else {
+      ToastAndroid.showWithGravity( 'Email and Password Fields cannot be empty',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+    }
     console.log("Logged In");
   }
 
-  updateToken = () => {
+  updateToken = async () => {
     let user = firebase.auth().currentUser;
-
     const email = user.email;
     const temail = email.slice(0,user.email.indexOf('@'));
-    let token = AsyncStorage.getItem('token')
-    let t = []
-    t.push(token)
-    console.log("In login token : " + t.token);
+    let token = await AsyncStorage.getItem('token')
+    console.log("In login token : " + token);
+    firebase.database().ref('Users/' + temail).update({token});
   }
 
   render(){

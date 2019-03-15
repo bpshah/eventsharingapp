@@ -45,7 +45,6 @@ firebase.messaging().hasPermission()
             //console.log("Fcmtoken : ", fcmtoken);
             firebase.messaging().getToken().then( (token) => {
                 if(token){
-                  console.log("hello");
                   console.log("Token : ", token);
                   AsyncStorage.setItem('token',token);
                 }

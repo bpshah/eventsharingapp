@@ -17,7 +17,6 @@ export default class Ex extends Component {
     super(props);
     this.state = ({
       imgsrc : this.props.navigation.state.params.imgsrc,
-      img : '../app/assets/cool-one-piece-wallpaper_011523568_277.png',
       fromtime : this.props.navigation.state.params.fromtime,
       totime : this.props.navigation.state.params.totime,
       place : this.props.navigation.state.params.place,
@@ -81,13 +80,12 @@ export default class Ex extends Component {
                   backgroundColor = '#000000'
                   imageProps = {{resizeMode : 'stretch'}}
                   editButton = {{size : 30}}
-
                 />
               </View>
             )}
               customButtons={(position, move) => (
                 <View style={styles.buttons}>
-                  {images.map((image, index) => {
+                  {this.state.imgsrc.map((image, index) => {
                     return (
                       <TouchableHighlight
                         key = {index}
