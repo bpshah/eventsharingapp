@@ -43,16 +43,17 @@ export default class Signup extends Component {
 
   handleSignUp = () => {
     //if(pwd.length >= 8 ){
-    let  email = this.state.email;
+    let email = this.state.email
     let password  = this.state.password
+    console.log("in sign up");
     if(email != '' && password != ''){
       console.log("in if");
       firebase
         .auth()
-        .createUserWithEmailAndPassword(this.state.email, this.state.password)
+        .createUserWithEmailAndPassword(this.state.email, password)
         .then(() => {
           firebase.auth().currentUser.sendEmailVerification().then(() => {
-                console.log("Email verificatioon link sent");
+                console.log("Email verification link sent");
             }).catch((error) => {
               console.log(error);
             })
@@ -92,12 +93,7 @@ export default class Signup extends Component {
         //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
         const uploadUri = uri;
         let uploadBlob = null;
-        //console.log("Imagename : " + imageName);
-        /*if(imageName == null){
-          imageName = 'Default'
-        }*/
         const imageRef = firebase.storage().ref('images').child(imageName);
-        //console.log("In UI : " + uploadUri + imageName);
         fs.readFile(uploadUri, 'base64')
         .then((data) => {
           return Blob.build(data, { type: `${mime};BASE64` })
@@ -117,13 +113,14 @@ export default class Signup extends Component {
           this.setState({
             imgsrc : url,
           });
-          let imgsrc = this.state.imgsrc;
+          /*let imgsrc = this.state.imgsrc;
           console.log("In UI :" + this.state.imgsrc);
-          let temail = this.state.email.slice(0,email.indexOf('@'));
+          let temail = this.state.email.slice(0,this.state.email.indexOf('@'));
+          console.log("Imgsrc : " + imgsrc);
           firebase
             .database()
             .ref('Users/'+ temail)
-            .update({imgsrc});
+            .update({imgsrc});*/
           resolve(url)
         })
         .catch((error) => {
@@ -134,6 +131,8 @@ export default class Signup extends Component {
   }
 
   handleProfileData = () => {
+
+      console.log("In profile data");
       let firstname = this.state.firstname;
       let lastname = this.state.lastName;
       let mobileno = this.state.mobileNumber;
@@ -147,7 +146,7 @@ export default class Signup extends Component {
       firebase
         .database()
         .ref('Users/' + temail)
-        .set({ firstname, lastname, mobileno, location , token})
+        .set({ firstname, lastname, mobileno, location , token,imgsrc})
         .catch(error => this.setState({ errorMessage: error.message }))
 
   }
@@ -191,8 +190,6 @@ export default class Signup extends Component {
     let temail = email.slice(0,email.indexOf('@'));
 
     if(password != confirmPassword ){
-      //Alert("Password don't match");
-      //console.log("Password don't match");
       ToastAndroid.showWithGravity( "Passwords don't match",ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
     }
     else {
@@ -205,19 +202,18 @@ export default class Signup extends Component {
       && this.state.confirmPassword != ''){
         if(this.state.filePath != ''){
           this.uploadImage(this.state.filePath, temail + '.png')
-          .then(() =>  {this.handleProfileData()
-                        this.handleSignUp(); });
+          .then(() =>  {
+            this.handleSignUp();
+            this.handleProfileData();
+          });
         }
         else{
           ToastAndroid.showWithGravity( 'Profile Picture is compulsory.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
         }
-
       }
       else {
         ToastAndroid.showWithGravity( 'All Fields and compulsory.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
       }
-
-
       console.log("Signed Up");
     }
   }

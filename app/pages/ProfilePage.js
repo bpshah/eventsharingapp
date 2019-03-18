@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, FlatList, StatusBar, View, Dimensions, KeyboardAvoidingView, Picker, ActivityIndicator} from 'react-native';
+import { Button, TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, FlatList, StatusBar, View, Dimensions, KeyboardAvoidingView, Picker, ActivityIndicator, ToastAndroid} from 'react-native';
 import { Avatar,CheckBox, ButtonGroup } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
@@ -25,6 +25,8 @@ export default class ProfilePage extends Component{
         errorMessage: null,
         loading : true,
       }
+      this.focusNextField = this.focusNextField.bind(this);
+      this.inputs = {};
   }
 
   static navigationOptions = ({navigation}) => ({
@@ -82,26 +84,6 @@ export default class ProfilePage extends Component{
         })
       });
     }
-
-  /*componentDidMount(){
-    this.setState({
-      loading : false,
-
-    })
-  }*/
-
-  /*shouldComponentUpdate(nextProps){
-    return nextState.filePath != this.state.filePath;
-  }
-
-  componentWillUpdate(){
-    if(this.shouldComponentUpdate()){
-      let fp = chooseFile();
-      this.setState({
-        filePath : fp,
-      })
-    }
-  }*/
 
   uploadImage = (uri, imageName, mime = 'image/png') => {
     const Blob = RNFetchBlob.polyfill.Blob;
@@ -195,50 +177,31 @@ export default class ProfilePage extends Component{
     const temail = user.email.slice(0,user.email.indexOf('@'));
     console.log("In DP:");
     console.log("FilePath : " + this.state.filePath);
-    this.setState({
-      loading : true,
-    })
-    this.uploadImage(this.state.filePath,temail + '.png').then( () => { this.setState({
-                                                                                    loading : false,
-                                                                                  });
-                                                                                  this.handleUpdate() });
-    console.log("After Update");
+    if(this.state.firstname != '' &&
+      this.state.lastName != '' &&
+      this.state.mobileNumber != '' &&
+      this.state.location != '' &&
+      this.state.email != '' &&
+      this.state.filepath != ''){
+      this.setState({
+        loading : true,
+      })
+      this.uploadImage(this.state.filePath,temail + '.png')
+          .then( () => { this.setState({
+                                loading : false,
+                                });
+                                this.handleUpdate() });
+
+    }
+    else {
+      ToastAndroid.showWithGravity( 'All Fields are compulsory.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+    }
+        console.log("After Update");
   }
 
-  /*  <DatePicker
-                  style = {{height : 40,width : '80%',marginBottom : 20,alignSelf : 'center',backgroundColor : Colors.white,}}
-                  date = {this.state.date}
-                  mode = "datetime"
-                  placeholder = ""
-                  placeholderTextColor = 'rgba(255,255,255,0.7)'
-                  format = "DD-MM-YYYY"
-                  minDate = "01-01-1950"
-                  maxDate = "01-01-2020"
-                  confirmBtnText = "Confirm"
-                  cancelBtnText = "Cancel"
-                  customStyles = {{
-                    dateIcon : {
-                      position : 'absolute',
-                      left : 292,
-                      top : 4,
-                      marginLeft : 0
-                    },
-                    dateInput : {
-                      marginRight : 44
-                    }
-                  }}
-                  onDateChange = {(date) => {this.setState({date : date})}}
-            />
-            <Picker
-                selectedValue = {this.state.gender}
-                style = {styles.input}
-                itemStyle = {{fontSize : 12,paddingHorizontal : 15,}}
-                mode = 'dropdown'
-                onValueChange = {(itemValue, itemIndex) => this.setState({gender : itemValue})}>
-                <Picker.Item label = 'Female' value = 'female'/>
-                <Picker.Item label = 'Male' value = 'male'/>
-                <Picker.Item label = 'Other' value = 'other'/>
- </Picker>*/
+  focusNextField(id) {
+    this.inputs[id].focus();
+  }
 
   render(){
     const { selectedIndex } = this.state;
@@ -274,6 +237,12 @@ export default class ProfilePage extends Component{
               autoCapitalize = 'none'
               autoCorrect = {false}
               onChangeText = {firstname => this.setState({ firstname })}
+              onSubmitEditing = { () => {
+                this.focusNextField('two');
+              }}
+              ref = { input => {
+                this.inputs['one'] = input;
+              }}
               value = {this.state.firstname}
               autoFocus = {false}/>
           </View>
@@ -289,6 +258,12 @@ export default class ProfilePage extends Component{
               autoCapitalize = 'none'
               autoCorrect = {false}
               onChangeText = {lastName => this.setState({ lastName })}
+              onSubmitEditing = { () => {
+                this.focusNextField('three');
+              }}
+              ref = { input => {
+                this.inputs['two'] = input;
+              }}
               value = {this.state.lastName}/>
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
@@ -306,6 +281,12 @@ export default class ProfilePage extends Component{
               dataDetectorTypes = 'phoneNumber'
               maxLength = {13}
               onChangeText = {mobileNumber => this.setState({ mobileNumber })}
+              onSubmitEditing = { () => {
+                this.focusNextField('four');
+              }}
+              ref = { input => {
+                this.inputs['three'] = input;
+              }}
               value = {this.state.mobileNumber}/>
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
@@ -320,6 +301,12 @@ export default class ProfilePage extends Component{
               autoCapitalize = 'none'
               autoCorrect = {false}
               onChangeText = {location => this.setState({ location })}
+              onSubmitEditing = { () => {
+                this.focusNextField('five');
+              }}
+              ref = { input => {
+                this.inputs['four'] = input;
+              }}
               value = {this.state.location}/>
         </View>
         <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
@@ -335,6 +322,9 @@ export default class ProfilePage extends Component{
             autoCapitalize = 'none'
             autoCorrect = {false}
             onChangeText = {email => this.setState({ email })}
+            ref = { input => {
+              this.inputs['five'] = input;
+            }}
             value = {this.state.email}/>
         </View>
         <TouchableOpacity style = {styles.buttonContainer}

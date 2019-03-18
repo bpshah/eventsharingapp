@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar} from 'react-native';
+import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar,ToastAndroid} from 'react-native';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
 
@@ -13,12 +13,17 @@ export default class FPassword extends Component{
   }
 
   handleResetPwd = () => {
-        //const { email, pasword } = this.state
-        firebase
-          .auth()
-          .sendPasswordResetEmail(this.state.email)
-          .then(() => this.props.navigation.navigate('Login'))
-          .catch(error => this.setState({ errorMessage: error.message }))
+
+    if(this.state.email != ''){
+      firebase
+        .auth()
+        .sendPasswordResetEmail(this.state.email)
+        .then(() => this.props.navigation.navigate('Login'))
+        .catch(error => this.setState({ errorMessage: error.message }))
+    }
+    else {
+      ToastAndroid.showWithGravity( 'Please enter email.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+    }
   }
 
   static navigationOptions = {
@@ -61,8 +66,6 @@ const styles = StyleSheet.create({
     backgroundColor : Colors.primaryAppColor,
     padding : 20,
     justifyContent : 'flex-start',
-
-    //flexDirection: 'column',
   },
   input : {
     height : 40,
@@ -74,10 +77,8 @@ const styles = StyleSheet.create({
     color : Colors.inputColor,
   },
   buttonContainer : {
-    //flex:1,
     backgroundColor : Colors.primaryAppColor,
     paddingVertical : 15,
-    //width: '40%',
   },
   buttonText : {
     textAlign : 'center',

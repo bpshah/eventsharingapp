@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView,TouchableHighlight} from 'react-native';
-//import Ev from '../Screens/Events.js';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView,TouchableHighlight,ToastAndroid} from 'react-native';
 import { Button, Avatar, Divider } from 'react-native-elements';
 import { createStackNavigator, createAppContainer } from 'react-navigation';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Colors from '../styles/colors.js';
 import Fonts from '../styles/fonts.js';
+import firebase from 'react-native-firebase';
 import ImageSlider from 'react-native-image-slider';
-
-
+import Activity from '../components/activityIndicator.js'
 
 export default class Ex extends Component {
 
@@ -24,8 +23,10 @@ export default class Ex extends Component {
       description : this.props.navigation.state.params.desc,
       title : this.props.navigation.state.params.title,
       contact : this.props.navigation.state.params.contact,
+      members : [],
+      userImages : [],
+      loading : true,
     })
-
   }
 
   static navigationOptions = ({navigation}) =>({
@@ -54,12 +55,74 @@ export default class Ex extends Component {
     )
   })
 
+  componentDidMount(){
+    this.fetchMembers();
+  }
+
+  fetchMembers = () => {
+    firebase
+      .database()
+      .ref('Events/' + this.state.title)
+      .once('value')
+      .then((snapshot) => {
+          this.setState({
+            members : snapshot.val().members,
+          })
+          console.log(this.state.members);
+      })
+      .then( () => this.fetchMemberInfo())
+      .then( () => {
+        this.setState({
+          loading : false,
+        })
+      })
+  }
+
+  fetchMemberInfo = () => {
+    let promises = [];
+     this.state.members.map((item,index) => {
+      console.log("Item : " + item);
+      const request = firebase
+        .database()
+        .ref('Users/' + item)
+        .once('value')
+        .then((snapshot) => {
+          this.state.userImages.push(snapshot.val().imgsrc);
+          console.log(this.state.userImages);
+        })
+        promises.push(request);
+    })
+    return Promise.all(promises);
+  }
+
+  joinEvent = () => {
+    console.log("In join Event");
+
+    let user = firebase.auth().currentUser;
+    const temail = user.email.slice(0,user.email.indexOf('@'));
+    if(!this.state.members.includes(temail)){
+      this.state.members.push(temail);
+      let members = this.state.members;
+      firebase
+        .database()
+        .ref('Events/' + this.state.title)
+        .update({members})
+        .then(() => {
+          console.log("joined");
+      });
+    }
+    else {
+      ToastAndroid.showWithGravity( 'You are already subscribed for the event.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+    }
+  }
+
   render(){
-    const images = ['../app/assets/cool-one-piece-wallpaper_011523568_277.png',
-    '../app/assets/logo.png',
-    '../app/assets/logo.png'
-    ];
-       return(
+
+    if(!this.state.loading){
+      <Activity/>
+    }
+    console.log("In render");
+    return(
        <ScrollView contentContainerStyle = {styles.Container}
                    behaviour = 'height'>
           <View style = {{height : 200,marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%',width : '100%'}}>
@@ -104,8 +167,9 @@ export default class Ex extends Component {
             />
           </View>
           <Divider containerStyle = {{backgroundColor : Colors.primaryAppColor,borderWidth : 1}}/>
-          <Button title = 'JOIN AND RSVP'
-                    containerStyle = {styles.buttonContainer}/>
+          <Button title = 'JOIN'
+                    containerStyle = {styles.buttonContainer}
+                    onPress = {this.joinEvent}/>
           <View style = {styles.childContainer1}>
             <Icon name="clock"
                   size={20}
@@ -128,39 +192,21 @@ export default class Ex extends Component {
             <Text style = {styles.childContainerText}>Organizer : {this.state.org} {'\n'} Contact No. : {this.state.contact}</Text>
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'center',marginRight : '4%', marginTop : '5%'}}>
-            <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '9%', fontWeight : 'bold', fontSize : 18}}>8 people are going</Text>
+            <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '9%', fontWeight : 'bold', fontSize : 18}}>{this.state.members.length} people are going</Text>
           </View>
           <View style = {{flexDirection : 'row',justifyContent : 'flex-start',alignSelf : 'flex-start',marginLeft : '8%', marginRight : '6%', marginTop : '3%',flexWrap: 'wrap'}}>
-            <Avatar
-              size = "small"
-              rounded
-              title ="BS"
-              containerStyle = {styles.avatar}
-            />
-            <Avatar
-              size = "small"
-              rounded
-              title ="BS"
-              containerStyle = {styles.avatar}
-            />
-            <Avatar
-              size = "small"
-              rounded
-              title ="BS"
-              containerStyle = {styles.avatar}
-            />
-            <Avatar
-              size = "small"
-              rounded
-              title ="BS"
-              containerStyle = {styles.avatar}
-            />
-            <Avatar
-              size = "small"
-              rounded
-              title ="BS"
-              containerStyle = {styles.avatar}
-            />
+            {
+              this.state.userImages.map((item,index) => {
+                console.log("item : " + item);
+                return (<Avatar
+                  size = "small"
+                  source = {{uri : item}}
+                  rounded
+                  title ="BS"
+                  containerStyle = {styles.avatar}
+                />)
+              })
+            }
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'center',marginRight : '10%', marginTop : '6%'}}>
             <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '10%', fontWeight : 'normal', fontSize : 15}}>{this.state.description}</Text>
@@ -182,13 +228,9 @@ export default class Ex extends Component {
     paddingBottom : 40,
   },
   buttonContainer : {
-    //backgroundColor : Colors.primaryAppColor,
-    //paddingVertical : 20,
     margin : 20,
     alignSelf : 'center',
     width : '80%',
-    color : Colors.primaryAppColor,
-    //alignSelf : 'center',
   },
   buttonText : {
     textAlign : 'center',

@@ -1,5 +1,5 @@
 import React, {Component}  from 'react';
-import {PixelRatio,View, ScrollView ,Text, Image, StyleSheet, TextInput, KeyboardAvoidingView, TouchableOpacity, Picker,TouchableHighlight} from 'react-native';
+import {PixelRatio,View, ScrollView ,Text, Image, StyleSheet, TextInput, KeyboardAvoidingView, TouchableOpacity, Picker,TouchableHighlight,ToastAndroid} from 'react-native';
 import {StackActions, NavigationActions} from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
@@ -20,7 +20,6 @@ const options = {
 let i = 0;
 let j = 0;
 
-
 export default class EventCreate extends Component{
 
   static navigationOptions = ({navigation}) => ({
@@ -34,12 +33,7 @@ export default class EventCreate extends Component{
       backgroundColor : Colors.primaryAppColor,
     },
     headerTintColor : Colors.white,
-    /*headerRight : (
-      <View marginRight = {10}>
-        <Icon id = {1} name="check" size={20} color="#900" onPress = {this.handle}/>
-      </View>
-
-    ),*/
+    drawerLockMode: 'locked-open',
     headerLeft : (
       <View marginLeft = {10}>
         <TouchableOpacity onPress={() => navigation.navigate('Events')}>
@@ -241,49 +235,58 @@ export default class EventCreate extends Component{
     //console.log("Urls",urls);
   }
 // <service android:name="io.invertase.firebase.messaging.RNFirebaseBackgroundMessagingService" />
-
   handle = () => {
     this.setState({
       loading : true,
     })
-    this.uploadImages(this.state.filePath)
-    .then( () => this.handleEvent())
-    .then( () => {
-      this.setState({
-        loading : false,
-      })
-    });
-    fetch('https://fcm.googleapis.com/fcm/send',
-            {
-                method: 'POST',
-                headers:
+    if(this.state.eventname != '' &&
+      this.selectedPlace != 'Select Location' &&
+      this.state.organizer != '' &&
+      this.state.mobileNumber != '' &&
+      this.state.fromtime != '' &&
+      this.state.selectedCategory != 'category'){
+        this.uploadImages(this.state.filePath)
+        .then( () => this.handleEvent())
+        .then( () => {
+          this.setState({
+            loading : false,
+          })
+        });
+        fetch('https://fcm.googleapis.com/fcm/send',
                 {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'key=AAAAP6OjSUc:APA91bGDee_s4YQeGx2pK1-WqjsqG3coAXtAhFRG_lB9A9SGzQB9dGGMasO90_TtbdqNfVW_nkhe3eTAAu8jXy3HyNBofELij1xAx7aHnP7tUk6iDrsDHjkzZidCUiPHoUTCt8ku5sP0'
-                },
-                body: JSON.stringify(
+                    method: 'POST',
+                    headers:
+                    {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'key=AAAAP6OjSUc:APA91bGDee_s4YQeGx2pK1-WqjsqG3coAXtAhFRG_lB9A9SGzQB9dGGMasO90_TtbdqNfVW_nkhe3eTAAu8jXy3HyNBofELij1xAx7aHnP7tUk6iDrsDHjkzZidCUiPHoUTCt8ku5sP0'
+                    },
+                    body: JSON.stringify(
+                    {
+                      "notification": {
+                        "title": this.state.eventname,
+                        "body": this.state.selectedPlace,
+                    },
+                    "data": {
+                      "title": this.state.eventname,
+                      "body": "Place" + this.state.place + this.state.organizer,
+                    },
+                      "registration_ids" : this.state.datasrc,
+                    })
+
+                }).then((response) => response.json()).then((responseJsonFromServer) =>
                 {
-                  "notification": {
-                    "title": this.state.eventname,
-                    "body": this.state.selectedPlace,
-                },
-                "data": {
-                  "title": this.state.eventname,
-                  "body": "Place" + this.state.place + this.state.organizer,
-                },
-                  "registration_ids" : this.state.datasrc,
-                })
-
-            }).then((response) => response.json()).then((responseJsonFromServer) =>
-            {
-                console.log(responseJsonFromServer);
+                    console.log(responseJsonFromServer);
 
 
-            }).catch((error) =>
-            {
-              console.log(error);
-            });
-  }
+                }).catch((error) =>
+                {
+                  console.log(error);
+                });
+      }
+      else {
+        ToastAndroid.showWithGravity( 'Event Picture and some Fields cannot be empty.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+      }
+    }
 
   focusNextField(id) {
     this.inputs[id].focus();
@@ -296,7 +299,7 @@ export default class EventCreate extends Component{
                   behaviour = 'height'
                   >
 
-          <View style = {{ flex: 1, width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
+          <View style = {{flex: 1, width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
             <ImageSlider
               loopBothSides
               images = {this.state.filePath}
@@ -307,16 +310,16 @@ export default class EventCreate extends Component{
                   rectangle
                   source = {{uri : item}}
                   size = 'xlarge'
-                  //avatarStyle = {{height : '100%',width : '100%',alignSelf : 'center'}}
+                  style = {{height : "100%",width : '100%',alignSelf : 'center',marginTop : '0%'}}
                   //backgroundColor = 'white'
-                  width = "100%"
+                  //width = "100%"
                   imageProps = {{resizeMode : 'contain'}}
-                  //icon = {{name : 'plus', type : 'font-awesome', color : 'black', underlayColor : 'white',size : 40}}
+                  icon = {{name : 'plus', type : 'font-awesome', color : 'black', underlayColor : 'white',size : 35}}
                   //iconStyle = {{iconSize : 10}}
-                  editButton = {{name : 'camera', type : 'font-awesome', color : 'black', underlayColor : 'white',size : 40}}
-                  showEditButton
-                  onEditPress = {this.chooseFile.bind(this)}
-
+                  //editButton = {{name : 'camera', type : 'font-awesome', color : 'black', underlayColor : 'white',size : 40,top : 0,bottom : 0}}
+                  //showEditButton
+                  //onEditPress = {this.chooseFile.bind(this)}
+                  onPress = {this.chooseFile.bind(this)}
                 />
               </View>
             )}
@@ -340,7 +343,7 @@ export default class EventCreate extends Component{
             )}
             />
           </View>
-          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '5%',marginRight : '8%',marginLeft : '2%'}}>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginBottom : '-2%',marginTop : '5%',marginRight : '8%',marginLeft : '2%'}}>
             <Icon name="user-alt"
               size={22}
               color='black'
@@ -363,13 +366,13 @@ export default class EventCreate extends Component{
                 this.inputs['one'] = input;
               }}/>
           </View>
-          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '0.5%',marginRight : '4.5%',marginLeft : '2%'}}>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '0%',marginRight : '4.5%',marginLeft : '2%',marginBottom : '1%'}}>
             <Icon name="map-marker-alt"
               size={22}
               color='black'
               style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
               <View
-                style = {{flexDirection : 'row', flex : 1, borderBottomWidth : 1, width : '80%', backgroundColor : 'rgba(255,255,255,0)', borderBottomColor : 'black',marginLeft : '0%'}}>
+                style = {{flexDirection : 'row', flex : 1, borderBottomWidth : 1, width : '80%',marginBottom : '5%', backgroundColor : 'rgba(255,255,255,0)', borderBottomColor : 'black',marginLeft : '0%'}}>
                 <Picker
                   selectedValue = {this.state.selectedPlace}
                   mode = 'dropdown'
@@ -629,12 +632,9 @@ const styles = StyleSheet.create({
   Slide : {
     backgroundColor: Colors.primaryBackGourndColor,
     alignItems: 'center',
-    alignSelf : 'flex-start',
     justifyContent: 'center',
     borderRadius : 0,
     marginTop : '0%',
-    color : 'black',
-    flex : 1
   },
   buttons : {
     zIndex: 1,

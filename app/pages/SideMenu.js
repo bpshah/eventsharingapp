@@ -1,9 +1,11 @@
 import React, {Component} from 'react';
 import {NavigationActions} from 'react-navigation';
-import {ScrollView, Text, View} from 'react-native';
+import {ScrollView, Text, View,StyleSheet} from 'react-native';
 import { StackNavigator,DrawerActions } from 'react-navigation';
 import {Avatar} from 'react-native-elements';
 import firebase from 'react-native-firebase';
+import Icon from 'react-native-vector-icons/FontAwesome5.js';
+
 
 
 export default class SideMenu extends Component{
@@ -15,7 +17,6 @@ export default class SideMenu extends Component{
       firsname : null,
       lastname : null,
     })
-    //this.handleClickOutside = this.handleClickOutside.bind(this);
   }
 
   navigateToScreen = (route) => () => {
@@ -23,16 +24,9 @@ export default class SideMenu extends Component{
      routeName: route
    });
    this.props.navigation.dispatch(navigateAction);
-   //this.props.navigation.dispatch(DrawerActions.openDrawer());
-   //this.props.navigation.dispatch(DrawerActions.closeDrawer());
-   //this.props.navigation.dispatch(DrawerActions.toggleDrawer());
 }
 
-/*handleClickOutside = (event) => {
-  this.props.navigation.dispatch(DrawerActions.closeDrawer());
-}*/
-
-componentWillMount() {
+  componentWillMount() {
     //addEventListener('mousedown', this.handleClickOutside);
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
@@ -50,51 +44,67 @@ componentWillMount() {
       })
 }
 
-/*componentWillUnmount() {
-  removeEventListener('mousedown', this.handleClickOutside);
-}*/
-
-
   render(){
     return(
       <ScrollView>
-        <View style = {{backgroundColor : Colors.white,justifyContent : 'flex-start',alignItems : 'flex-start',height : 200}}>
+        <View style = {{flex : 1,backgroundColor : Colors.white,justifyContent : 'flex-start',alignItems : 'center',paddingBottom : '20%'}}>
           <Avatar
               rounded
               source = {{uri : this.state.imgsrc}}
+              //style = {{alignSelf : 'center'}}
               size = "large"
-              marginLeft = '14.5%'
-              marginBottom = '8%'
-              marginTop = '18%'
-              alignSelf = 'flex-start'
+              paddingTop = '10%'
+              //alignSelf = 'flex-start'
           />
-          <View>
-            <Text style = {{marginLeft : '12%',marginBottom : '1%',marginTop : '0%',fontSize : 17,alignSelf : 'flex-start'}}>{this.state.firsname} {this.state.lastname}</Text>
-          </View>
+          <Text style = {{flex : 1,paddingTop : '14%',fontSize : 17,alignSelf : 'center'}}> Welcome , {this.state.firsname} </Text>
         </View>
-        <View style = {{backgroundColor : Colors.primaryBackGourndColor,height : 275}}>
-          <View style = {{ flex : 1,justifyContent : 'flex-start',marginTop : '8%',marginBottom : '8%'}}>
-            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%'}}
+        <View style = {{flex : 2,backgroundColor : Colors.primaryBackGourndColor,paddingTop : '5%',height : '65%'}}>
+          <View style = {{ flexDirection : 'row',justifyContent : 'flex-start',paddingTop : '6%',paddingBottom : '6%'}}>
+            <Icon name="plus-square"
+              size={18}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
+            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
                   onPress={this.navigateToScreen('EventCreate')}>Create Event</Text>
           </View>
-          <View style = {{ flex : 1,justifyContent : 'flex-start',marginBottom : '8%'}}>
-            <Text style = {{justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17}}
-                  onPress={this.navigateToScreen('ProfilePage')}>Create Group</Text>
+          <View style = {styles.child1}>
+            <Icon name="user-plus"
+              size={18}
+              color='black'
+              style = {{paddingLeft : '10%',marginRight : '1%',alignSelf : 'center'}}/>
+            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
+                  onPress={this.navigateToScreen('MyEvents')}>Create Group</Text>
           </View>
-          <View style = {{ flex : 1,justifyContent : 'flex-start',marginBottom : '8%'}}>
-            <Text style = {{justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17}}
+          <View style = {styles.child1}>
+            <Icon name="plus"
+              size={18}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
+            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
                   onPress={this.navigateToScreen('ProfilePage')}>Join Group</Text>
           </View>
-          <View style = {{ flex : 1,justifyContent : 'flex-start',marginBottom : '8%'}}>
-            <Text style = {{justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17}}
+          <View style = {styles.child1}>
+            <Icon name="user"
+              size={18}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
+            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
                   onPress={this.navigateToScreen('ProfilePage')}>Profile</Text>
           </View>
-          <View style = {{ flex : 1,justifyContent : 'flex-start',marginBottom : '8%'}}>
-            <Text style = {{justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17}}
+          <View style = {styles.child1}>
+            <Icon name="clipboard"
+              size={18}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
+            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
                   onPress={this.navigateToScreen('ProfilePage')}>About Us</Text>
           </View>
-          <View style = {{ flex : 1,justifyContent : 'flex-start',marginBottom : '8%'}}>
-            <Text style = {{justifyContent : 'flex-start',marginLeft : '12%',fontSize : 17,}}
+          <View style = {styles.child1}>
+            <Icon name="sign-out-alt"
+              size={18}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
+            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
                   onPress = {() => firebase.auth().signOut().then((this.props.navigation.navigate('Login')))}>Logout</Text>
           </View>
         </View>
@@ -102,3 +112,12 @@ componentWillMount() {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  child1 : {
+     flexDirection : 'row',
+     justifyContent : 'flex-start',
+     paddingTop : '4%',
+     paddingBottom : '6%'
+  }
+})

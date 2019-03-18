@@ -1,15 +1,11 @@
 import React, { Component } from 'react';
-import { FlatList, Image, StyleSheet, View, Text,TouchableOpacity,TouchableWithoutFeedback, BackHandler, Alert,ActivityIndicator} from 'react-native';
+import { FlatList, Image, StyleSheet, View, Text,TouchableOpacity,TouchableWithoutFeedback,ToastAndroid} from 'react-native';
 import { List, ListItem, Card } from 'react-native-elements';
-import { createStackNavigator, createBottomTabNavigator, createAppContainer, withNavigationFocus, DrawerActions, } from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
 import Activity from '../components/activityIndicator.js'
 import type { RemoteMessage,Notification } from 'react-native-firebase';
-//import functions from "firebase-functions";
-//eimport admin from "firebase-admin";
-//let data = []
 export default class Events extends Component {
 
   constructor(props) {
@@ -19,7 +15,6 @@ export default class Events extends Component {
       refreshing : false,
       loading : false,
     }
-
   }
 
   static navigationOptions = ({navigation}) => ({
@@ -43,7 +38,7 @@ export default class Events extends Component {
   })
 
   componentWillMount(){
-  
+
   }
 
   componentDidMount(){
@@ -68,7 +63,8 @@ export default class Events extends Component {
       })
 
     }
-    componentWillUnmount(){
+
+  componentWillUnmount(){
       this.handleRefresh();
     }
 
@@ -85,21 +81,24 @@ export default class Events extends Component {
       .database()
       .ref('Events/')
       .on('value',(snapshot) => {
-        //console.log("Before Parsing");
-        //console.log("New Snapshot : " + snapshot);
         snapshot.forEach((csnapshot) => {
             let item = csnapshot.val();
             //item.key = csnapshot.key;
             data1.push(item)
         })
-        //console.log("After Parsing");
         this.setState({
           datasrc : data1,
           refreshing : false,
-          loading : false,
-        });
-        //console.log("Refreshed : " + this.state.datasrc);
+        })
       })
+      if(this.state.datasrc != []){
+        this.setState({
+          loading : false,
+        })
+      }
+      else {
+        ToastAndroid.showWithGravity( 'Unanble to get events.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+      }
     }
 
   render(){
