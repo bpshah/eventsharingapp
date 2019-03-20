@@ -8,7 +8,7 @@ import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
 import Colors from '../styles/colors.js';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
-
+import Loader from '../components/loader.js'
 
 export default class Signup extends Component {
 
@@ -26,6 +26,7 @@ export default class Signup extends Component {
       imgsrc : '',
       errorMessage: null,
       token : '',
+      loading : false,
     }
     this.focusNextField = this.focusNextField.bind(this);
     this.inputs = {};
@@ -48,6 +49,7 @@ export default class Signup extends Component {
     console.log("in sign up");
     if(email != '' && password != ''){
       console.log("in if");
+
       firebase
         .auth()
         .createUserWithEmailAndPassword(this.state.email, password)
@@ -201,10 +203,18 @@ export default class Signup extends Component {
       && this.state.password != ''
       && this.state.confirmPassword != ''){
         if(this.state.filePath != ''){
+          this.setState({
+            loading : true,
+          })
           this.uploadImage(this.state.filePath, temail + '.png')
           .then(() =>  {
             this.handleSignUp();
             this.handleProfileData();
+          })
+          .then(() => {
+            this.setState({
+              loading : false,
+            })
           });
         }
         else{
@@ -260,6 +270,7 @@ export default class Signup extends Component {
               value = {this.state.firstname}
               autoFocus = {false}/>
           </View>
+          <Loader loading = {this.state.loading}/>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
             <Icon name="user-alt"
               size={22}

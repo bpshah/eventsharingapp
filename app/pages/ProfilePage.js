@@ -8,14 +8,14 @@ import ImagePicker from 'react-native-image-picker';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
 import Colors from '../styles/colors.js';
-import Activity from '../components/activityIndicator.js'
+import Loader from '../components/loader.js'
 
 export default class ProfilePage extends Component{
 
   constructor(props){
       super(props);
       this.state = {
-        filePath : {},
+        filePath : '',
         email : '',
         firstname : '',
         lastName : '',
@@ -23,7 +23,7 @@ export default class ProfilePage extends Component{
         location : '',
         imgsrc : '',
         errorMessage: null,
-        loading : true,
+        loading : false,
       }
       this.focusNextField = this.focusNextField.bind(this);
       this.inputs = {};
@@ -58,6 +58,9 @@ export default class ProfilePage extends Component{
   componentWillMount(){
 
     let user = firebase.auth().currentUser;
+    this.setState({
+      loading : true,
+    })
     //console.log(user);
     //let firstname,lastname,birthdate,mobileno,gender,email,password;
     const temail = user.email.slice(0,user.email.indexOf('@'));
@@ -145,7 +148,7 @@ export default class ProfilePage extends Component{
             // You can also display the image using data:
             // let source = { uri: 'data:image/jpeg;base64,' + response.data };
             this.setState({
-              filePath : source.path,
+              filePath : response.uri,
             });
           }
         });
@@ -168,7 +171,10 @@ export default class ProfilePage extends Component{
   console.log("Before Update");
 
   //console.log(temail);
-  firebase.database().ref('Users/' + temail).update({firstname,lastname,mobileno,location,imgsrc});
+  firebase.database().ref('Users/' + temail).update({firstname,lastname,mobileno,location,imgsrc})
+  .then(() => {
+    this.props.navigation.navigate('Events')
+  });
   console.log("Updated");
 };
 
@@ -181,22 +187,29 @@ export default class ProfilePage extends Component{
       this.state.lastName != '' &&
       this.state.mobileNumber != '' &&
       this.state.location != '' &&
-      this.state.email != '' &&
-      this.state.filepath != ''){
+      this.state.email != ''){
       this.setState({
         loading : true,
       })
-      this.uploadImage(this.state.filePath,temail + '.png')
-          .then( () => { this.setState({
-                                loading : false,
-                                });
-                                this.handleUpdate() });
-
+        if(this.state.filePath != ''){
+          this.uploadImage(this.state.filePath,temail + '.png')
+              .then( () => { this.setState({
+                                    loading : false,
+                                    filePath : '',
+                                    });
+                                    this.handleUpdate() });
+        }
+        else {
+          this.setState({
+            loading : false,
+          })
+          this.handleUpdate();
+        }
     }
     else {
       ToastAndroid.showWithGravity( 'All Fields are compulsory.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
     }
-        console.log("After Update");
+    console.log("After Update");
   }
 
   focusNextField(id) {
@@ -205,12 +218,6 @@ export default class ProfilePage extends Component{
 
   render(){
     const { selectedIndex } = this.state;
-
-    if (this.state.loading) {
-      return (
-        <Activity />
-      );
-    }
 
     return(
         <ScrollView contentContainerStyle = {styles.Container}>
@@ -246,6 +253,7 @@ export default class ProfilePage extends Component{
               value = {this.state.firstname}
               autoFocus = {false}/>
           </View>
+          <Loader loading = {this.state.loading}/>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
             <Icon name="user-alt"
               size={22}
@@ -401,6 +409,7 @@ const styles = StyleSheet.create({
     textAlign : 'center',
     backgroundColor : Colors.primaryAppColor,
     paddingVertical : 15,
-    fontWeight : '700'
+    fontWeight : '700',
+    color : 'white',
   },
 });

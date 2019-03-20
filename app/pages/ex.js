@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView,TouchableHighlight,ToastAndroid} from 'react-native';
 import { Button, Avatar, Divider } from 'react-native-elements';
-import { createStackNavigator, createAppContainer } from 'react-navigation';
+import { StackActions,NavigationActions } from 'react-navigation';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Colors from '../styles/colors.js';
@@ -9,6 +9,8 @@ import Fonts from '../styles/fonts.js';
 import firebase from 'react-native-firebase';
 import ImageSlider from 'react-native-image-slider';
 import Activity from '../components/activityIndicator.js'
+
+let imgs = [];
 
 export default class Ex extends Component {
 
@@ -26,6 +28,7 @@ export default class Ex extends Component {
       members : [],
       userImages : [],
       loading : true,
+      joined : false,
     })
   }
 
@@ -44,7 +47,15 @@ export default class Ex extends Component {
     },
     headerLeft : (
       <View marginLeft = {10}>
-        <TouchableOpacity onPress={() => navigation.navigate('Events')}>
+        <TouchableOpacity onPress={() => {
+          const resetAction = StackActions.reset({
+                      index: 0,
+                      actions: [
+                        NavigationActions.navigate({routeName: "Events"})
+                      ]
+                    });
+          navigation.dispatch(resetAction);
+        }}>
           <Icon1 name="ios-arrow-back" size={25} color={Colors.white} />
         </TouchableOpacity>
       </View>
@@ -59,15 +70,24 @@ export default class Ex extends Component {
     this.fetchMembers();
   }
 
+  componentWillUnmount(){
+    imgs = [];
+  }
+
   fetchMembers = () => {
     firebase
       .database()
-      .ref('Events/' + this.state.title)
+      .ref('Events/' + this.state.title + '/' + 'members')
       .once('value')
       .then((snapshot) => {
-          this.setState({
-            members : snapshot.val().members,
-          })
+          if(snapshot.exists()) {
+            this.setState({
+              members : snapshot.val(),
+            })
+          }
+          else
+            console.log("Data not available");
+          console.log(snapshot);
           console.log(this.state.members);
       })
       .then( () => this.fetchMemberInfo())
@@ -75,45 +95,132 @@ export default class Ex extends Component {
         this.setState({
           loading : false,
         })
+      }).catch((error) => {
+        console.log(error);
       })
   }
 
   fetchMemberInfo = () => {
     let promises = [];
+      //console.log("In userImages members : " + this.state.members);
      this.state.members.map((item,index) => {
-      console.log("Item : " + item);
+      //console.log("Item : " + item);
       const request = firebase
         .database()
-        .ref('Users/' + item)
+        .ref('Users/' + item + '/' + 'imgsrc')
         .once('value')
         .then((snapshot) => {
-          this.state.userImages.push(snapshot.val().imgsrc);
-          console.log(this.state.userImages);
+          imgs.push(snapshot.val());
+        })
+        .then(() => {
+          this.setState({
+            userImages :  imgs,
+          })
+          console.log("In map : " + this.state.userImages);
         })
         promises.push(request);
     })
     return Promise.all(promises);
   }
 
-  joinEvent = () => {
-    console.log("In join Event");
+  addMemberInfo = (temail) => {
+    firebase
+      .database()
+      .ref('Users/' + temail + '/' + 'imgsrc')
+      .once('value')
+      .then((snapshot) => {
+          imgs.push(snapshot.val());
+      }).then(() => {
+        this.setState({
+          userImages : imgs,
+        })
+      })
+  }
 
+  joinEvent = () => {
+    //console.log("In join Event");
+    this.setState({
+      joined : true,
+    })
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
     if(!this.state.members.includes(temail)){
       this.state.members.push(temail);
+      this.addMemberInfo(temail);
       let members = this.state.members;
       firebase
         .database()
         .ref('Events/' + this.state.title)
-        .update({members})
-        .then(() => {
-          console.log("joined");
-      });
+        .update({members});
+
     }
     else {
       ToastAndroid.showWithGravity( 'You are already subscribed for the event.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
     }
+  }
+
+  leaveEvent = () => {
+    this.setState({
+      joined : false,
+    })
+    //console.log("in leave userImages " + this.state.userImages);
+    let user = firebase.auth().currentUser;
+    const temail = user.email.slice(0,user.email.indexOf('@'));
+    this.state.members.splice(this.state.members.indexOf(temail),1);
+    imgs.splice(this.state.members.indexOf(temail),1);
+    this.setState({
+      userImages : imgs,
+    })
+    console.log(this.state.userImages);
+    let members = this.state.members;
+    firebase
+      .database()
+      .ref('Events/' + this.state.title)
+      .update({members})
+      .then(() => {
+        console.log("left");
+      });
+  }
+
+  displayText = () => {
+    if(this.state.members != [])
+      return <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '9%', fontWeight : 'bold', fontSize : 18}}>{ this.state.members.length} people are going</Text>
+    else
+      return <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '9%', fontWeight : 'bold', fontSize : 18}}> 0 people are going</Text>
+
+  }
+
+  changeButton = () => {
+    let user = firebase.auth().currentUser;
+    const temail = user.email.slice(0,user.email.indexOf('@'));
+    if(!this.state.joined && !this.state.members.includes(temail)){
+      return (<Button title = 'JOIN'
+                containerStyle = {styles.buttonContainer}
+                onPress = {this.joinEvent}/>
+              )
+    }
+    else {
+      return(
+        <Button title = 'LEAVE'
+                  containerStyle = {styles.buttonContainer}
+                  onPress = {this.leaveEvent}/>
+      )
+    }
+  }
+
+  changeAvatar = () => {
+    this.state.userImages.map((item,index) => {
+      console.log("item : " + item);
+      return (
+        <Avatar
+          size = "small"
+          source = {{uri : item}}
+          rounded
+          title ="BS"
+          containerStyle = {styles.avatar}
+      />
+    )
+    })
   }
 
   render(){
@@ -121,7 +228,6 @@ export default class Ex extends Component {
     if(!this.state.loading){
       <Activity/>
     }
-    console.log("In render");
     return(
        <ScrollView contentContainerStyle = {styles.Container}
                    behaviour = 'height'>
@@ -167,9 +273,7 @@ export default class Ex extends Component {
             />
           </View>
           <Divider containerStyle = {{backgroundColor : Colors.primaryAppColor,borderWidth : 1}}/>
-          <Button title = 'JOIN'
-                    containerStyle = {styles.buttonContainer}
-                    onPress = {this.joinEvent}/>
+          {this.changeButton()}
           <View style = {styles.childContainer1}>
             <Icon name="clock"
                   size={20}
@@ -192,21 +296,23 @@ export default class Ex extends Component {
             <Text style = {styles.childContainerText}>Organizer : {this.state.org} {'\n'} Contact No. : {this.state.contact}</Text>
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'center',marginRight : '4%', marginTop : '5%'}}>
-            <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '9%', fontWeight : 'bold', fontSize : 18}}>{this.state.members.length} people are going</Text>
+            {this.displayText()}
           </View>
           <View style = {{flexDirection : 'row',justifyContent : 'flex-start',alignSelf : 'flex-start',marginLeft : '8%', marginRight : '6%', marginTop : '3%',flexWrap: 'wrap'}}>
-            {
-              this.state.userImages.map((item,index) => {
-                console.log("item : " + item);
-                return (<Avatar
+          {
+            this.state.userImages.map((item,index) => {
+              console.log("item : " + item);
+              return (
+                <Avatar
                   size = "small"
                   source = {{uri : item}}
                   rounded
                   title ="BS"
                   containerStyle = {styles.avatar}
-                />)
-              })
-            }
+              />
+            )
+            })
+          }
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'center',marginRight : '10%', marginTop : '6%'}}>
             <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '10%', fontWeight : 'normal', fontSize : 15}}>{this.state.description}</Text>

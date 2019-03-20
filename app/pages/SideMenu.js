@@ -6,8 +6,6 @@ import {Avatar} from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 
-
-
 export default class SideMenu extends Component{
 
   constructor(props){
@@ -82,6 +80,14 @@ export default class SideMenu extends Component{
               style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
             <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
                   onPress={this.navigateToScreen('ProfilePage')}>Join Group</Text>
+          </View>
+          <View style = {styles.child1}>
+            <Icon name="user-plus"
+              size={18}
+              color='black'
+              style = {{paddingLeft : '10%',marginRight : '1%',alignSelf : 'center'}}/>
+            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
+                  onPress={this.navigateToScreen('MyEvents')}>My Events</Text>
           </View>
           <View style = {styles.child1}>
             <Icon name="user"

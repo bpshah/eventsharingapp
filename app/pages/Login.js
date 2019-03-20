@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image, ScrollView, Dimensions,AsyncStorage,ToastAndroid} from 'react-native';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
-import Activity from '../components/activityIndicator.js'
+import Loader from '../components/loader.js'
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 
 export default class Login extends Component {
@@ -28,6 +28,9 @@ export default class Login extends Component {
   handleLogin = () => {
     const { email, password } = this.state
     if(email != '' && password != ''){
+      this.setState({
+        loading : true,
+      })
       firebase
         .auth()
         .signInWithEmailAndPassword(this.state.email, this.state.password)
@@ -36,6 +39,9 @@ export default class Login extends Component {
           return res;
         })
         .then((res) => {
+            this.setState({
+              loading : false,
+            })
             this.props.navigation.navigate('Events')
           })
         .then(() => {this.updateToken()})
@@ -85,6 +91,7 @@ export default class Login extends Component {
                     onChangeText={email => this.setState({ email })}
                     value={this.state.email}/>
             </View>
+            <Loader loading = {this.state.loading}/>
             <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginRight : '8%',marginLeft : '3%'}}>
                   <Icon name="lock"
                     size={22}
@@ -100,6 +107,7 @@ export default class Login extends Component {
                           value={this.state.password}
                     />
             </View>
+            <Loader loading = {this.state.loading}/>
             <Text style = {styles.textstyle}
                   onPress={() => this.props.navigation.navigate('FPassword')}>
                                 Forgot Your Password?

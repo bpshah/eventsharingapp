@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { FlatList, Image, StyleSheet, View, Text,TouchableOpacity,TouchableWithoutFeedback,ToastAndroid} from 'react-native';
-import { List, ListItem, Card } from 'react-native-elements';
+import { List, ListItem, Card, Avatar } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
@@ -128,15 +128,23 @@ export default class Events extends Component {
                                                                         imgsrc : item.imgsrc,
                                                                         contact : item.mobileno,})} >
                 <Card containerStyle = {styles.Container}
-                      dividerStyle = {{backgroundColor : Colors.cardTextColor}}
-                      title = {item.eventname}
-                      titleStyle = {styles.title}
                       titleNumberOfLines = {2}>
-                  <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : Colors.cardTextColor}}>From : {item.fromtime} {"\n"}</Text>
-                  <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : Colors.cardTextColor}}>To : {item.totime} {"\n"}</Text>
-                  <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : Colors.cardTextColor}}>{item.place} {"\n"}</Text>
-                  <Text style = {styles.desc}>Organizer : {item.org} {"\n"}</Text>
-                  <Text style = {styles.desc}>Contact : {item.mobileno} {"\n"}</Text>
+                  <View style = {{flexDirection : 'row',justifyContent : 'space-around'}}>
+                    <View style = {{marginLeft : -25,height : 125,width : 125}}>
+                      <Avatar
+                        source = {{uri : item.imgsrc[0]}}
+                        size = 'xlarge'
+                        style = {{height : 100,width : 100,alignSelf : 'flex-end'}}
+                        imageProps = {{resizeMode : 'cover'}}
+                      />
+                    </View>
+                    <View style = {{marginLeft : 20}}>
+                    <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black'}}>City : {item.place}</Text>
+                    <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black'}}>City : {item.place}</Text>
+                    <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black'}}>City : {item.place}</Text>
+                    </View>
+                  </View>
+
                 </Card>
               </TouchableWithoutFeedback>
             </View>
@@ -149,32 +157,14 @@ export default class Events extends Component {
 const styles = StyleSheet.create({
   Container : {
     //flex : 1,
-    flexDirection : 'column',
-    justifyContent : 'flex-start',
+    alignItems : 'flex-start',
     backgroundColor : Colors.primaryBackGourndColor,
-    marginBottom : 10,
+    //marginBottom : -10,
+    height : 125,
   },
   title : {
-    fontSize : 20,
+    fontSize : 18,
     color : Colors.primaryAppColor,
     alignSelf : 'flex-start'
   },
-  imageWrapper : {
-
-  },
-  imageS : {
-
-  },
-  imageP : {
-    resizeMode : 'stretch',
-    alignSelf : 'flex-start',
-    margin : 10,
-  },
-  dividerStyle : {
-
-  },
-  desc : {
-    alignSelf : 'flex-start' ,
-  },
-
 });

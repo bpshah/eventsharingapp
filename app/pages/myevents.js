@@ -18,6 +18,10 @@ export default class MyEvents extends Component {
     }
   }
 
+  componentWillMount(){
+    this.handleRefresh();
+  }
+
   componentDidMount(){
     this.handleRefresh();
   }
@@ -85,14 +89,15 @@ export default class MyEvents extends Component {
           onRefresh = {this.handleRefresh}
           renderItem={({item})=>(
           <View style={{flex : 1,backgroundColor : Colors.primaryBackGourndColor}}>
-            <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Ex',{  title : item.eventname,
+            <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('EditEvent',{  title : item.eventname,
                                                                       desc : item.description,
                                                                       organizer : item.org,
                                                                       place : item.place,
                                                                       fromtime : item.fromtime,
                                                                       totime : item.totime,
                                                                       imgsrc : item.imgsrc,
-                                                                      contact : item.mobileno,})} >
+                                                                      contact : item.mobileno,
+                                                                      category : item.category})} >
               <Card containerStyle = {styles.Container}
                     dividerStyle = {{backgroundColor : Colors.cardTextColor}}
                     title = {item.eventname}

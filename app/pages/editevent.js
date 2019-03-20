@@ -11,17 +11,33 @@ import DatePicker from 'react-native-datepicker';
 import Colors from '../styles/colors.js';
 import ImageSlider from 'react-native-image-slider';
 import ImagePicker from 'react-native-image-crop-picker';
-import Loader from '../components/loader.js'
 
-const options = {
-  title : 'Add Picture',
-  chooseFromLibraryButtonTitle : 'Select from Library',
-}
 
-let i = 0;
-let j = 0;
+export default class EditEvent extends Component {
 
-export default class EventCreate extends Component{
+  constructor(props){
+    super(props);
+    this.state = {
+      imgsrc : this.props.navigation.state.params.imgsrc,
+      fromtime : this.props.navigation.state.params.fromtime,
+      totime : this.props.navigation.state.params.totime,
+      selectedPlace : this.props.navigation.state.params.place,
+      org : this.props.navigation.state.params.organizer,
+      description : this.props.navigation.state.params.desc,
+      title : this.props.navigation.state.params.title,
+      contact : this.props.navigation.state.params.contact,
+      selectedCategory : this.props.navigation.state.params.category,
+      place : [],
+      eventname : this.props.navigation.state.params.title,
+      category : [],
+      filePath : [],
+      selectedValuePlace : 0,
+      selectedValueCategory : 0,
+    };
+    this.focusNextField = this.focusNextField.bind(this);
+    this.inputs = {};
+
+  }
 
   static navigationOptions = ({navigation}) => ({
     headerTitleStyle : {
@@ -29,7 +45,7 @@ export default class EventCreate extends Component{
        flex : 1,
        fontSize : 20,
      },
-    title : 'New Event',
+    title : navigation.state.params.title,
     headerStyle : {
       backgroundColor : Colors.primaryAppColor,
     },
@@ -44,39 +60,13 @@ export default class EventCreate extends Component{
     )
   })
 
-  constructor(props){
-    super(props);
-    this.state = {
-      filePath : [] ,
-      eventname : '',
-      place : [],
-      organizer : '',
-      contact : '',
-      description : '',
-      category : [],
-      fromtime : '',
-      totime : '',
-      imgsrc : [],
-      selectedPlace : '',
-      selectedValuePlace : 0,
-      selectedCategory : '',
-      selectedValueCategory : 0,
-      datasrc : null,
-      loading : false,
-    };
-    this.focusNextField = this.focusNextField.bind(this);
-    this.inputs = {};
-  }
-
   componentWillMount(){
     firebase
       .database()
       .ref('Locations/')
       .once('value').then((snapshot) => {
-        //console.log("Before Parsing Locations");
         snapshot.forEach((csnapshot) => {
             let item = csnapshot.val();
-            //console.log("Locations : " + item);
             this.state.place.push(item);
 
         });
@@ -86,87 +76,13 @@ export default class EventCreate extends Component{
       .database()
       .ref('Catgory/')
       .once('value').then((snapshot) => {
-        //console.log("Before Parsing Categories");
         snapshot.forEach((csnapshot) => {
             let item = csnapshot.val();
-            //console.log("Category : " + item);
             this.state.category.push(item);
         });
         console.log("Data 2 : " + this.state.category);
       })
   }
-
-  componentDidMount(){
-
-    i = 0;
-    j = 0;
-    let data = [];
-
-    firebase
-      .database()
-      .ref('Users/')
-      .once('value').then((snapshot) => {
-        console.log("Before Parsing");
-        snapshot.forEach((csnapshot) => {
-            let item = csnapshot.val();
-            data.push(item.token);
-        });
-        //console.log("Tokens : " + data);
-        this.setState({
-          datasrc : data,
-        });
-      })
-  }
-
-  uploadImage = (uri, imageName, mime = 'image/png') => {
-    const Blob = RNFetchBlob.polyfill.Blob;
-    const fs = RNFetchBlob.fs;
-    window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
-    window.Blob = Blob;
-    return new Promise((resolve, reject) => {
-      //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
-        const uploadUri = uri;
-        let uploadBlob = null
-        const imageRef = firebase.storage().ref('events').child(this.state.eventname).child(imageName)
-        fs.readFile(uploadUri, 'base64')
-        .then((data) => {
-          return Blob.build(data, { type: `${mime};BASE64` })
-        })
-        .then((blob) => {
-          uploadBlob = blob
-          return imageRef.put(uri, { contentType: mime })
-        })
-        .then(() => {
-          uploadBlob.close()
-          return imageRef.getDownloadURL()
-        })
-        .then((url) => {
-          console.log("Image Uploaded : " + url);
-          this.state.imgsrc.push(url);
-          console.log("Imgsrc : " + this.state.imgsrc);
-          let imgsrc = this.state.imgsrc;
-          firebase
-            .database()
-            .ref('Events/'+ this.state.eventname)
-            .update({imgsrc});
-          resolve(url)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    })
-  }
-
-  selectPhotoTapped() {
-      const options = {
-        quality : 1.0,
-        maxWidth : 500,
-        maxHeight : 500,
-        storageOptions : {
-          skipBackup : true
-        }
-      }
-    }
 
   chooseFile = () => {
         let imgs = [];
@@ -194,38 +110,9 @@ export default class EventCreate extends Component{
         });
     };
 
-  handleEvent = () => {
-
-      let user = firebase.auth().currentUser;
-      const email = user.email;
-      let fromtime = this.state.fromtime;
-      let totime = this.state.totime;
-      let place = this.state.selectedPlace;
-      let mobileno = this.state.contact;
-      let description = this.state.description;
-      let org = this.state.organizer;
-      let eventname = this.state.eventname;
-      let category = this.state.selectedCategory;
-      let imgsrc = this.state.imgsrc;
-
-      console.log("In Handle Event : " + imgsrc);
-      let uid  = email.slice(0,user.email.indexOf('@'));
-      firebase
-        .database()
-        .ref('Events/'+ this.state.eventname)
-        .set({ eventname, place, org, mobileno, description,category,fromtime,totime,uid,imgsrc})
-        .then(() => {
-          const resetAction = StackActions.reset({
-                      index: 0,
-                      actions: [
-                        NavigationActions.navigate({routeName: "Events"})
-                      ]
-                    });
-                    this.props.navigation.dispatch(resetAction);
-        })
-        .catch(error => this.setState({ errorMessage: error.message }))
-      //console.log("Event Upload");
-    }
+  focusNextField(id) {
+    this.inputs[id].focus();
+  }
 
   uploadImages = async (photos) => {
     console.log("In photos : " + photos);
@@ -233,68 +120,39 @@ export default class EventCreate extends Component{
       console.log("P :" + p);
       this.uploadImage( p, this.state.eventname + index )})
     const urls = await Promise.all(uploadImagePromises)
-    //console.log("Urls",urls);
   }
-// <service android:name="io.invertase.firebase.messaging.RNFirebaseBackgroundMessagingService" />
-  handle = () => {
-    if(this.state.eventname != '' &&
-      this.selectedPlace != 'Select Location' &&
-      this.state.organizer != '' &&
-      this.state.mobileNumber != '' &&
-      this.state.fromtime != '' &&
-      this.state.selectedCategory != 'category'){
-        this.setState({
-          loading : true,
-        })
-        this.uploadImages(this.state.filePath)
-        .then( () => this.handleEvent())
-        .then( () => {
-          this.setState({
-            loading : false,
-          })
-        });
-        fetch('https://fcm.googleapis.com/fcm/send',
-                {
-                    method: 'POST',
-                    headers:
-                    {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'key=AAAAP6OjSUc:APA91bGDee_s4YQeGx2pK1-WqjsqG3coAXtAhFRG_lB9A9SGzQB9dGGMasO90_TtbdqNfVW_nkhe3eTAAu8jXy3HyNBofELij1xAx7aHnP7tUk6iDrsDHjkzZidCUiPHoUTCt8ku5sP0'
-                    },
-                    body: JSON.stringify(
-                    {
-                      "notification": {
-                        "title": this.state.eventname,
-                        "body": this.state.selectedPlace,
-                    },
-                    "data": {
-                      "title": this.state.eventname,
-                      "body": "Place" + this.state.place + this.state.organizer,
-                    },
-                      "registration_ids" : this.state.datasrc,
-                    })
 
-                }).then((response) => response.json()).then((responseJsonFromServer) =>
-                {
-                    console.log(responseJsonFromServer);
+  handleEventUpdate = () => {
+    let eventname = this.state.title;
+    let place = this.state.selectedPlace;
+    let mobileno = this.state.contact;
+    let imgsrc = this.state.imgsrc;
+    let fromtime = this.state.fromtime;
+    let totime = this.state.totime;
+    let description = this.state.desc;
 
+    console.log("Before Update");
+    firebase.database().ref('Events/' + this.state.eventname).update({eventname,place,mobileno,imgsrc,fromtime,totime,description});
+    console.log("Updated");
+  }
 
-                }).catch((error) =>
-                {
-                  console.log(error);
-                });
-      }
-      else {
-        ToastAndroid.showWithGravity( 'Event Picture and some Fields cannot be empty.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
-      }
-    }
+  updateEvent = () => {
+    let user = firebase.auth().currentUser;
+    const temail = user.email.slice(0,user.email.indexOf('@'));
+    console.log("FilePath : " + this.state.filePath);
+      this.uploadImages(this.state.filePath,temail + '.png')
+          .then( () => { this.setState({
+                                loading : false,
+                                });
+                                this.handleEventUpdate() })
+          .then(() => this.props.navigation.navigate('MyEvents'));                      ;
 
-  focusNextField(id) {
-    this.inputs[id].focus();
+    console.log("After Update");
   }
 
   render(){
-
+    console.log(this.state.place);
+    console.log(this.state.category);
     return(
       <ScrollView contentContainerStyle = {styles.container}
                   behaviour = 'height'
@@ -303,7 +161,7 @@ export default class EventCreate extends Component{
           <View style = {{flex: 1, width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
             <ImageSlider
               loopBothSides
-              images = {this.state.filePath}
+              images = {this.state.imgsrc}
               style = {{backgroundColor : 'black',width : '100%',borderRadius : 0}}
               customSlide = {({ index, item, style, width }) => (
               <View key={index} style={[style, styles.Slide]}>
@@ -338,7 +196,6 @@ export default class EventCreate extends Component{
             )}
             />
           </View>
-          <Loader loading = {this.state.loading}/>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginBottom : '-2%',marginTop : '5%',marginRight : '8%',marginLeft : '2%'}}>
             <Icon name="user-alt"
               size={22}
@@ -356,8 +213,8 @@ export default class EventCreate extends Component{
               //keyBoardType = 'email-address'
               autoCapitalize = 'words'
               autoCorrect = {false}
-              onChangeText = { eventname => this.setState({ eventname })}
-              value = {this.state.eventname}
+              onChangeText = { title => this.setState({ title })}
+              value = {this.state.title}
               ref = { input => {
                 this.inputs['one'] = input;
               }}/>
@@ -377,9 +234,11 @@ export default class EventCreate extends Component{
                     this.setState({ selectedPlace : itemValue,selectedValuePlace : itemIndex})}
                 >
                 <Picker.Item label="Select Location" value="location"/>
-                { this.state.place.map((item,index) =>
+                {
+                  this.state.place.map((item,index) =>
                   <Picker.Item label={item} value={item}/>
-                )}
+                )
+                }
                 </Picker>
               </View>
           </View>
@@ -400,8 +259,8 @@ export default class EventCreate extends Component{
                 //keyBoardType = 'email-address'
                 autoCapitalize = 'words'
                 autoCorrect = {false}
-                onChangeText = { organizer => this.setState({ organizer })}
-                value = {this.state.organizer}
+                onChangeText = { org => this.setState({ org })}
+                value = {this.state.org}
                 ref = { input => {
                   this.inputs['three'] = input;
                 }}/>
@@ -530,8 +389,8 @@ export default class EventCreate extends Component{
               autoGrow = {true}
               autoCorrect = {false}
               numberOfLines = {2}
-              onChangeText = { description => this.setState({ description })}
-              value = {this.state.description}
+              onChangeText = { desc => this.setState({ desc })}
+              value = {this.state.desc}
               ref = { input => {
                 this.inputs['seven'] = input;
               }}/>
@@ -559,8 +418,8 @@ export default class EventCreate extends Component{
             </View>
           </View>
           <TouchableOpacity style = {styles.buttonContainer}
-                            onPress = {this.handle}>
-              <Text style = {styles.buttonText}>Create Event</Text>
+                            onPress = {this.updateEvent}>
+              <Text style = {styles.buttonText}>Update Event</Text>
           </TouchableOpacity>
 
       </ScrollView>
@@ -569,7 +428,6 @@ export default class EventCreate extends Component{
 }
 
 const styles = StyleSheet.create({
-
   container : {
     flexGrow : 1,
     backgroundColor : Colors.primaryBackGourndColor,
