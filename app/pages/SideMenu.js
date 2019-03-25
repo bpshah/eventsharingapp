@@ -71,7 +71,7 @@ export default class SideMenu extends Component{
               color='black'
               style = {{paddingLeft : '10%',marginRight : '1%',alignSelf : 'center'}}/>
             <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
-                  onPress={this.navigateToScreen('MyEvents')}>Create Group</Text>
+                  onPress={this.navigateToScreen('CreateGroup')}>Create Group</Text>
           </View>
           <View style = {styles.child1}>
             <Icon name="plus"

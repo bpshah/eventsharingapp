@@ -26,7 +26,7 @@ export default class Login extends Component {
       }
 
   handleLogin = () => {
-    const { email, password } = this.state
+    const { email, password } = this.state;
     if(email != '' && password != ''){
       this.setState({
         loading : true,
@@ -42,7 +42,13 @@ export default class Login extends Component {
             this.setState({
               loading : false,
             })
-            this.props.navigation.navigate('Events')
+            console.log(firebase.auth().currentUser.emailVerified);
+            if(!firebase.auth().currentUser.emailVerified){
+              ToastAndroid.showWithGravity( 'Email is not verified.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+            }
+            else{
+              this.props.navigation.navigate("Events")
+            }
           })
         .then(() => {this.updateToken()})
         .catch(error => {
@@ -69,7 +75,7 @@ export default class Login extends Component {
     const temail = email.slice(0,user.email.indexOf('@'));
     let token = await AsyncStorage.getItem('token')
     console.log("In login token : " + token);
-    firebase.database().ref('Users/' + temail).update({token});
+    await firebase.database().ref('Users/' + temail).update({token});
   }
 
   render(){

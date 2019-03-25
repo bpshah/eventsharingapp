@@ -138,6 +138,12 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-vector-icons')
+    compile project(':react-native-push-notification')
+    compile project(':react-native-image-picker')
+    compile project(':react-native-gesture-handler')
+    compile project(':react-native-firebase')
+    compile project(':react-native-fetch-blob')
     compile project(':react-native-image-crop-picker')
     //compile project('com.github.yalantis:ucrop:2.2.2')
     implementation project(':react-native-push-notification')

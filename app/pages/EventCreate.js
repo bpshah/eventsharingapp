@@ -96,7 +96,7 @@ export default class EventCreate extends Component{
       })
   }
 
-  componentDidMount(){
+  /*componentDidMount(){
 
     i = 0;
     j = 0;
@@ -105,16 +105,47 @@ export default class EventCreate extends Component{
     firebase
       .database()
       .ref('Users/')
+      .orderBy('location')
+      .equalTo(this.state.selectedPlace)
       .once('value').then((snapshot) => {
         console.log("Before Parsing");
         snapshot.forEach((csnapshot) => {
             let item = csnapshot.val();
+            console.log(item.token);
             data.push(item.token);
         });
         //console.log("Tokens : " + data);
         this.setState({
           datasrc : data,
         });
+      })
+  }*/
+
+  /*componentDidMount(){
+    this.notificationLocation();
+}*/
+
+  notificationLocation = async () => {
+
+    let data = [];
+    //console.log("Place : " + this.state.selectedPlace);
+    await firebase
+      .database()
+      .ref('Users/')
+      .orderByChild('location')
+      .equalTo(this.state.selectedPlace)
+      .once('value').then((snapshot) => {
+        //console.log("Before Parsing");
+        snapshot.forEach((csnapshot) => {
+            let item = csnapshot.val();
+            //console.log(csnapshot.val());
+            data.push(item.token);
+        });
+        //console.log("Tokens : " + data);
+        this.setState({
+          datasrc : data,
+        });
+        console.log("Datasrc : " + this.state.datasrc);
       })
   }
 
@@ -183,14 +214,14 @@ export default class EventCreate extends Component{
         ImagePicker.openPicker({
           multiple: true
         }).then(images => {
-          console.log(images);
+          //console.log(images);
           images.forEach((img) => {
             imgs.push(img.path);
           })
           this.setState({
             filePath : imgs,
           })
-          console.log(this.state.filePath);
+          //console.log(this.state.filePath);
         });
     };
 
@@ -228,9 +259,9 @@ export default class EventCreate extends Component{
     }
 
   uploadImages = async (photos) => {
-    console.log("In photos : " + photos);
+    //console.log("In photos : " + photos);
     const uploadImagePromises = photos.map((p, index) => {
-      console.log("P :" + p);
+      //console.log("P :" + p);
       this.uploadImage( p, this.state.eventname + index )})
     const urls = await Promise.all(uploadImagePromises)
     //console.log("Urls",urls);
@@ -247,45 +278,46 @@ export default class EventCreate extends Component{
           loading : true,
         })
         this.uploadImages(this.state.filePath)
+        .then( () => this.notificationLocation())
+        .then( () => {
+          fetch('https://fcm.googleapis.com/fcm/send',
+                  {
+                      method: 'POST',
+                      headers:
+                      {
+                          'Content-Type': 'application/json',
+                          'Authorization': 'key=AAAAP6OjSUc:APA91bGDee_s4YQeGx2pK1-WqjsqG3coAXtAhFRG_lB9A9SGzQB9dGGMasO90_TtbdqNfVW_nkhe3eTAAu8jXy3HyNBofELij1xAx7aHnP7tUk6iDrsDHjkzZidCUiPHoUTCt8ku5sP0'
+                      },
+                      body: JSON.stringify(
+                      {
+                        "notification": {
+                          "title": this.state.eventname,
+                          "body": this.state.selectedPlace,
+                      },
+                      "data": {
+                        "title": this.state.eventname,
+                        "body": "Place" + this.state.place + this.state.organizer,
+                      },
+                        "registration_ids" : this.state.datasrc,
+                      })
+                  }).then((response) => response.json()).then((responseJsonFromServer) =>
+                  {
+                    console.log(responseJsonFromServer);
+                  }).catch((error) =>
+                  {
+                    console.log(error);
+                  });
+
+        })
         .then( () => this.handleEvent())
         .then( () => {
           this.setState({
             loading : false,
           })
         });
-        fetch('https://fcm.googleapis.com/fcm/send',
-                {
-                    method: 'POST',
-                    headers:
-                    {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'key=AAAAP6OjSUc:APA91bGDee_s4YQeGx2pK1-WqjsqG3coAXtAhFRG_lB9A9SGzQB9dGGMasO90_TtbdqNfVW_nkhe3eTAAu8jXy3HyNBofELij1xAx7aHnP7tUk6iDrsDHjkzZidCUiPHoUTCt8ku5sP0'
-                    },
-                    body: JSON.stringify(
-                    {
-                      "notification": {
-                        "title": this.state.eventname,
-                        "body": this.state.selectedPlace,
-                    },
-                    "data": {
-                      "title": this.state.eventname,
-                      "body": "Place" + this.state.place + this.state.organizer,
-                    },
-                      "registration_ids" : this.state.datasrc,
-                    })
-
-                }).then((response) => response.json()).then((responseJsonFromServer) =>
-                {
-                    console.log(responseJsonFromServer);
-
-
-                }).catch((error) =>
-                {
-                  console.log(error);
-                });
       }
       else {
-        ToastAndroid.showWithGravity( 'Event Picture and some Fields cannot be empty.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+        ToastAndroid.showWithGravity( 'Event Pics and some Fields cannot be empty.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
       }
     }
 

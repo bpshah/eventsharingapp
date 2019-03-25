@@ -129,19 +129,11 @@ export default class Events extends Component {
                                                                         contact : item.mobileno,})} >
                 <Card containerStyle = {styles.Container}
                       titleNumberOfLines = {2}>
-                  <View style = {{flexDirection : 'row',justifyContent : 'space-around'}}>
-                    <View style = {{marginLeft : -25,height : 125,width : 125}}>
-                      <Avatar
-                        source = {{uri : item.imgsrc[0]}}
-                        size = 'xlarge'
-                        style = {{height : 100,width : 100,alignSelf : 'flex-end'}}
-                        imageProps = {{resizeMode : 'cover'}}
-                      />
-                    </View>
-                    <View style = {{marginLeft : 20}}>
-                    <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black'}}>City : {item.place}</Text>
-                    <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black'}}>City : {item.place}</Text>
-                    <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black'}}>City : {item.place}</Text>
+                  <View style = {{flex : 1,flexDirection : 'column',justifyContent : 'space-around'}}>
+                    <View style = {{marginLeft : 0}}>
+                      <Text style = {{alignSelf : 'flex-start', fontSize : 18, color : Colors.primaryAppColor,marginBottom : '2%'}}>{item.eventname}</Text>
+                      <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black',marginBottom : '0%'}}>City : {item.place}</Text>
+                      <Text style = {{alignSelf : 'center', fontSize : 15, color : 'black',textAlign : 'justify'}}>{item.fromtime} onwards</Text>
                     </View>
                   </View>
 
@@ -153,14 +145,21 @@ export default class Events extends Component {
     );
   }
 }
-
+/*<View style = {{marginLeft : -15,height : 125,width : 125}}>
+  <Avatar
+    source = {{uri : item.imgsrc[0]}}
+    size = 'xlarge'
+    style = {{height : 100,width : 100,alignSelf : 'flex-end',borderRadius : 100}}
+    imageProps = {{resizeMode : 'cover'}}
+  />
+</View>*/
 const styles = StyleSheet.create({
   Container : {
-    //flex : 1,
+    flex : 1,
     alignItems : 'flex-start',
     backgroundColor : Colors.primaryBackGourndColor,
     //marginBottom : -10,
-    height : 125,
+    //height : 75,
   },
   title : {
     fontSize : 18,

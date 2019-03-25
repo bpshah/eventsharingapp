@@ -13,5 +13,4 @@ export default Colors = {
   placeholderTextSignup : 'rgba(255,255,255,0.7)',
   textColor : '#FFFFFF',
   cardTextColor : '#808080',
-
 };

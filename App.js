@@ -19,6 +19,7 @@ import EventCreate from './app/pages/EventCreate.js';
 import SideMenu from './app/pages/SideMenu.js';
 import MyEvents from './app/pages/myevents.js'
 import EditEvent from './app/pages/editevent.js'
+import CreateGroup from './app/pages/createGroup.js'
 
 import { createStackNavigator, createAppContainer, createBottomTabNavigator, createDrawerNavigator, createSwitchNavigator} from 'react-navigation';
 import firebase from 'react-native-firebase';
@@ -26,6 +27,15 @@ import type { RemoteMessage } from 'react-native-firebase';
 
 
 type Props = {};
+let isVerified = false;
+
+if(firebase.auth().currentUser === null){
+  isVerified = false;
+}
+else{
+  isVerified = firebase.auth().currentUser.emailVerified
+}
+console.log(isVerified);
 
 const config = {
     apiKey: "AIzaSyAmtO-w9eUbDoeqPe-uI1YkgtRdwB45YWI",
@@ -101,6 +111,9 @@ const EventStack = createStackNavigator({
     },
     EditEvent : {
       screen : EditEvent,
+    },
+    CreateGroup : {
+      screen : CreateGroup
     },
 
     initialRouteName : 'Events',
@@ -201,6 +214,9 @@ const App1 = createSwitchNavigator({
       header : null,
     },
   },
+},
+{
+    initialRouteName : isVerified ? "Drawer" : "LoginStack"
 });
 
 const App =  createAppContainer(App1);

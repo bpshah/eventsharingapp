@@ -9,6 +9,7 @@ import Fonts from '../styles/fonts.js';
 import firebase from 'react-native-firebase';
 import ImageSlider from 'react-native-image-slider';
 import Activity from '../components/activityIndicator.js'
+import call from 'react-native-phone-call'
 
 let imgs = [];
 
@@ -154,9 +155,7 @@ export default class Ex extends Component {
         .update({members});
 
     }
-    else {
-      ToastAndroid.showWithGravity( 'You are already subscribed for the event.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
-    }
+    ToastAndroid.showWithGravity( 'You have subscribed for the event.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
   }
 
   leaveEvent = () => {
@@ -180,6 +179,7 @@ export default class Ex extends Component {
       .then(() => {
         console.log("left");
       });
+      ToastAndroid.showWithGravity( 'You have unsubscribed for the event.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
   }
 
   displayText = () => {
@@ -221,6 +221,13 @@ export default class Ex extends Component {
       />
     )
     })
+  }
+
+  callOrganizer = () => {
+    const args = {
+      number : this.state.contact,
+    }
+    call(args).catch(console.error)
   }
 
   render(){
@@ -293,7 +300,7 @@ export default class Ex extends Component {
                 size={20}
                 color='black'
                 style = {{marginRight : '4%', marginLeft : '10%',alignSelf : 'center'}}/>
-            <Text style = {styles.childContainerText}>Organizer : {this.state.org} {'\n'} Contact No. : {this.state.contact}</Text>
+            <Text style = {styles.childContainerText} onPress = {this.callOrganizer}>Organizer : {this.state.org} {'\n'} Contact No. : {this.state.contact}</Text>
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'center',marginRight : '4%', marginTop : '5%'}}>
             {this.displayText()}

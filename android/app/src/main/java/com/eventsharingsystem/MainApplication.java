@@ -3,6 +3,12 @@ package com.eventsharingsystem;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
+import com.imagepicker.ImagePickerPackage;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import io.invertase.firebase.RNFirebasePackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.reactnative.ivpusic.imagepicker.PickerPackage;
 //import com.reactnative.ivpusic.imagepicker.PickerPackage;
 import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
@@ -46,10 +52,10 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new PickerPackage(),
-            new ReactNativePushNotificationPackage(),
             new VectorIconsPackage(),
+            new ReactNativePushNotificationPackage(),
             new ImagePickerPackage(),
+            new PickerPackage(),
             new RNGestureHandlerPackage(),
             new RNFirebasePackage(),
             new RNFetchBlobPackage(),
