@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { FlatList, Image, StyleSheet, View, Text,TouchableOpacity,TouchableWithoutFeedback,ToastAndroid} from 'react-native';
-import { List, ListItem, Card } from 'react-native-elements';
+import { List, ListItem, Card, SearchBar } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import firebase from 'react-native-firebase';
@@ -15,6 +15,8 @@ export default class MyEvents extends Component {
       datasrc : null,
       loading : true,
       refreshing : false,
+      value : '',
+      searchArrayHolder : [],
     }
   }
 
@@ -25,6 +27,60 @@ export default class MyEvents extends Component {
   componentDidMount(){
     this.handleRefresh();
   }
+
+  emptyComp = () => {
+    return(
+      <View style = {{flex : 1,justifyContent : 'center',alignItems : 'center'}}>
+        <Text style = {{fontSize : 16}}>No events</Text>
+      </View>
+    )
+  }
+
+  searchFilter = (text) => {
+
+    this.setState({
+      value : text,
+    });
+
+    const newData = this.state.searchArrayHolder.filter(item => {
+      const itemData = `${item.eventname}`
+      return itemData.indexOf(text) > -1
+    });
+
+    this.setState({
+      datasrc : newData,
+    })
+  }
+
+  onCancleSearch = () => {
+    this.setState({
+      value : '',
+    })
+  }
+
+  searchBarHeader = () => {
+    return (
+      <SearchBar
+        placeholder="Search Events..."
+        lightTheme
+        round
+        onChangeText = { text => this.searchFilter(text)}
+        onCancel = {this.onCancleSearch}
+        platform = 'default'
+        value = {this.state.value}
+        autoCorrect = {false}
+      />
+    )
+  }
+
+  renderSeparator = () => {
+    return (
+      <View
+        style={{ height: 1, width: '86%', backgroundColor: '#CED0CE', marginLeft: '14%'}}
+      />
+    );
+  }
+
 
   handleRefresh = () => {
 
@@ -42,12 +98,14 @@ export default class MyEvents extends Component {
       .equalTo(temail)
       .on('value',(snapshot) => {
         snapshot.forEach((csnapshot) => {
+          console.log(csnapshot.val());
             let item = csnapshot.val();
             data1.push(item)
         })
         this.setState({
           datasrc : data1,
           refreshing : false,
+          searchArrayHolder : data1,
         })
       })
       if(this.state.datasrc != []){
@@ -87,6 +145,10 @@ export default class MyEvents extends Component {
           data = {this.state.datasrc}
           refreshing = {this.state.refreshing}
           onRefresh = {this.handleRefresh}
+          ListHeaderComponent = {this.searchBarHeader}
+          ListEmptyComponent = {this.emptyComp}
+          ItemSeparatorComponent={this.renderSeparator}
+          initialNumToRender = {5}
           renderItem={({item})=>(
           <View style={{flex : 1,backgroundColor : Colors.primaryBackGourndColor}}>
             <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('EditEvent',{  title : item.eventname,

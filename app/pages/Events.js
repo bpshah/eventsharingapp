@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { FlatList, Image, StyleSheet, View, Text,TouchableOpacity,TouchableWithoutFeedback,ToastAndroid} from 'react-native';
-import { List, ListItem, Card, Avatar } from 'react-native-elements';
+import { List, ListItem, Card, Avatar, SearchBar } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
@@ -14,6 +14,8 @@ export default class Events extends Component {
       datasrc : null,
       refreshing : false,
       loading : false,
+      value : '',
+      searchArrayHolder : [],
     }
   }
 
@@ -68,6 +70,59 @@ export default class Events extends Component {
       this.handleRefresh();
     }
 
+  emptyComp = () => {
+    return(
+      <View style = {{flex : 1,justifyContent : 'center',alignItems : 'center'}}>
+        <Text style = {{fontSize : 16}}>There are no events currently</Text>
+      </View>
+    )
+  }
+
+  searchFilter = (text) => {
+
+    this.setState({
+      value : text,
+    });
+
+    const newData = this.state.searchArrayHolder.filter(item => {
+      const itemData = `${item.eventname}`
+      return itemData.indexOf(text) > -1
+    });
+
+    this.setState({
+      datasrc : newData,
+    })
+  }
+
+  onCancleSearch = () => {
+    this.setState({
+      value : '',
+    })
+  }
+
+  searchBarHeader = () => {
+    return (
+      <SearchBar
+        placeholder="Search Events..."
+        lightTheme
+        round
+        onChangeText = { text => this.searchFilter(text)}
+        onCancel = {this.onCancleSearch}
+        platform = 'default'
+        value = {this.state.value}
+        autoCorrect = {false}
+      />
+    )
+  }
+
+  renderSeparator = () => {
+    return (
+      <View
+        style={{ height: 1, width: '86%', backgroundColor: '#CED0CE', marginLeft: '14%'}}
+      />
+    );
+  }
+
   handleRefresh = () => {
 
     this.setState({
@@ -89,6 +144,7 @@ export default class Events extends Component {
         this.setState({
           datasrc : data1,
           refreshing : false,
+          searchArrayHolder : data1,
         })
       })
       if(this.state.datasrc != []){
@@ -117,6 +173,10 @@ export default class Events extends Component {
             data = {this.state.datasrc}
             refreshing = {this.state.refreshing}
             onRefresh = {this.handleRefresh}
+            ListHeaderComponent = {this.searchBarHeader}
+            ListEmptyComponent = {this.emptyComp}
+            ItemSeparatorComponent={this.renderSeparator}
+            initialNumToRender = {5}
             renderItem={({item})=>(
             <View style={{flex : 1,backgroundColor : Colors.primaryBackGourndColor}}>
               <TouchableWithoutFeedback onPress={() => navigate('Ex',{  title : item.eventname,
@@ -126,7 +186,8 @@ export default class Events extends Component {
                                                                         fromtime : item.fromtime,
                                                                         totime : item.totime,
                                                                         imgsrc : item.imgsrc,
-                                                                        contact : item.mobileno,})} >
+                                                                        contact : item.mobileno,
+                                                                        screen : 'Events'})} >
                 <Card containerStyle = {styles.Container}
                       titleNumberOfLines = {2}>
                   <View style = {{flex : 1,flexDirection : 'column',justifyContent : 'space-around'}}>
@@ -145,14 +206,7 @@ export default class Events extends Component {
     );
   }
 }
-/*<View style = {{marginLeft : -15,height : 125,width : 125}}>
-  <Avatar
-    source = {{uri : item.imgsrc[0]}}
-    size = 'xlarge'
-    style = {{height : 100,width : 100,alignSelf : 'flex-end',borderRadius : 100}}
-    imageProps = {{resizeMode : 'cover'}}
-  />
-</View>*/
+
 const styles = StyleSheet.create({
   Container : {
     flex : 1,

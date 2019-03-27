@@ -52,7 +52,7 @@ export default class Ex extends Component {
           const resetAction = StackActions.reset({
                       index: 0,
                       actions: [
-                        NavigationActions.navigate({routeName: "Events"})
+                        NavigationActions.navigate({routeName : navigation.state.params.screen})
                       ]
                     });
           navigation.dispatch(resetAction);
@@ -145,6 +145,7 @@ export default class Ex extends Component {
     })
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
+    let ename = this.state.title;
     if(!this.state.members.includes(temail)){
       this.state.members.push(temail);
       this.addMemberInfo(temail);
@@ -153,6 +154,11 @@ export default class Ex extends Component {
         .database()
         .ref('Events/' + this.state.title)
         .update({members});
+      firebase
+        .database()
+        .ref('Users/' + temail)
+        .child('going')
+        .push({ename});
 
     }
     ToastAndroid.showWithGravity( 'You have subscribed for the event.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
@@ -178,6 +184,21 @@ export default class Ex extends Component {
       .update({members})
       .then(() => {
         console.log("left");
+      });
+    firebase
+      .database()
+      .ref('Users/' + temail)
+      .child('going')
+      .once('value')
+      .then(
+        (snapshot) => {
+          snapshot.forEach((item) => {
+            console.log(item._value.ename);
+            console.log(item.key);
+            if(item._value.ename == this.state.title){
+              firebase.database().ref('Users/' + temail).child('going').child(item.key).remove();
+            }
+          })
       });
       ToastAndroid.showWithGravity( 'You have unsubscribed for the event.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
   }

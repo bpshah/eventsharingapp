@@ -20,6 +20,8 @@ import SideMenu from './app/pages/SideMenu.js';
 import MyEvents from './app/pages/myevents.js'
 import EditEvent from './app/pages/editevent.js'
 import CreateGroup from './app/pages/createGroup.js'
+import Going from './app/pages/going.js'
+
 
 import { createStackNavigator, createAppContainer, createBottomTabNavigator, createDrawerNavigator, createSwitchNavigator} from 'react-navigation';
 import firebase from 'react-native-firebase';
@@ -114,6 +116,9 @@ const EventStack = createStackNavigator({
     },
     CreateGroup : {
       screen : CreateGroup
+    },
+    Going : {
+      screen : Going,
     },
 
     initialRouteName : 'Events',

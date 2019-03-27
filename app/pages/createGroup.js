@@ -14,12 +14,16 @@ import ImagePicker from 'react-native-image-crop-picker';
 import Loader from '../components/loader.js'
 
 export default class CreateGroup extends Component{
+
   constructor(props){
     super(props);
     this.state = {
       groupName : '',
       description : '',
       location : '',
+      filePath : '',
+      imgsrc : [],
+      loading : false,
       categories : ['Tech','Sports','Cultural'],
       checked : [ false ,false, false],
     }
@@ -53,26 +57,90 @@ export default class CreateGroup extends Component{
     this.inputs[id].focus();
   }
 
-  changeCheckBox = (index) => {
-    console.log(" abc "+ index);
-    let check = this.state.checked;
-    check[index] = !check[index];
-    console.log(check);
-    this.setState({
-      checked : check,
+  /*generateCheckboxgroup = () => {
+    this.state.categories.map((item,index) => {
+      console.log(item + " " + index)
+      return (
+        <CheckBox
+          title = {item}
+          checked = {this.state.checked}
+          onPress = {this.changeCheckBox(index)}
+          containerStyle = {{backgroundColor : Colors.primaryBackGourndColor,borderWidth : 0,padding : 0}}
+        />
+    )
     })
-    //console.log(this.state.checked);
-  }
+  }*/
 
   mapCheckBox = () => {
     let cats = [];
     this.state.categories.forEach((cat) => {
       if(this.state.checked[this.state.categories.indexOf(cat)] === true){
-        cats.push(this.state.categories[index]);
+        cats.push(this.state.categories[this.state.categories.indexOf(cat)]);
       }
     })
     return cats;
   }
+
+  uploadImage = (uri, imageName, mime = 'image/png') => {
+    const Blob = RNFetchBlob.polyfill.Blob;
+    const fs = RNFetchBlob.fs;
+    window.XMLHttpRequest = RNFetchBlob.polyfill.XMLHttpRequest;
+    window.Blob = Blob;
+    return new Promise((resolve, reject) => {
+      //const uploadUri = Platform.OS === 'ios' ? uri.replace('file://', '') : uri;
+        const uploadUri = uri;
+        let uploadBlob = null
+        const imageRef = firebase.storage().ref('groupDP').child(this.state.groupName).child(imageName)
+        fs.readFile(uploadUri, 'base64')
+        .then((data) => {
+          return Blob.build(data, { type: `${mime};BASE64` })
+        })
+        .then((blob) => {
+          uploadBlob = blob
+          return imageRef.put(uri, { contentType: mime })
+        })
+        .then(() => {
+          uploadBlob.close()
+          return imageRef.getDownloadURL()
+        })
+        .then((url) => {
+          console.log("Image Uploaded : " + url);
+          this.state.imgsrc.push(url);
+          console.log("Imgsrc : " + this.state.imgsrc);
+          let imgsrc = this.state.imgsrc;
+          firebase
+            .database()
+            .ref('Groups/' + this.state.groupName)
+            .update({imgsrc});
+          resolve(url)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    })
+  }
+
+  chooseFile = () => {
+        //let imgs = [];
+        var options = {
+          title: 'Select Image',
+          customButtons: [
+            { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
+          ],
+          storageOptions: {
+            skipBackup: true,
+            path: 'images',
+          },
+        };
+        ImagePicker.openPicker({
+          multiple : false
+        }).then(image => {
+          this.setState({
+            filePath : image.path,
+          })
+          //console.log("Filepath : " + this.state.filePath);
+        });
+    };
 
   CreateGroup = () => {
 
@@ -80,11 +148,30 @@ export default class CreateGroup extends Component{
     let desc = this.state.description;
     let location = this.state.location;
     let tcats = this.mapCheckBox();
-    //console.log("Cats : " + tcats);
-    firebase
-      .database()
-      .ref('Groups/' + this.state.groupName)
-      .set({groupName,desc,location,tcats})
+    let admin = firebase.auth().currentUser.email.slice(0,user.email.indexOf('@'))
+    this.setState({
+      loading : true,
+    })
+    if( groupName != '' &&
+        location != ''){
+      console.log("Cats : " + tcats);
+      this.uploadImage(this.state.filePath,this.state.groupName)
+      .then(() => {
+        firebase
+          .database()
+          .ref('Groups/' + this.state.groupName)
+          .set({groupName,desc,location,tcats,admin})
+      })
+      .then(() => {
+        this.setState({
+          loading : false,
+        })
+      })
+      .then(() => this.props.navigation.navigate('Events'))
+    }
+    else {
+      ToastAndroid.showWithGravity( 'Group Name and Location cannot be empty.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+    }
   }
 
   render(){
@@ -92,11 +179,14 @@ export default class CreateGroup extends Component{
       <ScrollView contentContainerStyle = {styles.container}>
         <Avatar
             rounded
+            source = {{ uri : this.state.filePath }}
             showEditButton
             size = "xlarge"
             margin = {20}
             alignSelf = 'center'
+            onEditPress = {this.chooseFile.bind(this)}
         />
+        <Loader loading = {this.state.loading}/>
         <Text style = {{alignSelf : 'center',fontSize : 18,color : 'black',marginBottom : '8%'}}>Find LikeMinded people and do your thing</Text>
         <Divider style = {{ flex : 1,backgroundColor: Colors.primaryAppColor,height : 1}} />
         <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '5%',marginRight : '8%',marginLeft : '2%'}}>
@@ -164,22 +254,25 @@ export default class CreateGroup extends Component{
         <View style = {{flexDirection : 'row',justifyContent: 'space-between',alignSelf : 'flex-start',marginTop : '1%',marginLeft : '8%',flexWrap: 'wrap'}}>
         {
           this.state.categories.map((item,index) => {
-            console.log(index)
-            return (
-              <CheckBox
-                title = {item}
-                checked = {this.state.checked[index]}
-                onPress = {(index) => {
-                  console.log("index : " + Object.key())
-                  this.changeCheckBox(index)}}
-                containerStyle = {{backgroundColor : Colors.primaryBackGourndColor,borderWidth : 0,padding : 0}}
-              />
-          )
-          })
-        }
+          console.log(item + " " + index)
+          return (
+            <CheckBox
+              title = {item}
+              checked = {this.state.checked[index]}
+              onPress = {() => {
+                let check = this.state.checked
+                check[index] = !check[index]
+                this.setState({
+                  checked : check
+                })
+              }}
+              containerStyle = {{backgroundColor : Colors.primaryBackGourndColor,borderWidth : 0,padding : 0}}
+            />
+        )
+        })}
         </View>
         <TouchableOpacity style = {styles.buttonContainer}
-                          onPress = {this.CreateGroup()}>
+                          onPress = {this.CreateGroup}>
               <Text style = {styles.buttonText}>Create Group</Text>
         </TouchableOpacity>
       </ScrollView>

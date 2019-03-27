@@ -45,7 +45,7 @@ export default class SideMenu extends Component{
   render(){
     return(
       <ScrollView>
-        <View style = {{flex : 1,backgroundColor : Colors.white,justifyContent : 'flex-start',alignItems : 'center',paddingBottom : '20%'}}>
+        <View style = {{backgroundColor : Colors.white,justifyContent : 'flex-start',alignItems : 'center',paddingBottom : '20%'}}>
           <Avatar
               rounded
               source = {{uri : this.state.imgsrc}}
@@ -54,7 +54,7 @@ export default class SideMenu extends Component{
               paddingTop = '10%'
               //alignSelf = 'flex-start'
           />
-          <Text style = {{flex : 1,paddingTop : '14%',fontSize : 17,alignSelf : 'center'}}> Welcome , {this.state.firsname} </Text>
+          <Text style = {{paddingTop : '14%',fontSize : 17,alignSelf : 'center'}}> Welcome , {this.state.firsname} </Text>
         </View>
         <View style = {{flex : 2,backgroundColor : Colors.primaryBackGourndColor,paddingTop : '5%',height : '65%'}}>
           <View style = {{ flexDirection : 'row',justifyContent : 'flex-start',paddingTop : '6%',paddingBottom : '6%'}}>
@@ -103,7 +103,7 @@ export default class SideMenu extends Component{
               color='black'
               style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
             <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
-                  onPress={this.navigateToScreen('ProfilePage')}>About Us</Text>
+                  onPress={this.navigateToScreen('Going')}>Going</Text>
           </View>
           <View style = {styles.child1}>
             <Icon name="sign-out-alt"
