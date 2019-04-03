@@ -45,16 +45,17 @@ export default class SideMenu extends Component{
   render(){
     return(
       <ScrollView>
-        <View style = {{backgroundColor : Colors.white,justifyContent : 'flex-start',alignItems : 'center',paddingBottom : '20%'}}>
+        <View style = {{flex : 1,backgroundColor : Colors.white,justifyContent : 'flex-start',alignItems : 'center',paddingBottom : '20%'}}>
           <Avatar
               rounded
               source = {{uri : this.state.imgsrc}}
-              //style = {{alignSelf : 'center'}}
+              //style = {{backgroundColor : 'black'}}
               size = "large"
               paddingTop = '10%'
-              //alignSelf = 'flex-start'
+              paddingLeft = '2%'
+              paddingRight = '2%'
           />
-          <Text style = {{paddingTop : '14%',fontSize : 17,alignSelf : 'center'}}> Welcome , {this.state.firsname} </Text>
+          <Text style = {{paddingTop : '14%',fontSize : 17,alignSelf : 'center',flex : 1}}> Welcome , {this.state.firsname} </Text>
         </View>
         <View style = {{flex : 2,backgroundColor : Colors.primaryBackGourndColor,paddingTop : '5%',height : '65%'}}>
           <View style = {{ flexDirection : 'row',justifyContent : 'flex-start',paddingTop : '6%',paddingBottom : '6%'}}>
@@ -82,28 +83,12 @@ export default class SideMenu extends Component{
                   onPress={this.navigateToScreen('ProfilePage')}>Join Group</Text>
           </View>
           <View style = {styles.child1}>
-            <Icon name="user-plus"
-              size={18}
-              color='black'
-              style = {{paddingLeft : '10%',marginRight : '1%',alignSelf : 'center'}}/>
-            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
-                  onPress={this.navigateToScreen('MyEvents')}>My Events</Text>
-          </View>
-          <View style = {styles.child1}>
             <Icon name="user"
               size={18}
               color='black'
               style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
             <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
                   onPress={this.navigateToScreen('ProfilePage')}>Profile</Text>
-          </View>
-          <View style = {styles.child1}>
-            <Icon name="clipboard"
-              size={18}
-              color='black'
-              style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
-            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
-                  onPress={this.navigateToScreen('Going')}>Going</Text>
           </View>
           <View style = {styles.child1}>
             <Icon name="sign-out-alt"

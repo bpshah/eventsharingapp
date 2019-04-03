@@ -24,8 +24,8 @@ export default class CreateGroup extends Component{
       filePath : '',
       imgsrc : [],
       loading : false,
-      categories : ['Tech','Sports','Cultural'],
-      checked : [ false ,false, false],
+      categories : [],
+      checked : [],
     }
     this.focusNextField = this.focusNextField.bind(this);
     this.inputs = {};
@@ -52,6 +52,34 @@ export default class CreateGroup extends Component{
       </View>
     )
   })
+
+  componentWillMount(){
+    firebase
+      .database()
+      .ref('Catgory/')
+      .once('value').then((snapshot) => {
+        //console.log("Before Parsing Categories");
+        snapshot.forEach((csnapshot) => {
+            let item = csnapshot.val();
+            //console.log("Category : " + item);
+            this.state.categories.push(item);
+        });
+        //console.log("Data 2 : " + this.state.categories);
+      })
+      .then(() => {
+        let check = [];
+        this.state.categories.forEach((item) => {
+          check.push(false);
+        })
+        this.setState({
+          checked : check,
+        })
+        //console.log("Check : " + check);
+        //console.log("Checked : " + this.state.checked);
+      })
+
+
+  }
 
   focusNextField(id) {
     this.inputs[id].focus();
@@ -251,7 +279,8 @@ export default class CreateGroup extends Component{
         </View>
         <Divider style = {{ flex : 1,backgroundColor: Colors.primaryAppColor,height : 1}} />
         <Text style = {{alignSelf : 'flex-start',paddingTop : '1%',paddingBottom : '1%',marginBottom : '2%',marginTop : '2%',marginRight : '8%',marginLeft : '10%',fontSize : 16}}> Category : </Text>
-        <View style = {{flexDirection : 'row',justifyContent: 'space-between',alignSelf : 'flex-start',marginTop : '1%',marginLeft : '8%',flexWrap: 'wrap'}}>
+        <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'flex-start',arginTop : '1%',marginLeft : '8%',
+        flexWrap: 'wrap'}}>
         {
           this.state.categories.map((item,index) => {
           console.log(item + " " + index)

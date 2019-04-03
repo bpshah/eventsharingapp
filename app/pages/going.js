@@ -12,13 +12,17 @@ export default class Going extends Component {
   constructor(props){
     super(props);
     this.state = {
-      datasrc : [],
+      datasrc : null,
       loading : true,
       refreshing : false,
       value : '',
       searchArrayHolder : [],
     }
   }
+
+  static navigationOptions = ({navigation}) => ({
+    header : null,
+  })
 
   componentWillMount(){
     this.handleRefresh();
@@ -95,18 +99,20 @@ export default class Going extends Component {
       .ref('Users/' + temail + '/' + 'going')
       .once('value')
       .then(async (snapshot) => {
+        //console.log("Snapshot : "  + snapshot);
         let keys = snapshot._childKeys;
         //console.log(snapshot);
         await keys.forEach((item) => {
-          console.log(snapshot._value[item].ename);
+          //console.log(snapshot._value[item].ename);
           firebase
             .database()
             .ref('Events/')
             .child(snapshot._value[item].ename)
             .once('value')
             .then((snapshot) => {
-              console.log(snapshot);
+              console.log("snapshot : " + snapshot);
               data1.push(snapshot._value);
+              console.log(data1);
             })
             .then(() => {
               this.setState({
@@ -115,6 +121,7 @@ export default class Going extends Component {
                 loading : false,
                 searchArrayHolder : data1,
               })
+              //console.log("datasrc : " + this.state.datasrc);
             })
         })
       })
@@ -170,7 +177,7 @@ export default class Going extends Component {
                                                                       imgsrc : item.imgsrc,
                                                                       contact : item.mobileno,
                                                                       category : item.category,
-                                                                      screen : 'Going'})} >
+                                                                      })} >
               <Card containerStyle = {styles.Container}
                     dividerStyle = {{backgroundColor : Colors.cardTextColor}}
                     title = {item.eventname}

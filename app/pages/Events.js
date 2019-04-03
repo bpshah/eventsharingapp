@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FlatList, Image, StyleSheet, View, Text,TouchableOpacity,TouchableWithoutFeedback,ToastAndroid} from 'react-native';
+import { FlatList, Image, StyleSheet, View, Text,TouchableOpacity,TouchableWithoutFeedback,ToastAndroid, NetInfo} from 'react-native';
 import { List, ListItem, Card, Avatar, SearchBar } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import firebase from 'react-native-firebase';
@@ -15,6 +15,7 @@ export default class Events extends Component {
       refreshing : false,
       loading : false,
       value : '',
+      isConnected : false,
       searchArrayHolder : [],
     }
   }
@@ -40,10 +41,11 @@ export default class Events extends Component {
   })
 
   componentWillMount(){
-
+    this.handleRefresh();
   }
 
   componentDidMount(){
+    NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
     this.handleRefresh();
 
     this.unsubscribeFromNotificationListener = firebase.notifications().onNotification(notification => {
@@ -68,7 +70,16 @@ export default class Events extends Component {
 
   componentWillUnmount(){
       this.handleRefresh();
+      NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
     }
+
+  handleConnectivityChange = (isConnected) => {
+    if (isConnected) {
+      this.setState({ isConnected : true});
+    } else {
+      this.setState({ isConnected : false});
+    }
+  }
 
   emptyComp = () => {
     return(
@@ -140,6 +151,7 @@ export default class Events extends Component {
             let item = csnapshot.val();
             //item.key = csnapshot.key;
             data1.push(item)
+            //console.log(item);
         })
         this.setState({
           datasrc : data1,
@@ -161,12 +173,11 @@ export default class Events extends Component {
 
       const {navigate} = this.props.navigation;
 
-      if (this.state.loading) {
-        return (
-          <Activity/>
+      if(!this.state.isConnected){
+        return(
+          <Text style = {{flex : 1,alignSelf : 'center',padding : 20}}>No internet connection</Text>
         );
       }
-
       return(
 
         <FlatList
@@ -187,7 +198,7 @@ export default class Events extends Component {
                                                                         totime : item.totime,
                                                                         imgsrc : item.imgsrc,
                                                                         contact : item.mobileno,
-                                                                        screen : 'Events'})} >
+                                                                        address : item.address})} >
                 <Card containerStyle = {styles.Container}
                       titleNumberOfLines = {2}>
                   <View style = {{flex : 1,flexDirection : 'column',justifyContent : 'space-around'}}>

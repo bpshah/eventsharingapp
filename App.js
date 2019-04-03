@@ -6,7 +6,7 @@
  * @flow
  */
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, Image,AsyncStorage} from 'react-native';
+import {Platform, StyleSheet, Text, View, Image,AsyncStorage,TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Login from './app/pages/Login.js';
 import Signup from './app/pages/Signup.js';
@@ -22,8 +22,7 @@ import EditEvent from './app/pages/editevent.js'
 import CreateGroup from './app/pages/createGroup.js'
 import Going from './app/pages/going.js'
 
-
-import { createStackNavigator, createAppContainer, createBottomTabNavigator, createDrawerNavigator, createSwitchNavigator} from 'react-navigation';
+import { createStackNavigator, createAppContainer, createMaterialTopTabNavigator, createDrawerNavigator, createSwitchNavigator} from 'react-navigation';
 import firebase from 'react-native-firebase';
 import type { RemoteMessage } from 'react-native-firebase';
 
@@ -88,16 +87,75 @@ firebase.messaging().hasPermission()
 const ProfileStack = createStackNavigator({
   ProfilePage : {
     screen : ProfilePage,
-
   },
 })
 
+const TabNav = createMaterialTopTabNavigator(
+    {
+      Events : {
+          screen : Events,
+          navigationOptions : {
+          tabBarLabel : "Events",
+        },
+      },
+      MyEvents : {
+        screen : MyEvents,
+        navigationOptions : {
+        tabBarLabel : "My Events",
+      }
+    },
+    Going : {
+      screen : Going,
+      navigationOptions : {
+      tabBarLabel : "Going",
+    }
+  },
+  },
+  {
+    tabBarOptions : {
+      activeTintColor : Colors.primaryAppColor,
+      inactiveTintColor : 'black',
+      style: {
+        backgroundColor : 'white',
+      },
+      indicatorStyle : {
+        backgroundColor: 'rgba(0,0,0,0.4)'
+      }
+    },
+  },
+);
+
 const EventStack = createStackNavigator({
-    Events : {
-      screen : Events ,
+    TabNav : {
+      screen : TabNav ,
+      navigationOptions : ({navigation}) => ({
+        headerTitleStyle : {
+           textAlign : 'justify',
+           flex : 1,
+           fontSize : 20,
+         },
+        headerStyle : {
+          backgroundColor : Colors.tabBarColor,
+        },
+        title : 'Events',
+        headerTintColor : Colors.white,
+        headerLeft : (
+          <View marginLeft = {10}>
+              <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+                <Icon name="bars" size={20} color={Colors.white} />
+              </TouchableOpacity>
+          </View>
+        )
+      })
     },
     Ex : {
       screen : Ex,
+    },
+    Events : {
+      screen : Events,
+    },
+    Going : {
+      screen : Going
     },
     EventCreate : {
         screen : EventCreate,
@@ -108,55 +166,16 @@ const EventStack = createStackNavigator({
         header : null,
       },
     },
-    MyEvents : {
-        screen : MyEvents,
-    },
     EditEvent : {
       screen : EditEvent,
     },
     CreateGroup : {
       screen : CreateGroup
     },
-    Going : {
-      screen : Going,
-    },
-
     initialRouteName : 'Events',
 })
 
-/*const TabNav = createBottomTabNavigator(
-    {
-      EventStack : {
-          screen : EventStack,
-          navigationOptions : {
-          tabBarLabel : "Events",
-          tabBarIcon : ({ tintColor }) => (
-            <Icon name="stream" size={20} color="#F2F2F2" />
-          ),
-        },
-      },
-      ProfileStack : {
-        screen : ProfileStack,
-        navigationOptions : {
-        tabBarLabel : "Profile",
-        tabBarIcon : ({ tintColor }) => (
-          <Icon name="user" size={20} color="#F2F2F2" />
-        ),
-        tabBarVisible : false,
-      }
-    }
-  },
-  {
-    order : ['EventStack', 'ProfileStack'],
-    tabBarOptions : {
-      activeTintColor : 'black',
-      inactiveTintColor : '#F2F2F2',
-      style: {
-        backgroundColor : 'white',
-      }
-    },
-  },
-);*/
+
 
 const Drawer =  createDrawerNavigator({
   EventStack : {
@@ -167,16 +186,6 @@ const Drawer =  createDrawerNavigator({
   contentComponent : SideMenu,
   drawerWidth : 225,
 })
-
-EventStack.navigationOptions = ({ navigation }) => {
-  let tabBarVisible = true;
-  if (navigation.state.index > 0) {
-    tabBarVisible = false;
-  }
-  return {
-    tabBarVisible,
-  };
-};
 
 const LoginStack = createStackNavigator({
   Login : {

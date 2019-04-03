@@ -98,7 +98,7 @@ export default class MyEvents extends Component {
       .equalTo(temail)
       .on('value',(snapshot) => {
         snapshot.forEach((csnapshot) => {
-          console.log(csnapshot.val());
+          //console.log(csnapshot.val());
             let item = csnapshot.val();
             data1.push(item)
         })

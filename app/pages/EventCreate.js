@@ -4,7 +4,7 @@ import {StackActions, NavigationActions} from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import Activity from '../components/activityIndicator.js'
-import { Avatar } from 'react-native-elements';
+import { Avatar,CheckBox } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
 import DatePicker from 'react-native-datepicker';
@@ -63,6 +63,9 @@ export default class EventCreate extends Component{
       selectedValueCategory : 0,
       datasrc : null,
       loading : false,
+      address : '',
+      checked : [],
+      color : Colors.placeholderText,
     };
     this.focusNextField = this.focusNextField.bind(this);
     this.inputs = {};
@@ -90,9 +93,20 @@ export default class EventCreate extends Component{
         snapshot.forEach((csnapshot) => {
             let item = csnapshot.val();
             //console.log("Category : " + item);
-            this.state.category.push(item);
+            //this.state.category.push(item);
         });
-        console.log("Data 2 : " + this.state.category);
+        //console.log("Data 2 : " + this.state.category);
+      })
+      .then(() => {
+        let check = [];
+        this.state.category.forEach((item) => {
+          check.push(false);
+        })
+        this.setState({
+          checked : check,
+        })
+        //console.log("Check : " + check);
+        //console.log("Checked : " + this.state.checked);
       })
   }
 
@@ -119,11 +133,11 @@ export default class EventCreate extends Component{
           datasrc : data,
         });
       })
-  }*/
-
-  /*componentDidMount(){
-    this.notificationLocation();
 }*/
+
+  componentDidMount(){
+    //this.changePickerColor();
+  }
 
   notificationLocation = async () => {
 
@@ -225,6 +239,16 @@ export default class EventCreate extends Component{
         });
     };
 
+  mapCheckBox = () => {
+    let cats = [];
+    this.state.category.forEach((cat) => {
+      if(this.state.checked[this.state.category.indexOf(cat)] === true){
+        cats.push(this.state.category[this.state.category.indexOf(cat)]);
+      }
+    })
+    return cats;
+  }
+
   handleEvent = () => {
 
       let user = firebase.auth().currentUser;
@@ -238,13 +262,15 @@ export default class EventCreate extends Component{
       let eventname = this.state.eventname;
       let category = this.state.selectedCategory;
       let imgsrc = this.state.imgsrc;
+      let address = this.state.address;
+      let tcats = this.mapCheckBox();
 
       console.log("In Handle Event : " + imgsrc);
       let uid  = email.slice(0,user.email.indexOf('@'));
       firebase
         .database()
         .ref('Events/'+ this.state.eventname)
-        .set({ eventname, place, org, mobileno, description,category,fromtime,totime,uid,imgsrc})
+        .set({ eventname, place, org, mobileno, description,tcats,fromtime,totime,uid,imgsrc,address})
         .then(() => {
           const resetAction = StackActions.reset({
                       index: 0,
@@ -260,10 +286,12 @@ export default class EventCreate extends Component{
 
   uploadImages = async (photos) => {
     //console.log("In photos : " + photos);
+    let array = [];
     const uploadImagePromises = photos.map((p, index) => {
       //console.log("P :" + p);
-      this.uploadImage( p, this.state.eventname + index )})
-    const urls = await Promise.all(uploadImagePromises)
+      array.push(this.uploadImage( p, this.state.eventname + index ));
+      })
+    await Promise.all(array)
     //console.log("Urls",urls);
   }
 // <service android:name="io.invertase.firebase.messaging.RNFirebaseBackgroundMessagingService" />
@@ -296,7 +324,7 @@ export default class EventCreate extends Component{
                       },
                       "data": {
                         "title": this.state.eventname,
-                        "body": "Place" + this.state.place + this.state.organizer,
+                        "body": this.state.place + this.state.organizer,
                       },
                         "registration_ids" : this.state.datasrc,
                       })
@@ -321,6 +349,26 @@ export default class EventCreate extends Component{
       }
     }
 
+  changePickerColor = () => {
+    console.log("in changePickerColor");
+    if(this.state.selectedPlace == 'Select Location' || this.state.selectedPlace == ''){
+      console.log("in if");
+      this.setState({
+        color : 'rgba(0,0,0,0.4)',
+      })
+      console.log(this.state.color);
+      //return this.state.color;
+    }
+    else {
+      console.log("in else");
+      this.setState({
+        color : 'black',
+      })
+      console.log(this.state.color);
+    //return this.state.color;
+    }
+  }
+
   focusNextField(id) {
     this.inputs[id].focus();
   }
@@ -332,7 +380,7 @@ export default class EventCreate extends Component{
                   behaviour = 'height'
                   >
 
-          <View style = {{flex: 1, width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
+          <View style = {{ height : '22%',width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
             <ImageSlider
               loopBothSides
               images = {this.state.filePath}
@@ -394,19 +442,46 @@ export default class EventCreate extends Component{
                 this.inputs['one'] = input;
               }}/>
           </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginBottom : '-2%',marginTop : '5%',marginRight : '8%',marginLeft : '2%'}}>
+            <Icon name="map-pin"
+              size={22}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
+              title = 'Address of Event'
+              placeholder = "Address of Event"
+              placeholderTextColor = {Colors.placeholderText}
+              returnKeyType = 'next'
+              blurOnSubmit = { false }
+              onSubmitEditing = { () => {
+                this.focusNextField('three');
+              }}
+              //keyBoardType = 'email-address'
+              autoCapitalize = 'words'
+              autoCorrect = {false}
+              onChangeText = { address => this.setState({ address })}
+              value = {this.state.address}
+              ref = { input => {
+                this.inputs['two'] = input;
+              }}/>
+          </View>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '0%',marginRight : '4.5%',marginLeft : '2%',marginBottom : '1%'}}>
             <Icon name="map-marker-alt"
               size={22}
               color='black'
               style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
               <View
-                style = {{flexDirection : 'row', flex : 1, borderBottomWidth : 1, width : '80%',marginBottom : '5%', backgroundColor : 'rgba(255,255,255,0)', borderBottomColor : 'black',marginLeft : '0%'}}>
+                style = {{flexDirection : 'row', borderBottomWidth : 1, width : '80%',marginBottom : '5%', backgroundColor : 'rgba(255,255,255,0)', borderBottomColor : 'black',marginLeft : '0%'}}>
                 <Picker
                   selectedValue = {this.state.selectedPlace}
                   mode = 'dropdown'
-                  style = {[styles.pickerStyle,{color : Colors.placeholderText,marginLeft : '3%'}]}
+                  style = {[styles.pickerStyle,{color : this.state.color,marginLeft : '3%'}]}
                   onValueChange = {(itemValue, itemIndex) =>
-                    this.setState({ selectedPlace : itemValue,selectedValuePlace : itemIndex})}
+                    this.setState({
+                      selectedPlace : itemValue,
+                      selectedValuePlace : itemIndex,
+                    })
+                  }
                 >
                 <Picker.Item label="Select Location" value="location"/>
                 { this.state.place.map((item,index) =>
@@ -553,7 +628,7 @@ export default class EventCreate extends Component{
               returnKeyType = 'next'
               blurOnSubmit = { false }
               onSubmitEditing = { () => {
-                this.focusNextField('eight');
+                this.focusNextField('six');
               }}
               //keyBoardType = 'email-address'
               multiline = {false}
@@ -565,30 +640,29 @@ export default class EventCreate extends Component{
               onChangeText = { description => this.setState({ description })}
               value = {this.state.description}
               ref = { input => {
-                this.inputs['seven'] = input;
+                this.inputs['five'] = input;
               }}/>
           </View>
-          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '4.5%',marginLeft : '2%',marginBottom : '2%'}}>
-            <Icon name="stream"
-              size={22}
-              color='black'
-              style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
-            <View style = {{flexDirection : 'row', flex : 1, borderBottomWidth : 1, width : '80%', backgroundColor : 'rgba(255,255,255,0)', borderBottomColor : 'black',marginLeft : '0%'}}>
-              <Picker
-                selectedValue = {this.state.selectedCategory}
-                mode = 'dropdown'
-                prompt = "Event Category"
-                blurOnSubmit = { false }
-                style = {[styles.pickerStyle,{color : Colors.placeholderText,marginLeft : '3%'}]}
-                onValueChange = {(itemValue, itemIndex) =>
-                  this.setState({ selectedCategory : itemValue,selectedValueCategory : itemIndex})}
-                  >
-                  <Picker.Item label="Select Category" value="category"/>
-                  { this.state.category.map((item,index) =>
-                    <Picker.Item label={item} value={item}/>
-                  )}
-              </Picker>
-            </View>
+          <Text style = {{alignSelf : 'flex-start',paddingTop : '1%',paddingBottom : '1%',marginBottom : '2%',marginTop : '2%',marginRight : '8%',marginLeft : '12%',fontSize : 16}}> Category : </Text>
+          <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'flex-start',flexWrap: 'wrap'}}>
+          {
+            this.state.category.map((item,index) => {
+            console.log(item + " " + index)
+            return (
+              <CheckBox
+                title = {item}
+                checked = {this.state.checked[index]}
+                onPress = {() => {
+                  let check = this.state.checked
+                  check[index] = !check[index]
+                  this.setState({
+                    checked : check
+                  })
+                }}
+                containerStyle = {{backgroundColor : Colors.primaryBackGourndColor,borderWidth : 0,padding : 0}}
+              />
+          )
+          })}
           </View>
           <TouchableOpacity style = {styles.buttonContainer}
                             onPress = {this.handle}>
@@ -599,7 +673,26 @@ export default class EventCreate extends Component{
     )
   }
 }
-
+/*<Icon name="stream"
+  size={22}
+  color='black'
+  style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
+<View style = {{flexDirection : 'row', flex : 1, borderBottomWidth : 1, width : '80%', backgroundColor : 'rgba(255,255,255,0)', borderBottomColor : 'black',marginLeft : '0%'}}>
+  <Picker
+    selectedValue = {this.state.selectedCategory}
+    mode = 'dropdown'
+    prompt = "Event Category"
+    blurOnSubmit = { false }
+    style = {[styles.pickerStyle,{color : Colors.placeholderText,marginLeft : '3%'}]}
+    onValueChange = {(itemValue, itemIndex) =>
+      this.setState({ selectedCategory : itemValue,selectedValueCategory : itemIndex})}
+      >
+      <Picker.Item label="Select Category" value="category"/>
+      { this.state.category.map((item,index) =>
+        <Picker.Item label={item} value={item}/>
+      )}
+  </Picker>
+</View>*/
 const styles = StyleSheet.create({
 
   container : {
@@ -609,8 +702,8 @@ const styles = StyleSheet.create({
     justifyContent : 'flex-start',
     alignItems : 'center',
     width : '100%',
-    height : 860,
-    paddingBottom : 40,
+    height : 850,
+    paddingBottom : 20,
   },
   input : {
     height : 40,

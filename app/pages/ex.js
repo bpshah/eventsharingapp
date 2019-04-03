@@ -26,6 +26,7 @@ export default class Ex extends Component {
       description : this.props.navigation.state.params.desc,
       title : this.props.navigation.state.params.title,
       contact : this.props.navigation.state.params.contact,
+      address : this.props.navigation.state.params.address,
       members : [],
       userImages : [],
       loading : true,
@@ -52,7 +53,7 @@ export default class Ex extends Component {
           const resetAction = StackActions.reset({
                       index: 0,
                       actions: [
-                        NavigationActions.navigate({routeName : navigation.state.params.screen})
+                        NavigationActions.navigate({routeName : 'TabNav'})
                       ]
                     });
           navigation.dispatch(resetAction);
@@ -251,6 +252,9 @@ export default class Ex extends Component {
     call(args).catch(console.error)
   }
 
+  imageSlide = () => {
+  }
+
   render(){
 
     if(!this.state.loading){
@@ -259,47 +263,47 @@ export default class Ex extends Component {
     return(
        <ScrollView contentContainerStyle = {styles.Container}
                    behaviour = 'height'>
-          <View style = {{height : 200,marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%',width : '100%'}}>
-            <ImageSlider
-              loopBothSides
-              images = {this.state.imgsrc}
-              style = {{backgroundColor : Colors.primaryBackGourndColor}}
-              customSlide = {({ index, item, style, width }) => (
-              <View key={index} style={[style, styles.Slide]}>
-                <Avatar
-                  rectangle
-                  source = {{uri : item}}
-                  size = 'xlarge'
-                  //marginTop = '5%'
-                  height = '90%'
-                  width = '90%'
-                  alignSelf = 'center'
-                  backgroundColor = '#000000'
-                  imageProps = {{resizeMode : 'stretch'}}
-                  editButton = {{size : 30}}
-                />
-              </View>
-            )}
-              customButtons={(position, move) => (
-                <View style={styles.buttons}>
-                  {this.state.imgsrc.map((image, index) => {
-                    return (
-                      <TouchableHighlight
-                        key = {index}
-                        underlayColor="#ccc"
-                        onPress = {() => move(index)}
-                        style = {styles.button}
-                      >
-                      <Text style = {position === index && styles.buttonSelected}>
-                       {index + 1}
-                      </Text>
-                    </TouchableHighlight>
-                  );
-                })}
-              </View>
-            )}
-            />
-          </View>
+           <View style = {{height : 200,marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%',width : '100%'}}>
+             <ImageSlider
+               loopBothSides
+               images = {this.state.imgsrc}
+               style = {{backgroundColor : Colors.primaryBackGourndColor}}
+               customSlide = {({ index, item, style, width }) => (
+               <View key={index} style={[style, styles.Slide]}>
+                 <Avatar
+                   rectangle
+                   source = {{uri : item}}
+                   size = 'xlarge'
+                   //marginTop = '5%'
+                   height = '90%'
+                   width = '90%'
+                   alignSelf = 'center'
+                   backgroundColor = '#000000'
+                   imageProps = {{resizeMode : 'stretch'}}
+                   editButton = {{size : 30}}
+                 />
+               </View>
+             )}
+               customButtons={(position, move) => (
+                 <View style={styles.buttons}>
+                   {this.state.imgsrc.map((image, index) => {
+                     return (
+                       <TouchableHighlight
+                         key = {index}
+                         underlayColor="#ccc"
+                         onPress = {() => move(index)}
+                         style = {styles.button}
+                       >
+                       <Text style = {position === index && styles.buttonSelected}>
+                        {index + 1}
+                       </Text>
+                     </TouchableHighlight>
+                   );
+                 })}
+               </View>
+             )}
+             />
+           </View>
           <Divider containerStyle = {{backgroundColor : Colors.primaryAppColor,borderWidth : 1}}/>
           {this.changeButton()}
           <View style = {styles.childContainer1}>
@@ -314,7 +318,7 @@ export default class Ex extends Component {
                 size={20}
                 color='black'
                 style = {{marginRight : '4%', marginLeft : '10%',marginBottom : '1%',alignSelf : 'center'}}/>
-            <Text style = {styles.childContainerText}>{this.state.place}</Text>
+            <Text style = {styles.childContainerText}>{this.state.address}{'\n'}{this.state.place}</Text>
           </View>
           <View style = {styles.childContainer1}>
             <Icon name="user"
