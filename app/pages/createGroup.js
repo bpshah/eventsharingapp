@@ -26,6 +26,7 @@ export default class CreateGroup extends Component{
       loading : false,
       categories : [],
       checked : [],
+      height : 0,
     }
     this.focusNextField = this.focusNextField.bind(this);
     this.inputs = {};
@@ -204,7 +205,7 @@ export default class CreateGroup extends Component{
 
   render(){
     return(
-      <ScrollView contentContainerStyle = {styles.container}>
+      <ScrollView contentContainerStyle = {[styles.container],{height : 700 + this.state.height}}>
         <Avatar
             rounded
             source = {{ uri : this.state.filePath }}
@@ -216,7 +217,6 @@ export default class CreateGroup extends Component{
         />
         <Loader loading = {this.state.loading}/>
         <Text style = {{alignSelf : 'center',fontSize : 18,color : 'black',marginBottom : '8%'}}>Find LikeMinded people and do your thing</Text>
-        <Divider style = {{ flex : 1,backgroundColor: Colors.primaryAppColor,height : 1}} />
         <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '5%',marginRight : '8%',marginLeft : '2%'}}>
           <Icon name="user-friends"
             size={22}
@@ -239,18 +239,24 @@ export default class CreateGroup extends Component{
             value = {this.state.groupName}
             autoFocus = {false}/>
         </View>
-        <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '-1%',marginRight : '8%',marginLeft : '2%'}}>
+        <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '8%',marginLeft : '2%'}}>
           <Icon name="clipboard"
             size={22}
             color='black'
             style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
-          <TextInput style = {styles.input}
+          <TextInput style = {[styles.input,{flex : 1},{height : Math.max(35, this.state.height)}]}
             title = 'Description'
             placeholder = "Description"
             placeholderTextColor = {Colors.placeholderText}
             autoCapitalize = 'sentences'
             returnKeyType = 'next'
             autoCorrect = {false}
+            autoGrow = {true}
+            multiline = {true}
+            onContentSizeChange={(event) => {
+              this.setState({ height : event.nativeEvent.contentSize.height })
+              console.log(this.state.height)
+            }}
             onChangeText = {description => this.setState({ description })}
             ref = { input => {
               this.inputs['two'] = input;
@@ -277,13 +283,12 @@ export default class CreateGroup extends Component{
             value = {this.state.location}
             autoFocus = {false}/>
         </View>
-        <Divider style = {{ flex : 1,backgroundColor: Colors.primaryAppColor,height : 1}} />
         <Text style = {{alignSelf : 'flex-start',paddingTop : '1%',paddingBottom : '1%',marginBottom : '2%',marginTop : '2%',marginRight : '8%',marginLeft : '10%',fontSize : 16}}> Category : </Text>
-        <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'flex-start',arginTop : '1%',marginLeft : '8%',
+        <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'flex-start',marginTop : '1%',marginLeft : '8%',
         flexWrap: 'wrap'}}>
         {
           this.state.categories.map((item,index) => {
-          console.log(item + " " + index)
+          //console.log(item + " " + index)
           return (
             <CheckBox
               title = {item}

@@ -1,17 +1,16 @@
 import React, {Component}  from 'react';
-import {PixelRatio,View, ScrollView ,Text, Image, StyleSheet, TextInput, KeyboardAvoidingView, TouchableOpacity, Picker,TouchableHighlight,ToastAndroid} from 'react-native';
+import {PixelRatio,View, ScrollView ,Text, Image, StyleSheet, TextInput, Dimensions,KeyboardAvoidingView, TouchableOpacity, Picker,TouchableHighlight,ToastAndroid} from 'react-native';
 import {StackActions, NavigationActions} from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import Activity from '../components/activityIndicator.js'
-import { Avatar } from 'react-native-elements';
+import { Avatar, CheckBox } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
 import DatePicker from 'react-native-datepicker';
 import Colors from '../styles/colors.js';
 import ImageSlider from 'react-native-image-slider';
 import ImagePicker from 'react-native-image-crop-picker';
-
 
 export default class EditEvent extends Component {
 
@@ -31,6 +30,11 @@ export default class EditEvent extends Component {
       eventname : this.props.navigation.state.params.title,
       category : [],
       filePath : [],
+      tempFilePath : null,
+      cats : null,
+      token : null,
+      checked : [],
+      height : 0,
       selectedValuePlace : 0,
       selectedValueCategory : 0,
     };
@@ -70,7 +74,7 @@ export default class EditEvent extends Component {
             this.state.place.push(item);
 
         });
-        console.log("Data 1 : " + this.state.place);
+        //console.log("Data 1 : " + this.state.place);
       })
     firebase
       .database()
@@ -80,12 +84,58 @@ export default class EditEvent extends Component {
             let item = csnapshot.val();
             this.state.category.push(item);
         });
-        console.log("Data 2 : " + this.state.category);
+        //console.log("Data 2 : " + this.state.category);
       })
+      .then(() => {
+        let check = [];
+        this.state.category.forEach((item) => {
+          check.push(false);
+        })
+        this.setState({
+          checked : check,
+        })
+        this.setCheckBoxState();
+        //console.log("Check : " + check);
+        //console.log("Checked : " + this.state.checked);
+      })
+    this.fetchMembers();
+    this.setImageSource();
+  }
+
+  /*componentDidMount(){
+    this.setImageSource();
+  }*/
+
+  setCheckBoxState = () => {
+    this.state.selectedCategory.forEach((item) => {
+      this.state.checked[this.state.category.indexOf(item)] = true;
+    })
+  }
+
+  setImageSource = () => {
+    let img = [];
+    img.push(this.state.imgsrc);
+    console.log("Temp0 : " + img);
+    this.setState({
+      tempFilePath : img,
+    })
+    console.log("Temp1 : " + this.state.tempFilePath);
+    if(this.state.filePath.length != 0){
+      img.push(this.state.filePath);
+      this.setState({
+        tempFilePath : img,
+      })
+      console.log("Temp File Path : " + this.state.tempFilePath);
+      return this.state.tempFilePath
+    }
+    else{
+      return this.state.tempFilePath
+    }
   }
 
   chooseFile = () => {
         let imgs = [];
+        //imgs.push(this.state.imgsrc)
         var options = {
           title: 'Select Image',
           customButtons: [
@@ -107,6 +157,9 @@ export default class EditEvent extends Component {
             filePath : imgs,
           })
           console.log(this.state.filePath);
+        })
+        .then(() => {
+          this.setImageSource();
         });
     };
 
@@ -114,16 +167,75 @@ export default class EditEvent extends Component {
     this.inputs[id].focus();
   }
 
+  fetchMembers = () => {
+    console.log(this.state.title);
+    let data1 = [];
+    firebase
+      .database()
+      .ref('Events/' + this.state.title + '/' + 'members')
+      .once('value')
+      .then(async (snapshot) => {
+        //console.log(snapshot);
+        let keys = snapshot._childKeys;
+        await keys.forEach((item) => {
+          //console.log(snapshot._value[item].ename);
+          firebase
+            .database()
+            .ref('Users/' + snapshot._value[item] + '/' + 'token')
+            .once('value')
+            .then((snapshot) => {
+              //console.log(snapshot._value);
+              data1.push(snapshot._value);
+              //console.log(data1);
+            })
+            .then(() => {
+              this.setState({
+                token : data1,
+              })
+              //console.log(this.state.token);
+            })
+          })
+        })
+
+  }
+
   uploadImages = async (photos) => {
     console.log("In photos : " + photos);
     const uploadImagePromises = photos.map((p, index) => {
       console.log("P :" + p);
+      index += this.state.imgsrc.length;
       this.uploadImage( p, this.state.eventname + index )})
     const urls = await Promise.all(uploadImagePromises)
   }
 
+  mapCheckBox = () => {
+    let cats = [];
+    this.state.category.forEach((cat) => {
+      if(this.state.checked[this.state.category.indexOf(cat)] === true){
+        cats.push(this.state.category[this.state.category.indexOf(cat)]);
+      }
+    })
+    return cats;
+  }
+
+  readCategory = () => {
+    let tempcats = []
+    firebase
+      .database()
+      .ref('Events/' + this.state.title + '/' + 'tcats')
+      .once('value')
+      .then(async (snapshot) => {
+        console.log(snapshot._value);
+        this.setState({
+          cats : snapshot._value,
+        })
+        console.log(this.state.cats);
+        console.log(this.state.selectedCategory);
+      })
+  }
+
   handleEventUpdate = () => {
-    let eventname = this.state.title;
+    //let eventname = this.state.title;
     let place = this.state.selectedPlace;
     let mobileno = this.state.contact;
     let imgsrc = this.state.imgsrc;
@@ -132,7 +244,7 @@ export default class EditEvent extends Component {
     let description = this.state.desc;
 
     console.log("Before Update");
-    firebase.database().ref('Events/' + this.state.eventname).update({eventname,place,mobileno,imgsrc,fromtime,totime,description});
+    firebase.database().ref('Events/' + this.state.eventname).update({place,mobileno,imgsrc,fromtime,totime,description});
     console.log("Updated");
   }
 
@@ -145,20 +257,47 @@ export default class EditEvent extends Component {
                                 loading : false,
                                 });
                                 this.handleEventUpdate() })
+          .then(() => {
+            fetch('https://fcm.googleapis.com/fcm/send',
+                    {
+                        method: 'POST',
+                        headers:
+                        {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'key=AAAAP6OjSUc:APA91bGDee_s4YQeGx2pK1-WqjsqG3coAXtAhFRG_lB9A9SGzQB9dGGMasO90_TtbdqNfVW_nkhe3eTAAu8jXy3HyNBofELij1xAx7aHnP7tUk6iDrsDHjkzZidCUiPHoUTCt8ku5sP0'
+                        },
+                        body: JSON.stringify(
+                        {
+                          "notification": {
+                            "title": this.state.eventname,
+                            "body": this.state.selectedPlace,
+                        },
+                        "data": {
+                          "title": this.state.eventname,
+                          "body": this.state.place + this.state.organizer,
+                        },
+                          "registration_ids" : this.state.token,
+                        })
+                    }).then((response) => response.json()).then((responseJsonFromServer) =>
+                    {
+                      console.log(responseJsonFromServer);
+                    }).catch((error) =>
+                    {
+                      console.log(error);
+                    });
+
+          })
           .then(() => this.props.navigation.navigate('MyEvents'));                      ;
 
     console.log("After Update");
   }
 
   render(){
-    console.log(this.state.place);
-    console.log(this.state.category);
+    {this.setImageSource}
     return(
-      <ScrollView contentContainerStyle = {styles.container}
-                  behaviour = 'height'
+      <ScrollView contentContainerStyle = {[styles.container,{height : 950 + this.state.height}]}
                   >
-
-          <View style = {{flex: 1, width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
+          <View style = {{height : 200, width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
             <ImageSlider
               loopBothSides
               images = {this.state.imgsrc}
@@ -206,6 +345,7 @@ export default class EditEvent extends Component {
               placeholder = "Name of Event"
               placeholderTextColor = {Colors.placeholderText}
               returnKeyType = 'next'
+              editable = {false}
               blurOnSubmit = { false }
               onSubmitEditing = { () => {
                 this.focusNextField('two');
@@ -373,7 +513,7 @@ export default class EditEvent extends Component {
               size={22}
               color='black'
               style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
-            <TextInput style = {styles.input}
+            <TextInput style = {[styles.input,{flex : 1},{height : Math.max(35, this.state.height)}]}
               title = 'Description'
               placeholder = 'Description of Event'
               placeholderTextColor = {Colors.placeholderText}
@@ -383,39 +523,41 @@ export default class EditEvent extends Component {
                 this.focusNextField('eight');
               }}
               //keyBoardType = 'email-address'
-              multiline = {false}
+              multiline = {true}
               enablesReturnKeyAutomatically = {true}
               autoCapitalize = 'sentences'
               autoGrow = {true}
               autoCorrect = {false}
-              numberOfLines = {2}
+              numberOfLines = {1}
               onChangeText = { desc => this.setState({ desc })}
+              onContentSizeChange={(event) => {
+                this.setState({ height : event.nativeEvent.contentSize.height })
+              }}
               value = {this.state.desc}
               ref = { input => {
                 this.inputs['seven'] = input;
               }}/>
           </View>
-          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '4.5%',marginLeft : '2%',marginBottom : '2%'}}>
-            <Icon name="stream"
-              size={22}
-              color='black'
-              style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
-            <View style = {{flexDirection : 'row', flex : 1, borderBottomWidth : 1, width : '80%', backgroundColor : 'rgba(255,255,255,0)', borderBottomColor : 'black',marginLeft : '0%'}}>
-              <Picker
-                selectedValue = {this.state.selectedCategory}
-                mode = 'dropdown'
-                prompt = "Event Category"
-                blurOnSubmit = { false }
-                style = {[styles.pickerStyle,{color : Colors.placeholderText,marginLeft : '3%'}]}
-                onValueChange = {(itemValue, itemIndex) =>
-                  this.setState({ selectedCategory : itemValue,selectedValueCategory : itemIndex})}
-                  >
-                  <Picker.Item label="Select Category" value="category"/>
-                  { this.state.category.map((item,index) =>
-                    <Picker.Item label={item} value={item}/>
-                  )}
-              </Picker>
-            </View>
+          <Text style = {{alignSelf : 'flex-start',paddingTop : '1%',paddingBottom : '1%',marginBottom : '2%',marginTop : '2%',marginRight : '8%',marginLeft : '10%',fontSize : 16}}> Category : </Text>
+          <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'flex-start',marginTop : '1%',marginRight : '0%',marginLeft : '8%',marginBottom : '2%',flexWrap : 'wrap'}}>
+            {
+              this.state.category.map((item,index) => {
+              //console.log(item + " " + index)
+              return (
+                <CheckBox
+                  title = {item}
+                  checked = {this.state.checked[index]}
+                  onPress = {() => {
+                    let check = this.state.checked
+                    check[index] = !check[index]
+                    this.setState({
+                      checked : check
+                    })
+                  }}
+                  containerStyle = {{backgroundColor : Colors.primaryBackGourndColor,borderWidth : 0,padding : 1}}
+                />
+            )
+            })}
           </View>
           <TouchableOpacity style = {styles.buttonContainer}
                             onPress = {this.updateEvent}>
@@ -430,13 +572,14 @@ export default class EditEvent extends Component {
 const styles = StyleSheet.create({
   container : {
     flexGrow : 1,
+    //flex : 1,
     backgroundColor : Colors.primaryBackGourndColor,
     flexDirection : 'column',
     justifyContent : 'flex-start',
     alignItems : 'center',
     width : '100%',
-    height : 860,
-    paddingBottom : 40,
+    paddingBottom : 20,
+    //flexWrap : 'wrap',
   },
   input : {
     height : 40,

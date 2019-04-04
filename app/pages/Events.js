@@ -15,7 +15,7 @@ export default class Events extends Component {
       refreshing : false,
       loading : false,
       value : '',
-      isConnected : false,
+      isConnected : true,
       searchArrayHolder : [],
     }
   }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, ScrollView, Picker, Platform, Alert,AsyncStorage,ToastAndroid} from 'react-native';
+import { Button, TextInput,NetInfo, View, StyleSheet, TouchableOpacity, Text, StatusBar, ScrollView, Picker, Platform, Alert,AsyncStorage,ToastAndroid} from 'react-native';
 import {BackHandler} from 'react-native';
 import { Avatar, CheckBox, ButtonGroup } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
@@ -27,6 +27,7 @@ export default class Signup extends Component {
       errorMessage: null,
       token : '',
       loading : false,
+      isConnected : true,
     }
     this.focusNextField = this.focusNextField.bind(this);
     this.inputs = {};
@@ -34,12 +35,27 @@ export default class Signup extends Component {
 
   componentDidMount(){
     AsyncStorage.getItem('token').then(token => {
-      console.log("Token Signup :" + token);
+      //console.log("Token Signup :" + token);
+      NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
       this.setState({
         token : token,
       });
-      console.log("State : " + this.state.token);
+      //console.log("State : " + this.state.token);
     })
+  }
+
+  componentWillUnmount(){
+    NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
+  }
+
+  handleConnectivityChange = (isConnected) => {
+    if (isConnected) {
+      console.log("in if connectionChange");
+      this.setState({ isConnected : true});
+    } else {
+      console.log("in else connectionChange");
+      this.setState({ isConnected : false});
+    }
   }
 
   handleSignUp = () => {
@@ -165,11 +181,11 @@ export default class Signup extends Component {
         },
       };
       ImagePicker.showImagePicker( response => {
-        console.log('Response = ', response);
+        //console.log('Response = ', response);
 
         if (response.didCancel) {
 
-          console.log('User cancelled image picker');
+          //console.log('User cancelled image picker');
         } else if (response.error) {
           console.log('ImagePicker Error: ', response.error);
         } else {
@@ -179,7 +195,7 @@ export default class Signup extends Component {
           this.setState({
             filePath : response.uri,
           });
-          console.log(this.state.filePath);
+          //console.log(this.state.filePath);
         }
       });
   };
@@ -203,9 +219,17 @@ export default class Signup extends Component {
       && this.state.password != ''
       && this.state.confirmPassword != ''){
         if(this.state.filePath != ''){
-          this.setState({
-            loading : true,
-          })
+          if(this.state.isConnected){
+            this.setState({
+              loading : false,
+            })
+          }
+          else{
+            this.setState({
+              loading : false,
+            })
+            ToastAndroid.showWithGravity( 'Please connect to internet.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+          }
           this.uploadImage(this.state.filePath, temail + '.png')
           .then(() =>  {
             this.handleSignUp();

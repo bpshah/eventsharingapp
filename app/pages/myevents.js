@@ -159,7 +159,7 @@ export default class MyEvents extends Component {
                                                                       totime : item.totime,
                                                                       imgsrc : item.imgsrc,
                                                                       contact : item.mobileno,
-                                                                      category : item.category})} >
+                                                                      category : item.tcats})} >
               <Card containerStyle = {styles.Container}
                     dividerStyle = {{backgroundColor : Colors.cardTextColor}}
                     title = {item.eventname}

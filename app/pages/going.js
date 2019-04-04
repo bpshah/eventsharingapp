@@ -110,9 +110,9 @@ export default class Going extends Component {
             .child(snapshot._value[item].ename)
             .once('value')
             .then((snapshot) => {
-              console.log("snapshot : " + snapshot);
+              //*console.log("snapshot : " + snapshot);
               data1.push(snapshot._value);
-              console.log(data1);
+              //console.log(data1);
             })
             .then(() => {
               this.setState({

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image, ScrollView, Dimensions,AsyncStorage,ToastAndroid} from 'react-native';
+import { Button, NetInfo,TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image, ScrollView, Dimensions,AsyncStorage,ToastAndroid} from 'react-native';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
 import Loader from '../components/loader.js'
@@ -15,6 +15,23 @@ export default class Login extends Component {
       errorMessage : null,
       errorCode : null,
       loading : false,
+      isConnected : true,
+    }
+  }
+
+  componentDidMount(){
+    NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
+  }
+
+  componentWillUnmount(){
+    NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
+  }
+
+  handleConnectivityChange = (isConnected) => {
+    if (isConnected) {
+      this.setState({ isConnected : true});
+    } else {
+      this.setState({ isConnected : false});
     }
   }
 
@@ -28,9 +45,17 @@ export default class Login extends Component {
   handleLogin = () => {
     const { email, password } = this.state;
     if(email != '' && password != ''){
-      this.setState({
-        loading : true,
-      })
+      if(this.state.isConnected){
+        this.setState({
+          loading : true,
+        })
+      }
+      else{
+        this.setState({
+          loading : false,
+        })
+        ToastAndroid.showWithGravity( 'Please connect to internet.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+      }
       firebase
         .auth()
         .signInWithEmailAndPassword(this.state.email, this.state.password)
@@ -42,7 +67,7 @@ export default class Login extends Component {
             this.setState({
               loading : false,
             })
-            console.log(firebase.auth().currentUser.emailVerified);
+            //console.log(firebase.auth().currentUser.emailVerified);
             if(!firebase.auth().currentUser.emailVerified){
               ToastAndroid.showWithGravity( 'Email is not verified.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
             }
@@ -74,7 +99,7 @@ export default class Login extends Component {
     const email = user.email;
     const temail = email.slice(0,user.email.indexOf('@'));
     let token = await AsyncStorage.getItem('token')
-    console.log("In login token : " + token);
+    //console.log("In login token : " + token);
     await firebase.database().ref('Users/' + temail).update({token});
   }
 

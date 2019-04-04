@@ -66,6 +66,7 @@ export default class EventCreate extends Component{
       address : '',
       checked : [],
       color : Colors.placeholderText,
+      height : 0,
     };
     this.focusNextField = this.focusNextField.bind(this);
     this.inputs = {};
@@ -83,7 +84,7 @@ export default class EventCreate extends Component{
             this.state.place.push(item);
 
         });
-        console.log("Data 1 : " + this.state.place);
+        //console.log("Data 1 : " + this.state.place);
       })
     firebase
       .database()
@@ -93,9 +94,9 @@ export default class EventCreate extends Component{
         snapshot.forEach((csnapshot) => {
             let item = csnapshot.val();
             //console.log("Category : " + item);
-            //this.state.category.push(item);
+            this.state.category.push(item);
         });
-        //console.log("Data 2 : " + this.state.category);
+        console.log("Data 2 : " + this.state.category);
       })
       .then(() => {
         let check = [];
@@ -105,8 +106,6 @@ export default class EventCreate extends Component{
         this.setState({
           checked : check,
         })
-        //console.log("Check : " + check);
-        //console.log("Checked : " + this.state.checked);
       })
   }
 
@@ -376,11 +375,9 @@ export default class EventCreate extends Component{
   render(){
 
     return(
-      <ScrollView contentContainerStyle = {styles.container}
-                  behaviour = 'height'
+      <ScrollView contentContainerStyle = {[styles.container,{height : 1000 + this.state.height}]}
                   >
-
-          <View style = {{ height : '22%',width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
+          <View style = {{ height : 200,width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
             <ImageSlider
               loopBothSides
               images = {this.state.filePath}
@@ -621,7 +618,7 @@ export default class EventCreate extends Component{
               size={22}
               color='black'
               style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
-            <TextInput style = {styles.input}
+            <TextInput style = {[styles.input],{flex : 1},{height : Math.max(35, this.state.height)}}
               title = 'Description'
               placeholder = 'Description of Event'
               placeholderTextColor = {Colors.placeholderText}
@@ -631,23 +628,26 @@ export default class EventCreate extends Component{
                 this.focusNextField('six');
               }}
               //keyBoardType = 'email-address'
-              multiline = {false}
+              multiline = {true}
               enablesReturnKeyAutomatically = {true}
               autoCapitalize = 'sentences'
               autoGrow = {true}
               autoCorrect = {false}
               numberOfLines = {2}
               onChangeText = { description => this.setState({ description })}
+              onContentSizeChange={(event) => {
+                this.setState({ height : event.nativeEvent.contentSize.height })
+              }}
               value = {this.state.description}
               ref = { input => {
                 this.inputs['five'] = input;
               }}/>
           </View>
-          <Text style = {{alignSelf : 'flex-start',paddingTop : '1%',paddingBottom : '1%',marginBottom : '2%',marginTop : '2%',marginRight : '8%',marginLeft : '12%',fontSize : 16}}> Category : </Text>
-          <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'flex-start',flexWrap: 'wrap'}}>
+          <Text style = {{alignSelf : 'flex-start',paddingTop : '1%',paddingBottom : '1%',marginBottom : '2%',marginTop : '4%',marginRight : '8%',marginLeft : '12%',fontSize : 16}}> Category : </Text>
+          <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'flex-start',flexWrap: 'wrap',marginTop : '1%',marginRight : '0%',marginLeft : '8%',marginBottom : '2%'}}>
           {
             this.state.category.map((item,index) => {
-            console.log(item + " " + index)
+            //console.log(item + " " + index)
             return (
               <CheckBox
                 title = {item}
@@ -659,7 +659,7 @@ export default class EventCreate extends Component{
                     checked : check
                   })
                 }}
-                containerStyle = {{backgroundColor : Colors.primaryBackGourndColor,borderWidth : 0,padding : 0}}
+                containerStyle = {{backgroundColor : Colors.primaryBackGourndColor,borderWidth : 0,padding : 1}}
               />
           )
           })}
