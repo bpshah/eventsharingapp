@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {NavigationActions} from 'react-navigation';
-import {ScrollView, Text, View,StyleSheet} from 'react-native';
+import {ScrollView, Text, View,StyleSheet,AsyncStorage} from 'react-native';
 import { StackNavigator,DrawerActions } from 'react-navigation';
 import {Avatar} from 'react-native-elements';
 import firebase from 'react-native-firebase';
@@ -24,22 +24,29 @@ export default class SideMenu extends Component{
    this.props.navigation.dispatch(navigateAction);
 }
 
-  componentWillMount() {
-    //addEventListener('mousedown', this.handleClickOutside);
-    let user = firebase.auth().currentUser;
-    const temail = user.email.slice(0,user.email.indexOf('@'));
-    firebase
-      .database()
-      .ref('Users/')
-      .child(temail)
-      .once('value').then( (snapshot) => {
-        //console.log(snapshot.val());
-        this.setState({
-          imgsrc : snapshot.val().imgsrc,
-          firsname : snapshot.val().firstname,
-          lastname : snapshot.val().lastname
-        })
+componentWillMount() {
+  this.getUserData();
+}
+
+componentDidMount(){
+  this.getUserData();
+}
+
+getUserData = () => {
+  let user = firebase.auth().currentUser;
+  const temail = user.email.slice(0,user.email.indexOf('@'));
+  firebase
+    .database()
+    .ref('Users/')
+    .child(temail)
+    .on('value',(snapshot) => {
+      //console.log(snapshot.val());
+      this.setState({
+        imgsrc : snapshot.val().imgsrc,
+        firsname : snapshot.val().firstname,
+        lastname : snapshot.val().lastname
       })
+    })
 }
 
   render(){

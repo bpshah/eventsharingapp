@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, TextInput, ScrollView, StyleSheet, TouchableOpacity, Text, FlatList, StatusBar, View, Dimensions, KeyboardAvoidingView, Picker, ActivityIndicator, ToastAndroid} from 'react-native';
+import { Button, TextInput, ScrollView, StyleSheet, TouchableOpacity, AsyncStorage,Text, FlatList, StatusBar, View, Dimensions, KeyboardAvoidingView, Picker, ActivityIndicator, ToastAndroid} from 'react-native';
 import { Avatar,CheckBox, ButtonGroup } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
@@ -80,11 +80,13 @@ export default class ProfilePage extends Component{
           email : user.email,
           location : snapshot.val().location,
           imgsrc : snapshot.val().imgsrc,
+          filePath : snapshot.val().imgsrc,
         })
       }).then( () => {
         this.setState({
           loading : false,
         })
+        console.log("Initial " + this.state.imgsrc);
       });
     }
 
@@ -148,8 +150,9 @@ export default class ProfilePage extends Component{
             // You can also display the image using data:
             // let source = { uri: 'data:image/jpeg;base64,' + response.data };
             this.setState({
-              filePath : response.uri,
+              imgsrc : response.uri,
             });
+            console.log("In chooseFile " + this.state.imgsrc);
           }
         });
     };
@@ -181,8 +184,8 @@ export default class ProfilePage extends Component{
   updateDP = () => {
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
-    console.log("In DP:");
-    console.log("FilePath : " + this.state.filePath);
+    //console.log("In DP:");
+    //console.log("FilePath : " + this.state.filePath);
     if(this.state.firstname != '' &&
       this.state.lastName != '' &&
       this.state.mobileNumber != '' &&
@@ -191,11 +194,12 @@ export default class ProfilePage extends Component{
       this.setState({
         loading : true,
       })
-        if(this.state.filePath != ''){
-          this.uploadImage(this.state.filePath,temail + '.png')
+        if(this.state.imgsrc != this.state.filePath){
+          console.log("In updateDP " + this.state.imgsrc);
+          this.uploadImage(this.state.imgsrc,temail + '.png')
               .then( () => { this.setState({
                                     loading : false,
-                                    filePath : '',
+                                    //filePath : '',
                                     });
                                     this.handleUpdate() });
         }
@@ -241,7 +245,7 @@ export default class ProfilePage extends Component{
               placeholder = {this.state.firstname}
               placeholderTextColor = 'black'
               returnKeyType = 'next'
-              autoCapitalize = 'none'
+              autoCapitalize = 'words'
               autoCorrect = {false}
               onChangeText = {firstname => this.setState({ firstname })}
               onSubmitEditing = { () => {
@@ -263,7 +267,7 @@ export default class ProfilePage extends Component{
               placeholder = {this.state.lastName}
               placeholderTextColor = 'black'
               returnKeyType = 'next'
-              autoCapitalize = 'none'
+              autoCapitalize = 'words'
               autoCorrect = {false}
               onChangeText = {lastName => this.setState({ lastName })}
               onSubmitEditing = { () => {
@@ -284,7 +288,7 @@ export default class ProfilePage extends Component{
               placeholderTextColor = 'black'
               returnKeyType = 'next'
               keyBoardType = 'phone-pad'
-              autoCapitalize = 'none'
+              autoCapitalize = 'words'
               autoCorrect = {false}
               dataDetectorTypes = 'phoneNumber'
               maxLength = {13}
@@ -306,7 +310,7 @@ export default class ProfilePage extends Component{
               placeholder = {this.state.location}
               placeholderTextColor = 'black'
               returnKeyType = 'next'
-              autoCapitalize = 'none'
+              autoCapitalize = 'words'
               autoCorrect = {false}
               onChangeText = {location => this.setState({ location })}
               onSubmitEditing = { () => {
@@ -327,7 +331,7 @@ export default class ProfilePage extends Component{
             placeholderTextColor = 'black'
             returnKeyType = 'next'
             keyBoardType = 'email-address'
-            autoCapitalize = 'none'
+            autoCapitalize = 'words'
             autoCorrect = {false}
             onChangeText = {email => this.setState({ email })}
             ref = { input => {

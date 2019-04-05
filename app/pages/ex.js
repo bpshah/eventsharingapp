@@ -275,11 +275,8 @@ export default class Ex extends Component {
                    source = {{uri : item}}
                    size = 'xlarge'
                    //marginTop = '5%'
-                   height = '90%'
-                   width = '90%'
-                   alignSelf = 'center'
-                   backgroundColor = '#000000'
-                   imageProps = {{resizeMode : 'stretch'}}
+                   style = {{height : "100%",width : '100%',alignSelf : 'center',marginTop : '0%'}}
+                   imageProps = {{resizeMode : 'contain'}}
                    editButton = {{size : 30}}
                  />
                </View>
