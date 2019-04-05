@@ -300,7 +300,7 @@ export default class CreateGroup extends Component{
                   checked : check
                 })
               }}
-              containerStyle = {{backgroundColor : Colors.primaryBackGourndColor,borderWidth : 0,padding : 0}}
+              containerStyle = {{backgroundColor : 'white',borderWidth : 0,padding : 0}}
             />
         )
         })}
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     borderBottomWidth : 1,
   },
   buttonContainer : {
-    backgroundColor : Colors.primaryBackGourndColor,
+    backgroundColor : Colors.white,
     paddingVertical : 20,
     bottom : 5,
     marginLeft : '2%',

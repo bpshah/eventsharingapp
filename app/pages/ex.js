@@ -263,7 +263,7 @@ export default class Ex extends Component {
     return(
        <ScrollView contentContainerStyle = {styles.Container}
                    behaviour = 'height'>
-           <View style = {{height : 200,marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%',width : '100%'}}>
+           <View style = {{height : 180,marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '2%',width : '100%'}}>
              <ImageSlider
                loopBothSides
                images = {this.state.imgsrc}
