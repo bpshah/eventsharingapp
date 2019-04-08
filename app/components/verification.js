@@ -3,9 +3,6 @@ import {  ActivityIndicator,  AppRegistry,  StyleSheet,  Text,  View} from 'reac
 import Colors from 'C:/Users/DELL/Documents/EventSharingSystem/app/styles/colors.js';
 import firebase from 'react-native-firebase';
 
-
-
-
 export default class Verification extends Component {
 
   constructor(props){

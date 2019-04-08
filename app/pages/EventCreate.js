@@ -266,18 +266,25 @@ export default class EventCreate extends Component{
 
       console.log("In Handle Event : " + imgsrc);
       let uid  = email.slice(0,user.email.indexOf('@'));
+
       firebase
         .database()
         .ref('Events/'+ this.state.eventname)
-        .set({ eventname, place, org, mobileno, description,tcats,fromtime,totime,uid,imgsrc,address})
+        .set({ eventname, place, org, mobileno, description, fromtime, totime, uid, imgsrc, address})
         .then(() => {
-          const resetAction = StackActions.reset({
-                      index: 0,
-                      actions: [
-                        NavigationActions.navigate({routeName: "Events"})
-                      ]
-                    });
-                    this.props.navigation.dispatch(resetAction);
+          firebase
+            .database()
+            .ref('Cats/' + eventname)
+            .set({tcats})
+            .then(() => {
+              const resetAction = StackActions.reset({
+                          index: 0,
+                          actions: [
+                            NavigationActions.navigate({routeName: "TabNav"})
+                          ]
+                        });
+                        this.props.navigation.dispatch(resetAction);
+            })
         })
         .catch(error => this.setState({ errorMessage: error.message }))
       //console.log("Event Upload");
@@ -618,7 +625,7 @@ export default class EventCreate extends Component{
               size={22}
               color='black'
               style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
-            <TextInput style = {[styles.input],{flex : 1},{height : Math.max(35, this.state.height)}}
+            <TextInput style = {[styles.input],{height : Math.max(35, this.state.height)}}
               title = 'Description'
               placeholder = 'Description of Event'
               placeholderTextColor = {Colors.placeholderText}
@@ -673,6 +680,7 @@ export default class EventCreate extends Component{
     )
   }
 }
+//{height : Math.max(35, this.state.height)}
 /*<Icon name="stream"
   size={22}
   color='black'

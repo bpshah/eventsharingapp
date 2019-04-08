@@ -21,6 +21,10 @@ import MyEvents from './app/pages/myevents.js'
 import EditEvent from './app/pages/editevent.js'
 import CreateGroup from './app/pages/createGroup.js'
 import Going from './app/pages/going.js'
+import Interested from './app/pages/interested.js'
+import SuggestedEvents from './app/pages/suggestedEvents.js'
+
+
 
 import { createStackNavigator, createAppContainer, createMaterialTopTabNavigator, createDrawerNavigator, createSwitchNavigator} from 'react-navigation';
 import firebase from 'react-native-firebase';
@@ -93,11 +97,11 @@ const ProfileStack = createStackNavigator({
 const TabNav = createMaterialTopTabNavigator(
     {
       Events : {
-          screen : Events,
-          navigationOptions : {
-          tabBarLabel : "Events",
-        },
+        screen : Events,
+        navigationOptions : {
+        tabBarLabel : "Events",
       },
+    },
       MyEvents : {
         screen : MyEvents,
         navigationOptions : {
@@ -108,6 +112,12 @@ const TabNav = createMaterialTopTabNavigator(
       screen : Going,
       navigationOptions : {
       tabBarLabel : "Going",
+    },
+  },
+  SuggestedEvents : {
+    screen : SuggestedEvents,
+    navigationOptions : {
+      tabBarLabel : 'Suggested'
     }
   },
   },
@@ -175,8 +185,6 @@ const EventStack = createStackNavigator({
     initialRouteName : 'Events',
 })
 
-
-
 const Drawer =  createDrawerNavigator({
   EventStack : {
     screen : EventStack,
@@ -187,6 +195,21 @@ const Drawer =  createDrawerNavigator({
   drawerWidth : 225,
 })
 
+const SignupSwitch = createSwitchNavigator({
+  Signup : {
+    screen : Signup,
+    navigationOptions : {
+      header : null,
+    },
+  },
+  Interested : {
+    screen : Interested,
+    navigationOptions : {
+      header : null,
+    },
+  },
+})
+
 const LoginStack = createStackNavigator({
   Login : {
     screen : Login,
@@ -194,8 +217,8 @@ const LoginStack = createStackNavigator({
       header : null,
     },
   },
-  Signup : {
-    screen : Signup,
+  SignupSwitch : {
+    screen : SignupSwitch,
     navigationOptions : {
       header : null,
     },

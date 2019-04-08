@@ -10,7 +10,7 @@ export default class Login extends Component {
   constructor(){
     super()
     this.state = {
-      email : 'bhumit1206@gmail.com',
+      email : 'sbhumit98@gmail.com',
       password : 'asdf1234',
       errorMessage : null,
       errorCode : null,
@@ -79,6 +79,7 @@ export default class Login extends Component {
         .catch(error => {
               this.setState({ errorMessage : error.message,
                               errorCode : error.code,
+                              loading : false,
                 });
               console.log(error.code);
               if (this.state.errorCode === 'auth/wrong-password'

@@ -81,7 +81,6 @@ export default class MyEvents extends Component {
     );
   }
 
-
   handleRefresh = () => {
 
     this.setState({
@@ -117,7 +116,6 @@ export default class MyEvents extends Component {
         ToastAndroid.showWithGravity( 'Unanble to get events.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
       }
     }
-
 
   static navigationOptions = ({navigation}) => ({
     headerTitleStyle : {
@@ -161,11 +159,13 @@ export default class MyEvents extends Component {
                                                                       contact : item.mobileno,
                                                                       category : item.tcats})} >
               <Card containerStyle = {styles.Container}
-                    dividerStyle = {{backgroundColor : Colors.cardTextColor}}
-                    title = {item.eventname}
-                    titleStyle = {styles.title}
                     titleNumberOfLines = {2}>
-                <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : Colors.cardTextColor}}>By : {item.org} At : {item.place} {"\n"}</Text>
+                    <View style = {{flex : 1,flexDirection : 'column',justifyContent : 'space-around'}}>
+                      <View style = {{marginLeft : 0}}>
+                        <Text style = {{alignSelf : 'flex-start', fontSize : 18, color : Colors.primaryAppColor,marginBottom : '2%'}}>{item.eventname}</Text>
+                        <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black',marginBottom : '0%'}}>By : {item.org} {'\n'}City : {item.place}</Text>
+                      </View>
+                    </View>
               </Card>
             </TouchableWithoutFeedback>
           </View>

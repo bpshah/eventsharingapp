@@ -16,7 +16,7 @@ export default class Signup extends Component {
     super()
     this.state = {
       filePath : '',
-      email : 'bhumit1206@gmail.com',
+      email : 'sbhumit98@gmail.com',
       password : 'asdf1234',
       confirmPassword : 'asdf1234',
       firstname : 'Bhumit ',
@@ -58,7 +58,7 @@ export default class Signup extends Component {
     }
   }
 
-  handleSignUp = () => {
+  handleSignUp = async () => {
     //if(pwd.length >= 8 ){
     let email = this.state.email
     let password  = this.state.password
@@ -66,7 +66,7 @@ export default class Signup extends Component {
     if(email != '' && password != ''){
       console.log("in if");
 
-      firebase
+      await firebase
         .auth()
         .createUserWithEmailAndPassword(this.state.email, password)
         .then(() => {
@@ -75,7 +75,7 @@ export default class Signup extends Component {
             }).catch((error) => {
               console.log(error);
             })
-          this.props.navigation.navigate('Login')
+          //this.props.navigation.navigate('Login')
         })
         .catch(error => {
           console.log(error);
@@ -164,7 +164,12 @@ export default class Signup extends Component {
       firebase
         .database()
         .ref('Users/' + temail)
-        .set({ firstname, lastname, mobileno, location , token,imgsrc})
+        .set({ firstname, lastname, mobileno, location , token, imgsrc})
+        .then(() => {
+          this.props.navigation.navigate("Interested",{
+              email : this.state.email,
+          });
+        })
         .catch(error => this.setState({ errorMessage: error.message }))
 
   }
@@ -221,7 +226,7 @@ export default class Signup extends Component {
         if(this.state.filePath != ''){
           if(this.state.isConnected){
             this.setState({
-              loading : false,
+              loading : true,
             })
           }
           else{
@@ -230,12 +235,12 @@ export default class Signup extends Component {
             })
             ToastAndroid.showWithGravity( 'Please connect to internet.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
           }
-          this.uploadImage(this.state.filePath, temail + '.png')
-          .then(() =>  {
-            this.handleSignUp();
-            this.handleProfileData();
+          this.handleSignUp()
+          .then(async () =>  {
+            await this.uploadImage(this.state.filePath, temail + '.png')
           })
           .then(() => {
+            this.handleProfileData();
             this.setState({
               loading : false,
             })

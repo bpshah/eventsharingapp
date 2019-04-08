@@ -76,7 +76,7 @@ export default class EditEvent extends Component {
         });
         //console.log("Data 1 : " + this.state.place);
       })
-    firebase
+    /*firebase
       .database()
       .ref('Catgory/')
       .once('value').then((snapshot) => {
@@ -97,7 +97,7 @@ export default class EditEvent extends Component {
         this.setCheckBoxState();
         //console.log("Check : " + check);
         //console.log("Checked : " + this.state.checked);
-      })
+      })*/
     this.fetchMembers();
     this.setImageSource();
   }
@@ -218,7 +218,7 @@ export default class EditEvent extends Component {
     return cats;
   }
 
-  readCategory = () => {
+  /*readCategory = () => {
     let tempcats = []
     firebase
       .database()
@@ -232,7 +232,7 @@ export default class EditEvent extends Component {
         console.log(this.state.cats);
         console.log(this.state.selectedCategory);
       })
-  }
+  }*/
 
   handleEventUpdate = () => {
     //let eventname = this.state.title;
@@ -295,7 +295,7 @@ export default class EditEvent extends Component {
   render(){
     {this.setImageSource}
     return(
-      <ScrollView contentContainerStyle = {[styles.container,{height : 950 + this.state.height}]}
+      <ScrollView contentContainerStyle = {[styles.container,{height : 750 + this.state.height}]}
                   >
           <View style = {{height : 200, width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
             <ImageSlider
@@ -538,7 +538,17 @@ export default class EditEvent extends Component {
                 this.inputs['seven'] = input;
               }}/>
           </View>
-          <Text style = {{alignSelf : 'flex-start',paddingTop : '1%',paddingBottom : '1%',marginBottom : '2%',marginTop : '2%',marginRight : '8%',marginLeft : '10%',fontSize : 16}}> Category : </Text>
+          <TouchableOpacity style = {styles.buttonContainer}
+                            onPress = {this.updateEvent}>
+              <Text style = {styles.buttonText}>Update Event</Text>
+          </TouchableOpacity>
+
+      </ScrollView>
+    )
+  }
+}
+
+/*<Text style = {{alignSelf : 'flex-start',paddingTop : '1%',paddingBottom : '1%',marginBottom : '2%',marginTop : '2%',marginRight : '8%',marginLeft : '10%',fontSize : 16}}> Category : </Text>
           <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'flex-start',marginTop : '1%',marginRight : '0%',marginLeft : '8%',marginBottom : '2%',flexWrap : 'wrap'}}>
             {
               this.state.category.map((item,index) => {
@@ -559,15 +569,7 @@ export default class EditEvent extends Component {
             )
             })}
           </View>
-          <TouchableOpacity style = {styles.buttonContainer}
-                            onPress = {this.updateEvent}>
-              <Text style = {styles.buttonText}>Update Event</Text>
-          </TouchableOpacity>
-
-      </ScrollView>
-    )
-  }
-}
+*/
 
 const styles = StyleSheet.create({
   container : {

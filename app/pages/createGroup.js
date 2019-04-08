@@ -86,20 +86,6 @@ export default class CreateGroup extends Component{
     this.inputs[id].focus();
   }
 
-  /*generateCheckboxgroup = () => {
-    this.state.categories.map((item,index) => {
-      console.log(item + " " + index)
-      return (
-        <CheckBox
-          title = {item}
-          checked = {this.state.checked}
-          onPress = {this.changeCheckBox(index)}
-          containerStyle = {{backgroundColor : Colors.primaryBackGourndColor,borderWidth : 0,padding : 0}}
-        />
-    )
-    })
-  }*/
-
   mapCheckBox = () => {
     let cats = [];
     this.state.categories.forEach((cat) => {
