@@ -58,12 +58,13 @@ export default class Interested extends Component{
 
   handleInterstes = () => {
     let temail = this.state.email.slice(0,this.state.email.indexOf('@'));
+    let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
     let tcats = this.mapCheckBox();
-    console.log(temail + ' ' + tcats);
+    console.log(temail1 + ' ' + tcats);
     this.setState({
       loading : true,
     })
-    firebase.database().ref('Users/' + temail).update({tcats}).then(() => {
+    firebase.database().ref('Users/' + temail1).update({tcats}).then(() => {
       this.props.navigation.navigate('Login');
       this.setState({
         loading : false,

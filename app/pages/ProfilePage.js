@@ -23,6 +23,9 @@ export default class ProfilePage extends Component{
         location : '',
         imgsrc : '',
         errorMessage: null,
+        categories : [],
+        checked : [],
+        cats : [],
         loading : false,
       }
       this.focusNextField = this.focusNextField.bind(this);
@@ -57,20 +60,58 @@ export default class ProfilePage extends Component{
 
   componentWillMount(){
 
-    let user = firebase.auth().currentUser;
-    this.setState({
-      loading : true,
+    this.getCategories().then(() => {
+      this.getUserProfileData().then(() => {
+        this.mapCurrentInterests();
+      })
     })
-    //console.log(user);
-    //let firstname,lastname,birthdate,mobileno,gender,email,password;
+    .then(() => {
+      this.setState({
+        loading : false,
+      })
+    })
+  }
+
+  /*componentDidMount(){
+    this.mapCurrentInterests();
+  }*/
+
+  getCategories = async () => {
+    await firebase
+      .database()
+      .ref('Catgory/')
+      .once('value').then((snapshot) => {
+        //console.log("Before Parsing Categories");
+        snapshot.forEach((csnapshot) => {
+            let item = csnapshot.val();
+            //console.log("Category : " + item);
+            this.state.categories.push(item);
+        });
+        console.log("Data 2 : " + this.state.categories);
+      })
+      .then(() => {
+        let check = [];
+        this.state.categories.forEach((item) => {
+          check.push(false);
+        })
+        this.setState({
+          checked : check,
+        })
+        //console.log("Data 2 : " + this.state.checked);
+      })
+  }
+
+  getUserProfileData = async () => {
+    let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
-    //console.log(temail);
-    firebase
+    let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
+
+    await firebase
       .database()
       .ref('Users/')
-      .child(temail)
+      .child(temail1)
       .once('value').then( (snapshot) => {
-        console.log(snapshot.val());
+        //console.log(snapshot.val());
         this.setState({
           firstname : snapshot.val().firstname,
           lastName : snapshot.val().lastname,
@@ -80,15 +121,16 @@ export default class ProfilePage extends Component{
           email : user.email,
           location : snapshot.val().location,
           imgsrc : snapshot.val().imgsrc,
+          cats : snapshot.val().tcats,
           filePath : snapshot.val().imgsrc,
         })
       }).then( () => {
         this.setState({
           loading : false,
         })
-        console.log("Initial " + this.state.imgsrc);
+        //console.log("Initial " + this.state.cats);
       });
-    }
+  }
 
   uploadImage = (uri, imageName, mime = 'image/png') => {
     const Blob = RNFetchBlob.polyfill.Blob;
@@ -157,12 +199,37 @@ export default class ProfilePage extends Component{
         });
     };
 
+  mapCheckBox = () => {
+    let cats = [];
+    this.state.categories.forEach((cat) => {
+      if(this.state.checked[this.state.categories.indexOf(cat)] === true){
+        cats.push(this.state.categories[this.state.categories.indexOf(cat)]);
+      }
+    })
+    return cats;
+  }
+
+  mapCurrentInterests = () => {
+
+    let check = this.state.checked;
+    this.state.cats.forEach((item) => {
+      if(this.state.categories.includes(item)){
+        check[this.state.categories.indexOf(item)] = true;
+      }
+    })
+    this.setState({
+      checked : check,
+    })
+    console.log("check : " + this.state.checked);
+  }
+
   handleUpdate = () => {
 
   let user = firebase.auth().currentUser;
 
   const email = user.email;
   const temail = email.slice(0,user.email.indexOf('@'));
+  let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
   //console.log("Before Uploading");
 
   let firstname = this.state.firstname;
@@ -170,20 +237,27 @@ export default class ProfilePage extends Component{
   let mobileno = this.state.mobileNumber;
   let location = this.state.location;
   let imgsrc = this.state.imgsrc;
+  let tcats = this.mapCheckBox();
 
   console.log("Before Update");
 
   //console.log(temail);
-  firebase.database().ref('Users/' + temail).update({firstname,lastname,mobileno,location,imgsrc})
-  .then(() => {
-    this.props.navigation.navigate('Events')
-  });
-  console.log("Updated");
+  if(tcats.length > 0){
+    firebase.database().ref('Users/' + temail1).update({firstname,lastname,tcats,mobileno,location,imgsrc})
+    .then(() => {
+      this.props.navigation.navigate('Events')
+    });
+    console.log("Updated");
+  }
+  else{
+    ToastAndroid.showWithGravity( 'At least one Interestes is necessary.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+  }
 };
 
   updateDP = () => {
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
+    let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
     //console.log("In DP:");
     //console.log("FilePath : " + this.state.filePath);
     if(this.state.firstname != '' &&
@@ -196,7 +270,7 @@ export default class ProfilePage extends Component{
       })
         if(this.state.imgsrc != this.state.filePath){
           console.log("In updateDP " + this.state.imgsrc);
-          this.uploadImage(this.state.imgsrc,temail + '.png')
+          this.uploadImage(this.state.imgsrc,temail1 + '.png')
               .then( () => { this.setState({
                                     loading : false,
                                     //filePath : '',
@@ -339,6 +413,29 @@ export default class ProfilePage extends Component{
             }}
             value = {this.state.email}/>
         </View>
+        <Text style = {{alignSelf : 'flex-start',paddingTop : '1%',paddingBottom : '1%',marginBottom : '2%',marginTop : '4%',marginRight : '8%',marginLeft : '12%',fontSize : 16}}>Interestes : </Text>
+        <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'flex-start',marginTop : '1%',marginLeft : '8%',
+        flexWrap: 'wrap'}}>
+        {
+          this.state.categories.map((item,index) => {
+          //console.log(item + "+" + index)
+          return (
+            <CheckBox
+              title = {item}
+              checked = {this.state.checked[index]}
+              onPress = {() => {
+                let check = this.state.checked
+                check[index] = !check[index]
+                this.setState({
+                  checked : check
+                })
+                //console.log("State : ", this.state.checked);
+              }}
+              containerStyle = {{backgroundColor : Colors.primaryBackGourndColor,borderWidth : 0,padding : 0}}
+            />
+        )
+        })}
+        </View>
         <TouchableOpacity style = {styles.buttonContainer}
                           onPress = {this.updateDP}>
               <Text style = {styles.buttonText}>Profile Ok</Text>
@@ -357,7 +454,7 @@ const styles = StyleSheet.create({
     flexDirection : 'column',
     alignItems: 'center',
     justifyContent : 'flex-start',
-    //height : 610,
+    height : 800,
     width : '100%'
   },
   childContainer1 : {

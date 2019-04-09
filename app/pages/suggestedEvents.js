@@ -43,35 +43,21 @@ export default class SuggestedEvents extends Component {
   })
 
   componentWillMount(){
-    this.getUserInterests();
+    this.getUserInterests().then(() => {
+      this.getEventData();
+    });
   }
 
   componentDidMount(){
     NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
-    this.getEventData();
-
-    this.unsubscribeFromNotificationListener = firebase.notifications().onNotification(notification => {
-	     console.log('Notification received!', notification);
-       const localNotification = new firebase.notifications.Notification({
-            sound : 'default',
-            show_in_foreground : true,
-          })
-          .setNotificationId(notification.notificationId)
-          .setTitle(notification.title)
-          .setSubtitle(notification.subtitle)
-          .setBody(notification.body)
-          .setData(notification.data)
-          .android.setChannelId('channelId') // e.g. the id you chose above
-
-        firebase.notifications()
-          .displayNotification(localNotification)
-          .catch(err => console.log(err));
-      })
-
-    }
+    this.getUserInterests().then(() => {
+      this.getEventData();
+    });
+    //this.getEventData();
+  }
 
   componentWillUnmount(){
-      this.handleRefresh();
+      //this.getEventData();
       NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
     }
 
@@ -140,9 +126,10 @@ export default class SuggestedEvents extends Component {
 
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
+    let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
     await firebase
       .database()
-      .ref('Users/' + temail + '/' + 'tcats')
+      .ref('Users/' + temail1 + '/' + 'tcats')
       .on('value',(snapshot) => {
         //console.log(snapshot._value);
         this.setState({
@@ -155,46 +142,45 @@ export default class SuggestedEvents extends Component {
   getEventData = () => {
 
     this.setState({
-      //datasrc : null,
       refreshing : true,
       loading : true,
     })
-
     let eventdata = [];
+
     firebase
       .database()
       .ref('Cats/')
-      .once('value').then(async (snapshot) => {
-        //console.log(snapshot);
-        await snapshot._childKeys.forEach((item) => {
-          //console.log(snapshot._value);
+      .once('value')
+      .then((snapshot) => {
+        snapshot._childKeys.forEach((item) => {
           firebase
             .database()
             .ref('Cats/' + item)
             .once('value')
-            .then(async(snapshot) => {
-              //eventdata[item] = (snapshot._value);
+            .then((csnapshot) => {
               let count = 0;
-              console.log(snapshot._value.tcats);
               for(i = 0;i<this.state.userCats.length;i++){
-                if(snapshot._value.tcats.includes(this.state.userCats[i])){
-                  //count++;
-                  await firebase
-                    .database()
-                    .ref('Events/' + item)
-                    .once('value')
-                    .then((snapshot) => {
-                      console.log(snapshot.val());
-                      eventdata.push(snapshot.val())
-                      //break;
-                    })
-                    break;
+                if(csnapshot._value.tcats.includes(this.state.userCats[i])){
+                  count++;
                 }
+              }
+              if(count > 0){
+                firebase
+                  .database()
+                  .ref('Events/' + item)
+                  .once('value')
+                  .then((snapshot) => {
+                    eventdata.push(snapshot.val())
+                  })
+                  .then(() => {
+                    this.setState({
+                      datasrc : eventdata,
+                    })
+                  })
               }
             })
             .then(() => {
               this.setState({
-                datasrc : eventdata,
                 loading : false,
                 refreshing : false,
               })
@@ -207,6 +193,7 @@ export default class SuggestedEvents extends Component {
 
       const {navigate} = this.props.navigation;
       console.log(this.state.datasrc);
+      //this.getEventData();
 
       if(!this.state.isConnected){
         return(

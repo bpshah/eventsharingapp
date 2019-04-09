@@ -146,10 +146,11 @@ export default class Ex extends Component {
     })
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
+    let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
     let ename = this.state.title;
-    if(!this.state.members.includes(temail)){
-      this.state.members.push(temail);
-      this.addMemberInfo(temail);
+    if(!this.state.members.includes(temail1)){
+      this.state.members.push(temail1);
+      this.addMemberInfo(temail1);
       let members = this.state.members;
       firebase
         .database()
@@ -157,7 +158,7 @@ export default class Ex extends Component {
         .update({members});
       firebase
         .database()
-        .ref('Users/' + temail)
+        .ref('Users/' + temail1)
         .child('going')
         .push({ename});
 
@@ -172,8 +173,9 @@ export default class Ex extends Component {
     //console.log("in leave userImages " + this.state.userImages);
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
-    this.state.members.splice(this.state.members.indexOf(temail),1);
-    imgs.splice(this.state.members.indexOf(temail),1);
+    let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
+    this.state.members.splice(this.state.members.indexOf(temail1),1);
+    imgs.splice(this.state.members.indexOf(temail1),1);
     this.setState({
       userImages : imgs,
     })
@@ -188,7 +190,7 @@ export default class Ex extends Component {
       });
     firebase
       .database()
-      .ref('Users/' + temail)
+      .ref('Users/' + temail1)
       .child('going')
       .once('value')
       .then(
@@ -197,7 +199,7 @@ export default class Ex extends Component {
             console.log(item._value.ename);
             console.log(item.key);
             if(item._value.ename == this.state.title){
-              firebase.database().ref('Users/' + temail).child('going').child(item.key).remove();
+              firebase.database().ref('Users/' + temail1).child('going').child(item.key).remove();
             }
           })
       });
@@ -215,7 +217,8 @@ export default class Ex extends Component {
   changeButton = () => {
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
-    if(!this.state.joined && !this.state.members.includes(temail)){
+    let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
+    if(!this.state.joined && !this.state.members.includes(temail1)){
       return (<Button title = 'JOIN'
                 containerStyle = {styles.buttonContainer}
                 onPress = {this.joinEvent}/>

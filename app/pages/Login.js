@@ -4,18 +4,20 @@ import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
 import Loader from '../components/loader.js'
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
+import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
 
 export default class Login extends Component {
 
-  constructor(){
-    super()
+  constructor(props){
+    super(props)
     this.state = {
-      email : 'sbhumit98@gmail.com',
+      email : 'bhumit1206@gmail.com',
       password : 'asdf1234',
       errorMessage : null,
       errorCode : null,
       loading : false,
       isConnected : true,
+      from : true,
     }
   }
 
@@ -48,6 +50,7 @@ export default class Login extends Component {
       if(this.state.isConnected){
         this.setState({
           loading : true,
+          from : false
         })
       }
       else{
@@ -72,7 +75,7 @@ export default class Login extends Component {
               ToastAndroid.showWithGravity( 'Email is not verified.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
             }
             else{
-              this.props.navigation.navigate("Events")
+              this.props.navigation.navigate("Events");
             }
           })
         .then(() => {this.updateToken()})
@@ -95,20 +98,83 @@ export default class Login extends Component {
     console.log("Logged In");
   }
 
+  googleLogin = () => {
+    console.log("in googleLogin");
+    let d;
+    GoogleSignin
+      .signIn()
+      .then((data) => {
+        // Create a new Firebase credential with the token
+        //console.log("Data : ");
+        this.setState({
+          loading : true,
+        })
+        console.log("Data : ");
+        d = data;
+        console.log(data);
+        const credential = firebase.auth.GoogleAuthProvider.credential(data.idToken, data.accessToken);
+        return firebase.auth().signInWithCredential(credential)
+      })
+      .then((user) => {
+        //const user = ;
+        console.log(user);
+        console.log("Data ");
+        console.log(d);
+        console.log("New User : "+ user.additionalUserInfo.isNewUser);
+        this.setState({
+          loading : false,
+        })
+        console.log("Family name "+ d.user.familyName);
+        let temp = d.user.givenName.toLowerCase();
+        let temp1 = temp.replace(temp.charAt(0),temp.charAt(0).toUpperCase())
+        let temp2 = d.user.familyName.toLowerCase();
+        let temp3 = temp2.replace(temp2.charAt(0),temp2.charAt(0).toUpperCase())
+        console.log(this.state.lastName);
+        console.log(this.state.firstname);
+        if(user.additionalUserInfo.isNewUser){
+          this.props.navigation.navigate('Signup',{
+            firstName : temp1,
+            lastName : temp3,
+            imgsrc : d.user.photo,
+            email : d.user.email,
+            from : this.state.from,
+          })
+        }
+        else{
+          this.props.navigation.navigate('TabNav')
+        }
+      })
+      .catch((error) => {
+        const { code, message } = error;
+        console.log(code + message);
+        // For details of error codes, see the docs
+        // The message contains the default Firebase string
+        // representation of the error
+      });
+    console.log("logged in ");
+}
+
   updateToken = async () => {
     let user = firebase.auth().currentUser;
     const email = user.email;
     const temail = email.slice(0,user.email.indexOf('@'));
+    let temail1 = temail1.replace(/[^a-zA-Z0-9]/g,'');
     let token = await AsyncStorage.getItem('token')
     //console.log("In login token : " + token);
-    await firebase.database().ref('Users/' + temail).update({token});
+    await firebase.database().ref('Users/' + temail1).update({token});
+  }
+
+  fromState = () => {
+    this.props.navigation.navigate('Signup',{
+      from : false,
+    })
   }
 
   render(){
     const {height : heightOfDeviceScreen} = Dimensions.get('window');
     return(
       <ScrollView contentContainerStyle =  {styles.container}>
-          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '55%',marginRight : '8%',marginLeft : '3%'}}>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '45%',marginRight : '8%',marginLeft : '3%',marginBottom : '-8%'}}>
                   <Icon name="envelope"
                     size={22}
                     color='black'
@@ -152,9 +218,18 @@ export default class Login extends Component {
             </View>
             <View style = {{flexDirection : 'row',justifyContent : 'flex-start',marginLeft : '20%',marginTop : '1%'}}>
             <TouchableOpacity style = {styles.buttonContainer1}
-                              onPress={() => this.props.navigation.navigate('Signup')}>
+                              onPress={this.fromState}>
                   <Text style = {styles.buttonText}>Signup</Text>
             </TouchableOpacity>
+            </View>
+            <Text style = {{marginTop : '5%',alignSelf : 'center',fontSize : 18,color : 'white'}}>Or</Text>
+            <View style = {{flexDirection : 'row',justifyContent : 'flex-start',marginLeft : '20%',marginTop : '4%'}}>
+            <GoogleSigninButton
+              style = {styles.buttonContainer1}
+              size = {GoogleSigninButton.Size.Wide}
+              color = {GoogleSigninButton.Color.Dark}
+              //disabled = {this.state.isSigninInProgress}
+              onPress = {this.googleLogin} />
             </View>
 
       </ScrollView>
@@ -206,7 +281,8 @@ const styles = StyleSheet.create({
   buttonContainer1 : {
     backgroundColor : Colors.primaryAppColor,
     paddingVertical : 15,
-    width : '78%',
+    height : 60,
+    width : '80%',
   },
 
   buttonText : {

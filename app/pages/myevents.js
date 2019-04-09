@@ -89,12 +89,13 @@ export default class MyEvents extends Component {
     })
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
+    let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
     let data1 = [];
     firebase
       .database()
       .ref('Events/')
       .orderByChild("uid")
-      .equalTo(temail)
+      .equalTo(temail1)
       .on('value',(snapshot) => {
         snapshot.forEach((csnapshot) => {
           //console.log(csnapshot.val());

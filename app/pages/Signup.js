@@ -12,15 +12,15 @@ import Loader from '../components/loader.js'
 
 export default class Signup extends Component {
 
-  constructor(){
-    super()
+  constructor(props){
+    super(props)
     this.state = {
       filePath : '',
-      email : 'sbhumit98@gmail.com',
+      email : 'bhumit1234@gmail.com',
       password : 'asdf1234',
       confirmPassword : 'asdf1234',
-      firstname : 'Bhumit ',
-      lastName : 'Shah',
+      firstname : 'bhumit',
+      lastName : 'shah',
       mobileNumber : '7359705973',
       location : 'Ahmedabad',
       imgsrc : '',
@@ -28,9 +28,21 @@ export default class Signup extends Component {
       token : '',
       loading : false,
       isConnected : true,
+      from : this.props.navigation.state.params.from,
     }
     this.focusNextField = this.focusNextField.bind(this);
     this.inputs = {};
+  }
+
+  componentWillMount(){
+    if(this.state.from){
+      this.setState({
+        firstname : this.props.navigation.state.params.firstName,
+        lastName : this.props.navigation.state.params.lastName,
+        imgsrc : this.props.navigation.state.params.imgsrc,
+        //email : this.props.navigation.navigate.params.email
+      });
+    }
   }
 
   componentDidMount(){
@@ -160,10 +172,11 @@ export default class Signup extends Component {
       let token = this.state.token;
 
       let temail = email.slice(0,email.indexOf('@'));
+      let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
 
       firebase
         .database()
-        .ref('Users/' + temail)
+        .ref('Users/' + temail1)
         .set({ firstname, lastname, mobileno, location , token, imgsrc})
         .then(() => {
           this.props.navigation.navigate("Interested",{
@@ -211,6 +224,7 @@ export default class Signup extends Component {
     const { password, confirmPassword } = this.state;
     let email = this.state.email;
     let temail = email.slice(0,email.indexOf('@'));
+    let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
 
     if(password != confirmPassword ){
       ToastAndroid.showWithGravity( "Passwords don't match",ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
@@ -237,7 +251,7 @@ export default class Signup extends Component {
           }
           this.handleSignUp()
           .then(async () =>  {
-            await this.uploadImage(this.state.filePath, temail + '.png')
+            await this.uploadImage(this.state.filePath, temail1 + '.png')
           })
           .then(() => {
             this.handleProfileData();
@@ -254,6 +268,27 @@ export default class Signup extends Component {
         ToastAndroid.showWithGravity( 'All Fields and compulsory.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
       }
       console.log("Signed Up");
+    }
+  }
+
+  fromState = () => {
+    console.log("in fromState");
+    if(this.state.from){
+      console.log("in if ");
+      return (  <TouchableOpacity style = {styles.buttonContainer}
+                        onPress = {this.handleProfileData}>
+                        <Text style = {styles.buttonText}>Submit</Text>
+                </TouchableOpacity>
+          )
+    }
+    else{
+      console.log("in else");
+      return (
+        <TouchableOpacity style = {styles.buttonContainer}
+                          onPress = {this.handle}>
+              <Text style = {styles.buttonText}>Submit</Text>
+        </TouchableOpacity>
+      )
     }
   }
 
@@ -423,11 +458,7 @@ export default class Signup extends Component {
             }}
             value = {this.state.confirmPassword}/>
         </View>
-
-        <TouchableOpacity style = {styles.buttonContainer}
-                          onPress = {this.handle}>
-              <Text style = {styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
+        {this.fromState()}
       </ScrollView>
 
     );

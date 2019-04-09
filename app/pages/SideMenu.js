@@ -35,17 +35,19 @@ componentDidMount(){
 getUserData = () => {
   let user = firebase.auth().currentUser;
   const temail = user.email.slice(0,user.email.indexOf('@'));
+  let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
+  console.log("Temail2 : " + temail1);
   firebase
     .database()
     .ref('Users/')
-    .child(temail)
+    .child(temail1)
     .on('value',(snapshot) => {
       //console.log(snapshot.val());
-      this.setState({
+      /*this.setState({
         imgsrc : snapshot.val().imgsrc,
         firsname : snapshot.val().firstname,
         lastname : snapshot.val().lastname
-      })
+      })*/
     })
 }
 
@@ -55,14 +57,14 @@ getUserData = () => {
         <View style = {{flex : 1,backgroundColor : Colors.white,justifyContent : 'flex-start',alignItems : 'center',paddingBottom : '20%'}}>
           <Avatar
               rounded
-              source = {{uri : this.state.imgsrc}}
+              //source = {{uri : this.state.imgsrc}}
               //style = {{backgroundColor : 'black'}}
               size = "large"
               paddingTop = '10%'
               paddingLeft = '2%'
               paddingRight = '2%'
           />
-          <Text style = {{paddingTop : '14%',fontSize : 17,alignSelf : 'center',flex : 1}}> Welcome , {this.state.firsname} </Text>
+          <Text style = {{paddingTop : '14%',fontSize : 17,alignSelf : 'center',flex : 1}}> Welcome, {this.state.firstname} </Text>
         </View>
         <View style = {{flex : 2,backgroundColor : Colors.primaryBackGourndColor,paddingTop : '5%',height : '65%'}}>
           <View style = {{ flexDirection : 'row',justifyContent : 'flex-start',paddingTop : '6%',paddingBottom : '6%'}}>

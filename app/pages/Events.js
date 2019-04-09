@@ -6,6 +6,8 @@ import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
 import Activity from '../components/activityIndicator.js'
 import type { RemoteMessage,Notification } from 'react-native-firebase';
+import { GoogleSignin } from 'react-native-google-signin';
+
 export default class Events extends Component {
 
   constructor(props) {
@@ -158,6 +160,7 @@ export default class Events extends Component {
           refreshing : false,
           searchArrayHolder : data1,
         })
+        //console.log(this.state.datasrc);
       })
       if(this.state.datasrc != []){
         this.setState({

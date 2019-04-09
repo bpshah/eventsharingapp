@@ -23,8 +23,7 @@ import CreateGroup from './app/pages/createGroup.js'
 import Going from './app/pages/going.js'
 import Interested from './app/pages/interested.js'
 import SuggestedEvents from './app/pages/suggestedEvents.js'
-
-
+import { GoogleSignin } from 'react-native-google-signin';
 
 import { createStackNavigator, createAppContainer, createMaterialTopTabNavigator, createDrawerNavigator, createSwitchNavigator} from 'react-navigation';
 import firebase from 'react-native-firebase';
@@ -51,6 +50,7 @@ const config = {
     messagingSenderId: "273328326983"
   };
 firebase.initializeApp(config);
+GoogleSignin.configure();
 
 firebase.messaging().hasPermission()
   .then(enabled => {
@@ -86,7 +86,7 @@ firebase.messaging().hasPermission()
     }
   });
 
-//console.disableYellowBox = true;
+console.disableYellowBox = true;
 
 const ProfileStack = createStackNavigator({
   ProfilePage : {

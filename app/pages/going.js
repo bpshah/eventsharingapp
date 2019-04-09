@@ -93,47 +93,42 @@ export default class Going extends Component {
     })
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
+    let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
     let data1 = [];
     firebase
       .database()
-      .ref('Users/' + temail + '/' + 'going')
+      .ref('Users/' + temail1 + '/' + 'going')
       .once('value')
       .then(async (snapshot) => {
         //console.log("Snapshot : "  + snapshot);
-        let keys = snapshot._childKeys;
-        //console.log(snapshot);
-        await keys.forEach((item) => {
-          //console.log(snapshot._value[item].ename);
-          firebase
-            .database()
-            .ref('Events/')
-            .child(snapshot._value[item].ename)
-            .once('value')
-            .then((snapshot) => {
-              //*console.log("snapshot : " + snapshot);
-              data1.push(snapshot._value);
-              //console.log(data1);
-            })
-            .then(() => {
-              this.setState({
-                datasrc : data1,
-                refreshing : false,
-                loading : false,
-                searchArrayHolder : data1,
+        //if(snapshot !== null){
+          let keys = snapshot._childKeys;
+          //console.log(snapshot._childKeys);
+          //console.log(snapshot);
+          await keys.forEach((item) => {
+            //console.log(snapshot._value[item].ename);
+            firebase
+              .database()
+              .ref('Events/')
+              .child(snapshot._value[item].ename)
+              .once('value')
+              .then((snapshot) => {
+                //console.log(snapshot);
+                data1.push(snapshot._value);
+                //console.log(data1);
               })
-              //console.log("datasrc : " + this.state.datasrc);
-            })
-        })
+              .then(() => {
+                this.setState({
+                  datasrc : data1,
+                  refreshing : false,
+                  loading : false,
+                  searchArrayHolder : data1,
+                })
+                //console.log("datasrc : " + this.state.datasrc);
+              })
+          })
+        //}
       })
-      if(this.state.datasrc != []){
-        this.setState({
-          loading : false,
-          refreshing : false,
-        })
-      }
-      else {
-        ToastAndroid.showWithGravity( 'Unanble to get events.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
-      }
     }
 
   static navigationOptions = ({navigation}) => ({
@@ -157,6 +152,7 @@ export default class Going extends Component {
   })
 
   render(){
+
     return(
       <FlatList
           data = {this.state.datasrc}
