@@ -51,6 +51,7 @@ const config = {
   };
 firebase.initializeApp(config);
 GoogleSignin.configure();
+//FacebookSdk.sdkInitialize();
 
 firebase.messaging().hasPermission()
   .then(enabled => {
