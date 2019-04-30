@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Button, NetInfo,TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar, Image, ScrollView, Dimensions,AsyncStorage,ToastAndroid} from 'react-native';
+import { Button, NetInfo,TextInput, View, StyleSheet, TouchableOpacity,TouchableHighlight, Text, StatusBar, Image, ScrollView, Dimensions,AsyncStorage,ToastAndroid} from 'react-native';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
 import Loader from '../components/loader.js'
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
+import { AccessToken, LoginManager, LoginButton, FBSDK } from 'react-native-fbsdk';
 
 export default class Login extends Component {
 
@@ -154,6 +155,35 @@ export default class Login extends Component {
     console.log("logged in ");
 }
 
+  facebookLogin = async () => {
+    try {
+      const result = await LoginManager.logInWithReadPermissions(['public_profile', 'email']);
+
+      if (result.isCancelled) {
+        throw new Error('User cancelled request'); // Handle this however fits the flow of your app
+      }
+
+      console.log(`Login success with permissions: ${result.grantedPermissions.toString()}`);
+
+      // get the access token
+      const data = await AccessToken.getCurrentAccessToken();
+
+      if (!data) {
+        throw new Error('Something went wrong obtaining the users access token'); // Handle this however fits the flow of your app
+      }
+
+      // create a new firebase credential with the token
+      const credential = firebase.auth.FacebookAuthProvider.credential(data.accessToken);
+
+      // login with credential
+      const currentUser = await firebase.auth().signInWithCredential(credential);
+
+      console.info(JSON.stringify(currentUser.toJSON()))
+    } catch (e) {
+      console.error(e);
+    }
+}
+
   updateToken = async () => {
     let user = firebase.auth().currentUser;
     const email = user.email;
@@ -174,36 +204,36 @@ export default class Login extends Component {
     const {height : heightOfDeviceScreen} = Dimensions.get('window');
     return(
       <ScrollView contentContainerStyle =  {styles.container}>
-          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '45%',marginRight : '8%',marginLeft : '3%',marginBottom : '-8%'}}>
-                  <Icon name="envelope"
-                    size={22}
-                    color='black'
-                    style = {{marginLeft : '10%',marginRight : '3.5%',marginBottom : '1%',alignSelf : 'center'}}/>
-                  <TextInput style = {styles.input}
-                    title = 'Username'
-                    placeholder = 'Username or Email'
-                    placeholderTextColor = 'rgba(255,255,255,0.7)'
-                    returnKeyType = 'next'
-                    keyBoardType = 'email-address'
-                    autoCapitalize = 'none'
-                    onChangeText={email => this.setState({ email })}
-                    value={this.state.email}/>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '30%',marginRight : '8%',marginLeft : '3%',marginBottom : '-8%'}}>
+            <Icon name="envelope"
+              size={22}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '3.5%',marginBottom : '1%',alignSelf : 'center'}}/>
+            <TextInput style = {styles.input}
+              title = 'Username'
+              placeholder = 'Username or Email'
+              placeholderTextColor = 'rgba(255,255,255,0.7)'
+              returnKeyType = 'next'
+              keyBoardType = 'email-address'
+              autoCapitalize = 'none'
+              onChangeText={email => this.setState({ email })}
+              value={this.state.email}/>
             </View>
             <Loader loading = {this.state.loading}/>
             <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginRight : '8%',marginLeft : '3%'}}>
-                  <Icon name="lock"
-                    size={22}
-                    color='black'
-                    style = {{marginLeft : '10%',marginRight : '3.5%',marginBottom : '1%',alignSelf : 'center'}}/>
-                    <TextInput style = {styles.input}
-                          placeholder = 'Password'
-                          secureTextEntry = {true}
-                          returnKeyType = 'go'
-                          placeholderTextColor = 'rgba(255,255,255,0.7)'
-                          maxLength = {20}
-                          onChangeText={password => this.setState({ password })}
-                          value={this.state.password}
-                    />
+              <Icon name="lock"
+                size={22}
+                color='black'
+                style = {{marginLeft : '10%',marginRight : '3.5%',marginBottom : '1%',alignSelf : 'center'}}/>
+              <TextInput style = {styles.input}
+                  placeholder = 'Password'
+                  secureTextEntry = {true}
+                  returnKeyType = 'go'
+                  placeholderTextColor = 'rgba(255,255,255,0.7)'
+                  maxLength = {20}
+                  onChangeText={password => this.setState({ password })}
+                  value={this.state.password}
+            />
             </View>
             <Loader loading = {this.state.loading}/>
             <Text style = {styles.textstyle}
@@ -224,14 +254,20 @@ export default class Login extends Component {
             </View>
             <Text style = {{marginTop : '5%',alignSelf : 'center',fontSize : 18,color : 'white'}}>Or</Text>
             <View style = {{flexDirection : 'row',justifyContent : 'flex-start',marginLeft : '20%',marginTop : '4%'}}>
-            <GoogleSigninButton
-              style = {styles.buttonContainer1}
-              size = {GoogleSigninButton.Size.Wide}
-              color = {GoogleSigninButton.Color.Dark}
-              //disabled = {this.state.isSigninInProgress}
-              onPress = {this.googleLogin} />
+              <GoogleSigninButton
+                style = {styles.buttonContainer1}
+                size = {GoogleSigninButton.Size.Wide}
+                color = {GoogleSigninButton.Color.Dark}
+                //disabled = {this.state.isSigninInProgress}
+                onPress = {this.googleLogin} />
             </View>
-
+            <View style = {{flexDirection : 'row',justifyContent : 'flex-start',marginLeft : '22%',marginTop : '4%'}}>
+            <LoginButton
+              //publishPermissions = {[“publish_actions”]}
+              style = {{height : 35,width : '78%',textAlign : 'center',padding : 15, borderRadius : 0}}
+              onPress = {this.facebookLogin}
+            />
+            </View>
       </ScrollView>
     );
   }
@@ -281,10 +317,9 @@ const styles = StyleSheet.create({
   buttonContainer1 : {
     backgroundColor : Colors.primaryAppColor,
     paddingVertical : 15,
-    height : 60,
+    height : 55,
     width : '80%',
   },
-
   buttonText : {
     textAlign : 'center',
     backgroundColor : Colors.buttonTextColor,

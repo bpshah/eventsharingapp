@@ -17,6 +17,7 @@ export default class MyEvents extends Component {
       refreshing : false,
       value : '',
       searchArrayHolder : [],
+      tmpdata : null
     }
   }
 
@@ -42,14 +43,22 @@ export default class MyEvents extends Component {
       value : text,
     });
 
+    const data = this.state.tmpdata
     const newData = this.state.searchArrayHolder.filter(item => {
       const itemData = `${item.eventname}`
       return itemData.indexOf(text) > -1
     });
 
-    this.setState({
-      datasrc : newData,
-    })
+    if(text != ''){
+      this.setState({
+        datasrc : newData,
+      })
+    }
+    else{
+      this.setState({
+        datasrc : data,
+      })
+    }
   }
 
   onCancleSearch = () => {
@@ -106,6 +115,7 @@ export default class MyEvents extends Component {
           datasrc : data1,
           refreshing : false,
           searchArrayHolder : data1,
+          tmpdata : data1
         })
       })
       if(this.state.datasrc != []){

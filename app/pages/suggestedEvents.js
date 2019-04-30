@@ -19,6 +19,7 @@ export default class SuggestedEvents extends Component {
       searchArrayHolder : [],
       eventcatdata : [],
       userCats : [],
+      tmpdata : null
     }
   }
 
@@ -83,14 +84,23 @@ export default class SuggestedEvents extends Component {
       value : text,
     });
 
+    const data = this.state.tmpdata
     const newData = this.state.searchArrayHolder.filter(item => {
       const itemData = `${item.eventname}`
+      console.log(itemData)
       return itemData.indexOf(text) > -1
     });
 
-    this.setState({
-      datasrc : newData,
-    })
+    if(text != ''){
+      this.setState({
+        datasrc : newData,
+      })
+    }
+    else{
+      this.setState({
+        datasrc : data,
+      })
+    }
   }
 
   onCancleSearch = () => {
@@ -175,6 +185,7 @@ export default class SuggestedEvents extends Component {
                   .then(() => {
                     this.setState({
                       datasrc : eventdata,
+                      tmpdata : eventdata,
                     })
                   })
               }

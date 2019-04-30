@@ -19,6 +19,7 @@ export default class Events extends Component {
       value : '',
       isConnected : true,
       searchArrayHolder : [],
+      tmpdata : null,
     }
   }
 
@@ -96,18 +97,41 @@ export default class Events extends Component {
     this.setState({
       value : text,
     });
+    const data = this.state.tmpdata
 
     const newData = this.state.searchArrayHolder.filter(item => {
       const itemData = `${item.eventname}`
-      return itemData.indexOf(text) > -1
+      const itemData1 = `${item.place}`
+      //console.log(itemData);
+      //console.log(itemData1);
+      if(itemData.indexOf(text) > -1){
+        console.log("In eventname");
+        console.log(itemData.indexOf(text));
+        return itemData.indexOf(text);
+      }
+      else if(itemData1.indexOf(text) > -1){
+        console.log("In place");
+        return itemData1.indexOf(text) > -1
+      }
+
     });
 
-    this.setState({
-      datasrc : newData,
-    })
+    console.log(newData);
+    if(text != ''){
+      this.setState({
+        datasrc : newData,
+      })
+    }
+    else{
+      this.setState({
+        datasrc : data,
+      })
+    }
+
   }
 
   onCancleSearch = () => {
+
     this.setState({
       value : '',
     })
@@ -159,6 +183,7 @@ export default class Events extends Component {
           datasrc : data1,
           refreshing : false,
           searchArrayHolder : data1,
+          tmpdata : data1
         })
         //console.log(this.state.datasrc);
       })
