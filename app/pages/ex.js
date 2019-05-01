@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView,TouchableHighlight,ToastAndroid} from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView,TouchableHighlight,ToastAndroid, Linking} from 'react-native';
 import { Button, Avatar, Divider } from 'react-native-elements';
 import { StackActions,NavigationActions } from 'react-navigation';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
@@ -326,6 +326,11 @@ export default class Ex extends Component {
                 color='black'
                 style = {{marginRight : '4%', marginLeft : '10%',alignSelf : 'center'}}/>
             <Text style = {styles.childContainerText} onPress = {this.callOrganizer}>Organizer : {this.state.org} {'\n'} Contact No. : {this.state.contact}</Text>
+          </View>
+          <View style = {styles.childContainer1}>
+            <Text style = {styles.childContainerText}
+                  onPress={() => {
+                                  Linking.openURL('http://api.whatsapp.com/send?phone='+ this.state.contact);}}>Send Whatsapp message to organizer</Text>
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'center',marginRight : '4%', marginTop : '5%'}}>
             {this.displayText()}

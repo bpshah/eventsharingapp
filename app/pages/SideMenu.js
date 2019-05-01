@@ -5,6 +5,7 @@ import { StackNavigator,DrawerActions } from 'react-navigation';
 import {Avatar} from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
+import Camera from 'react-native-camera';
 
 export default class SideMenu extends Component{
 
@@ -50,6 +51,39 @@ getUserData = () => {
       })*/
     })
 }
+
+takePicture = async function() {
+  this.camera.capture().catch(err => console.error('capture picture error', err));
+  };
+
+  mapVisionRespToScreen = (visionResp, imageProperties) => {
+      const IMAGE_TO_SCREEN_Y = screenHeight / imageProperties.height;
+      const IMAGE_TO_SCREEN_X = screenWidth / imageProperties.width;
+
+      return visionResp.map(item => {
+        return {
+          ...item,
+          position: {
+            width: item.bounding.width * IMAGE_TO_SCREEN_X,
+            left: item.bounding.left * IMAGE_TO_SCREEN_X,
+            height: item.bounding.height * IMAGE_TO_SCREEN_Y,
+            top: item.bounding.top * IMAGE_TO_SCREEN_Y
+          }
+        };
+      });
+  };
+
+processImage = async (imageProperties) => {
+
+    const uri = this.takePicture();
+    const visionResp = await RNTextDetector.detectFromUri(uri);
+    if (!(visionResp && visionResp.length > 0)) {
+      throw "UNMATCHED";
+    }
+    this.setState({
+      visionResp : this.mapVisionRespToScreen(visionResp, imageProperties)
+    });
+};
 
   render(){
     return(
@@ -98,6 +132,14 @@ getUserData = () => {
               style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
             <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
                   onPress={this.navigateToScreen('ProfilePage')}>Profile</Text>
+          </View>
+          <View style = {styles.child1}>
+            <Icon name="camera"
+              size={18}
+              color='black'
+              style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
+            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
+                  onPress = {this.takePicture}>Capture Event Text</Text>
           </View>
           <View style = {styles.child1}>
             <Icon name="sign-out-alt"

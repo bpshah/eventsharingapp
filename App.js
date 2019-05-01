@@ -24,6 +24,8 @@ import Going from './app/pages/going.js'
 import Interested from './app/pages/interested.js'
 import SuggestedEvents from './app/pages/suggestedEvents.js'
 import { GoogleSignin } from 'react-native-google-signin';
+import DropdownMenu from 'react-native-dropdown-menu';
+import { Dropdown } from 'react-native-material-dropdown';
 
 import { createStackNavigator, createAppContainer, createMaterialTopTabNavigator, createDrawerNavigator, createSwitchNavigator} from 'react-navigation';
 import firebase from 'react-native-firebase';
@@ -100,7 +102,7 @@ const TabNav = createMaterialTopTabNavigator(
       Events : {
         screen : Events,
         navigationOptions : {
-        tabBarLabel : "Events",
+        tabBarLabel : "All Events",
       },
     },
       MyEvents : {
@@ -136,6 +138,14 @@ const TabNav = createMaterialTopTabNavigator(
   },
 );
 
+ let data = [{
+      value : 'Ahmedabad',
+    }, {
+      value : 'Baroda',
+    }, {
+      value : 'Surat',
+    }];
+
 const EventStack = createStackNavigator({
     TabNav : {
       screen : TabNav ,
@@ -156,7 +166,25 @@ const EventStack = createStackNavigator({
                 <Icon name="bars" size={20} color={Colors.white} />
               </TouchableOpacity>
           </View>
-        )
+        ),
+        headerRight : (
+          <View marginRight = {25}
+                marginTop = {-18}
+                >
+            <Dropdown
+              label = {'Select Location'}
+              data = {data}
+              itemColor = {'black'}
+              selectedItemColor = {'black'}
+              containerStyle = {{width : 150}}
+              textColor = {'white'}
+              disabledItemColor= {'black'}
+              width = {50}
+              dropdownOffset = {{top : 25}}
+              dropdownPosition = {10}
+          />
+        </View>
+        ),
       })
     },
     Ex : {
@@ -255,6 +283,21 @@ const App1 = createSwitchNavigator({
 },
 {
     initialRouteName : isVerified ? "Drawer" : "LoginStack"
+});
+
+const styles = StyleSheet.create({
+    headerText : {
+    fontSize : 20,
+    margin : 12,
+    fontWeight : "bold",
+    color : 'white'
+  },
+  menuContent: {
+    color: "#000",
+    fontWeight: "bold",
+    padding: 2,
+    fontSize: 20
+  }
 });
 
 const App =  createAppContainer(App1);
