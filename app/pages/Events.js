@@ -101,18 +101,23 @@ export default class Events extends Component {
 
     const newData = this.state.searchArrayHolder.filter(item => {
       const itemData = `${item.eventname}`
-      const itemData1 = `${item.place}`
       //console.log(itemData);
       //console.log(itemData1);
-      if(itemData.indexOf(text) > -1){
+      const data = this.state.tmpdata;
+      const newData = this.state.searchArrayHolder.filter(item => {
+        const itemData = `${item.eventname}`
+        return itemData.indexOf(text) > -1
+      });
+
+      /*if(itemData.indexOf(text) > -1){
         console.log("In eventname");
         console.log(itemData.indexOf(text));
         return itemData.indexOf(text);
       }
-      else if(itemData1.indexOf(text) > -1){
+      /*else if(itemData1.indexOf(text) > -1){
         console.log("In place");
         return itemData1.indexOf(text) > -1
-      }
+      }*/
 
     });
 
@@ -193,7 +198,7 @@ export default class Events extends Component {
         })
       }
       else {
-        ToastAndroid.showWithGravity( 'Unanble to get events.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+        ToastAndroid.showWithGravity( 'Unable to get events.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
       }
     }
 
@@ -226,7 +231,8 @@ export default class Events extends Component {
                                                                         totime : item.totime,
                                                                         imgsrc : item.imgsrc,
                                                                         contact : item.mobileno,
-                                                                        address : item.address})} >
+                                                                        address : item.address,
+                                                                        limit : item.membersLimit})} >
                 <Card containerStyle = {styles.Container}
                       titleNumberOfLines = {2}>
                   <View style = {{flex : 1,flexDirection : 'column',justifyContent : 'space-around'}}>

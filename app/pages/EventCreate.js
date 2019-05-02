@@ -56,6 +56,7 @@ export default class EventCreate extends Component{
       category : [],
       fromtime : '',
       totime : '',
+      memberLimit : '',
       imgsrc : [],
       selectedPlace : '',
       selectedValuePlace : 0,
@@ -262,6 +263,7 @@ export default class EventCreate extends Component{
       let category = this.state.selectedCategory;
       let imgsrc = this.state.imgsrc;
       let address = this.state.address;
+      let membersLimit = this.state.memberLimit;
       let tcats = this.mapCheckBox();
 
       console.log("In Handle Event : " + imgsrc);
@@ -270,7 +272,7 @@ export default class EventCreate extends Component{
       firebase
         .database()
         .ref('Events/'+ this.state.eventname)
-        .set({ eventname, place, org, mobileno, description, fromtime, totime, uid, imgsrc, address})
+        .set({ eventname, place, org, mobileno, description, fromtime, totime, uid, imgsrc, address, membersLimit})
         .then(() => {
           firebase
             .database()
@@ -382,7 +384,7 @@ export default class EventCreate extends Component{
   render(){
 
     return(
-      <ScrollView contentContainerStyle = {[styles.container,{height : 1000 + this.state.height}]}
+      <ScrollView contentContainerStyle = {[styles.container,{height : 1050 + this.state.height}]}
                   >
           <View style = {{ height : 200,width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
             <ImageSlider
@@ -621,6 +623,27 @@ export default class EventCreate extends Component{
               />
           </View>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '4.5%',marginLeft : '2%'}}>
+              <Icon name="users"
+                size={22}
+                color='black'
+                style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
+              <TextInput style = {styles.input}
+                title = 'Limit'
+                placeholder = 'No. Of People'
+                placeholderTextColor = {Colors.placeholderText}
+                returnKeyType = 'next'
+                blurOnSubmit = { false }
+                //keyBoardType = 'email-address'
+                autoCapitalize = 'none'
+                autoCorrect = {false}
+                enablesReturnKeyAutomatically = {true}
+                onChangeText = { memberLimit => this.setState({ memberLimit })}
+                value = {this.state.memberLimit}
+                ref = { input => {
+                  this.inputs['six'] = input;
+                }}/>
+          </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '4.5%',marginLeft : '2%'}}>
             <Icon name="scroll"
               size={22}
               color='black'
@@ -650,6 +673,8 @@ export default class EventCreate extends Component{
                 this.inputs['five'] = input;
               }}/>
           </View>
+
+
           <Text style = {{alignSelf : 'flex-start',paddingTop : '1%',paddingBottom : '1%',marginBottom : '2%',marginTop : '4%',marginRight : '8%',marginLeft : '12%',fontSize : 16}}> Category : </Text>
           <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'flex-start',flexWrap: 'wrap',marginTop : '1%',marginRight : '0%',marginLeft : '8%',marginBottom : '2%'}}>
           {
@@ -710,7 +735,7 @@ const styles = StyleSheet.create({
     justifyContent : 'flex-start',
     alignItems : 'center',
     width : '100%',
-    height : 850,
+    height : 900,
     paddingBottom : 20,
   },
   input : {

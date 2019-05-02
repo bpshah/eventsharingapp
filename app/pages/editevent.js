@@ -26,6 +26,7 @@ export default class EditEvent extends Component {
       title : this.props.navigation.state.params.title,
       contact : this.props.navigation.state.params.contact,
       selectedCategory : this.props.navigation.state.params.category,
+      limit : this.props.navigation.state.params.limit,
       place : [],
       eventname : this.props.navigation.state.params.title,
       category : [],
@@ -508,6 +509,28 @@ export default class EditEvent extends Component {
               }}
               />
           </View>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '4.5%',marginLeft : '2%'}}>
+              <Icon name="users"
+                size={22}
+                color='black'
+                style = {{marginLeft : '10%',marginRight : '4.5%',marginBottom : '1%',alignSelf : 'center'}}/>
+              <TextInput style = {styles.input}
+                title = 'Limit'
+                placeholder = 'No. Of People'
+                placeholderTextColor = {Colors.placeholderText}
+                returnKeyType = 'next'
+                blurOnSubmit = { false }
+                //keyBoardType = 'email-address'
+                autoCapitalize = 'none'
+                autoCorrect = {false}
+                enablesReturnKeyAutomatically = {true}
+                onChangeText = { limit => this.setState({ limit })}
+                value = {this.state.limit}
+                ref = { input => {
+                  this.inputs['six'] = input;
+                }}/>
+          </View>
+
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '4.5%',marginLeft : '2%'}}>
             <Icon name="scroll"
               size={22}

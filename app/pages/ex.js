@@ -27,6 +27,7 @@ export default class Ex extends Component {
       title : this.props.navigation.state.params.title,
       contact : this.props.navigation.state.params.contact,
       address : this.props.navigation.state.params.address,
+      limit : this.props.navigation.state.params.limit,
       members : [],
       userImages : [],
       loading : true,
@@ -141,29 +142,37 @@ export default class Ex extends Component {
 
   joinEvent = () => {
     //console.log("In join Event");
-    this.setState({
-      joined : true,
-    })
+
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
     let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
     let ename = this.state.title;
-    if(!this.state.members.includes(temail1)){
-      this.state.members.push(temail1);
-      this.addMemberInfo(temail1);
-      let members = this.state.members;
-      firebase
-        .database()
-        .ref('Events/' + this.state.title)
-        .update({members});
-      firebase
-        .database()
-        .ref('Users/' + temail1)
-        .child('going')
-        .push({ename});
-
+    let lint = parseInt(this.state.limit,10);
+    console.log(lint);
+    if(this.state.members.length < lint){
+      console.log();
+      this.setState({
+        joined : true,
+      })
+      if(!this.state.members.includes(temail1)){
+        this.state.members.push(temail1);
+        this.addMemberInfo(temail1);
+        let members = this.state.members;
+        firebase
+          .database()
+          .ref('Events/' + this.state.title)
+          .update({members});
+        firebase
+          .database()
+          .ref('Users/' + temail1)
+          .child('going')
+          .push({ename});
+        }
+        ToastAndroid.showWithGravity( 'You have subscribed for the event.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
     }
-    ToastAndroid.showWithGravity( 'You have subscribed for the event.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+    else{
+      ToastAndroid.showWithGravity( 'No more space available',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
+    }
   }
 
   leaveEvent = () => {
