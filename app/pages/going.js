@@ -49,8 +49,9 @@ export default class Going extends Component {
 
     const data = this.state.tmpdata
     const newData = this.state.searchArrayHolder.filter(item => {
-      const itemData = `${item.eventname}`
-      return itemData.indexOf(text) > -1
+      return Object.keys(item).some(key =>
+        item[key].includes(text)
+      );
     });
 
     if(text != ''){

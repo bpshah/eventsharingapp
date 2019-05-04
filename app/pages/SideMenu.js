@@ -37,7 +37,7 @@ getUserData = () => {
   let user = firebase.auth().currentUser;
   const temail = user.email.slice(0,user.email.indexOf('@'));
   let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
-  console.log("Temail2 : " + temail1);
+  //console.log("Temail2 : " + temail1);
   firebase
     .database()
     .ref('Users/')

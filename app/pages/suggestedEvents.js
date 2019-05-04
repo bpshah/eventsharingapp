@@ -54,11 +54,9 @@ export default class SuggestedEvents extends Component {
     this.getUserInterests().then(() => {
       this.getEventData();
     });
-    //this.getEventData();
   }
 
   componentWillUnmount(){
-      //this.getEventData();
       NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
     }
 
@@ -86,9 +84,9 @@ export default class SuggestedEvents extends Component {
 
     const data = this.state.tmpdata
     const newData = this.state.searchArrayHolder.filter(item => {
-      const itemData = `${item.eventname}`
-      console.log(itemData)
-      return itemData.indexOf(text) > -1
+      return Object.keys(item).some(key =>
+        item[key].includes(text)
+      );
     });
 
     if(text != ''){
@@ -186,6 +184,7 @@ export default class SuggestedEvents extends Component {
                     this.setState({
                       datasrc : eventdata,
                       tmpdata : eventdata,
+                      searchArrayHolder : eventdata,
                     })
                   })
               }
@@ -203,7 +202,7 @@ export default class SuggestedEvents extends Component {
   render(){
 
       const {navigate} = this.props.navigation;
-      console.log(this.state.datasrc);
+      //console.log(this.state.datasrc);
       //this.getEventData();
 
       if(!this.state.isConnected){

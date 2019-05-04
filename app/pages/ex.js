@@ -337,7 +337,7 @@ export default class Ex extends Component {
             <Text style = {styles.childContainerText} onPress = {this.callOrganizer}>Organizer : {this.state.org} {'\n'} Contact No. : {this.state.contact}</Text>
           </View>
           <View style = {styles.childContainer1}>
-            <Text style = {styles.childContainerText}
+            <Text style = {[styles.childContainerText,{marginLeft : 60}]}
                   onPress={() => {
                                   Linking.openURL('http://api.whatsapp.com/send?phone='+ this.state.contact);}}>Send Whatsapp message to organizer</Text>
           </View>

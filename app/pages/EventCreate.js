@@ -11,7 +11,8 @@ import DatePicker from 'react-native-datepicker';
 import Colors from '../styles/colors.js';
 import ImageSlider from 'react-native-image-slider';
 import ImagePicker from 'react-native-image-crop-picker';
-import Loader from '../components/loader.js'
+import Loader from '../components/loader.js';
+import Tags from "react-native-tags";
 
 const options = {
   title : 'Add Picture',
@@ -68,6 +69,7 @@ export default class EventCreate extends Component{
       checked : [],
       color : Colors.placeholderText,
       height : 0,
+      tags : [],
     };
     this.focusNextField = this.focusNextField.bind(this);
     this.inputs = {};
@@ -239,6 +241,17 @@ export default class EventCreate extends Component{
         });
     };
 
+  removeDuplicateTags = (Tagsarray) => {
+    let uniqueTags = Tagsarray.filter((v,i) => Tagsarray.indexOf(v) === i);
+    //let unique = [...new Set(Tagsarray)];
+    /*for(i=0; i < array.length; i++){
+        if(uniqueArray.indexOf(array[i]) === -1) {
+            uniqueArray.push(array[i]);
+        }
+    }*/
+    return uniqueTags;
+  }
+
   mapCheckBox = () => {
     let cats = [];
     this.state.category.forEach((cat) => {
@@ -246,7 +259,7 @@ export default class EventCreate extends Component{
         cats.push(this.state.category[this.state.category.indexOf(cat)]);
       }
     })
-    return cats;
+        return cats;
   }
 
   handleEvent = () => {
@@ -265,6 +278,9 @@ export default class EventCreate extends Component{
       let address = this.state.address;
       let membersLimit = this.state.memberLimit;
       let tcats = this.mapCheckBox();
+
+      let tags = this.removeDuplicateTags(this.state.tags);
+      console.log("Tags : " + tags);
 
       console.log("In Handle Event : " + imgsrc);
       let uid  = email.slice(0,user.email.indexOf('@'));
@@ -309,7 +325,8 @@ export default class EventCreate extends Component{
       this.state.organizer != '' &&
       this.state.mobileNumber != '' &&
       this.state.fromtime != '' &&
-      this.state.selectedCategory != 'category'){
+      this.state.selectedCategory != 'category' &&
+      this.state.filePath != []){
         this.setState({
           loading : true,
         })
@@ -379,12 +396,15 @@ export default class EventCreate extends Component{
 
   focusNextField(id) {
     this.inputs[id].focus();
+    let tags = this.removeDuplicateTags(this.state.tags);
+    console.log(tags);
   }
 
   render(){
+    let count = 0;
 
     return(
-      <ScrollView contentContainerStyle = {[styles.container,{height : 1050 + this.state.height}]}
+      <ScrollView contentContainerStyle = {[styles.container,{height : 1150 + this.state.height}]}
                   >
           <View style = {{ height : 200,width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
             <ImageSlider
@@ -673,8 +693,33 @@ export default class EventCreate extends Component{
                 this.inputs['five'] = input;
               }}/>
           </View>
-
-
+          <Text style = {{alignSelf : 'flex-start',paddingTop : '0%',paddingBottom : '0%',marginBottom : '0%',marginTop : '1%',marginRight : '8%',marginLeft : '12%',fontSize : 16}}> #Tags :  </Text>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',flexWrap: 'wrap',alignSelf : 'flex-start',marginTop : '1%',marginRight : '4.5%',marginLeft : '2%'}}>
+            <Tags
+              initialText = ""
+              textInputProps = {{
+                placeholder : "Enter Space or Comma Seperated Tags"
+              }}
+              onChangeTags = {tags => {
+                //console.log("Tags: " + this.state.tags);
+                this.state.tags.push(tags)
+              }}
+              maxNumberOfTags = {5}
+              onTagPress = {(index, tagLabel, event, deleted) =>
+                console.log(index, tagLabel, event, deleted ? "deleted" : "not deleted")
+              }
+              containerStyle = {[Colors.placeholderText,{width : '80%',marginLeft : '12%',paddingBottom : '5%'}]}
+              inputStyle = {{ backgroundColor : Colors.primaryBackGourndColor, borderBottomWidth : 1,marginLeft : '0%' }}
+              renderTag = {({ tag, index, onPress, deleteTagOnPress, readonly }) => {
+                return (
+                  <TouchableOpacity key = {`${tag}-${index}`} onPress = {onPress} style = {{backgroundColor : 'rgba(0,0,0,0.1)',borderRadius : 5}}>
+                    <Text style = {{textAlign : 'center',marginLeft : '6%'}}>{tag}  </Text>
+                  </TouchableOpacity>
+                  )
+              }
+              }
+            />
+          </View>
           <Text style = {{alignSelf : 'flex-start',paddingTop : '1%',paddingBottom : '1%',marginBottom : '2%',marginTop : '4%',marginRight : '8%',marginLeft : '12%',fontSize : 16}}> Category : </Text>
           <View style = {{flexDirection : 'row',justifyContent: 'flex-start',alignSelf : 'flex-start',flexWrap: 'wrap',marginTop : '1%',marginRight : '0%',marginLeft : '8%',marginBottom : '2%'}}>
           {

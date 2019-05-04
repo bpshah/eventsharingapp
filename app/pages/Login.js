@@ -47,6 +47,7 @@ export default class Login extends Component {
 
   handleLogin = () => {
     const { email, password } = this.state;
+
     if(email != '' && password != ''){
       if(this.state.isConnected){
         this.setState({
@@ -60,6 +61,7 @@ export default class Login extends Component {
         })
         ToastAndroid.showWithGravity( 'Please connect to internet.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
       }
+
       firebase
         .auth()
         .signInWithEmailAndPassword(this.state.email, this.state.password)
