@@ -57,7 +57,7 @@ export default class Events extends Component {
 
   componentDidMount(){
     NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
-    this.handleRefresh();
+    //this.handleRefresh();
 
     this.unsubscribeFromNotificationListener = firebase.notifications().onNotification(notification => {
 	     console.log('Notification received!', notification);
@@ -107,11 +107,6 @@ export default class Events extends Component {
     });
     const data = this.state.tmpdata
 
-    /*const newData = this.state.searchArrayHolder.filter(item => {
-      return Object.keys(item).some(key =>
-        item[key].includes(text)
-      );
-    });*/
     const newData = this.state.searchArrayHolder.filter(item => {
       return Object.keys(item).some(key =>
         item[key].includes(text)
@@ -168,7 +163,6 @@ export default class Events extends Component {
       refreshing : true,
       loading : true,
     })
-    //console.log("data src null :" + this.state.datasrc);
     let data1 = [];
     firebase
       .database()
@@ -178,7 +172,7 @@ export default class Events extends Component {
             let item = csnapshot.val();
             //item.key = csnapshot.key;
             data1.push(item)
-            //console.log(item);
+            console.log(snapshot);
         })
         this.setState({
           datasrc : data1,
@@ -188,6 +182,7 @@ export default class Events extends Component {
         })
         //console.log(this.state.datasrc);
       })
+
       if(this.state.datasrc != []){
         this.setState({
           loading : false,
@@ -248,10 +243,7 @@ export default class Events extends Component {
     }
     let unixtimet = new Date(Date.UTC(parseInt(temp[2]),parseInt(temp[0]),parseInt(temp[1])));
     let eventtime = unixtimet.getTime()/1000;
-    //console.log(typeof(eventtime));
-    //console.log("Event Time " + eventtime);
     if(eventtime < time/1000){
-      //console.log('in if');
       return(
         <View>
           <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black',textAlign : 'left', color : 'rgba(0,0,0,0.5)'}}>Event Expired</Text>
@@ -273,6 +265,7 @@ export default class Events extends Component {
           <Text style = {{flex : 1,alignSelf : 'center',padding : 20}}>No internet connection</Text>
         );
       }
+
       return(
 
         <FlatList
@@ -301,7 +294,7 @@ export default class Events extends Component {
                     <View style = {{marginLeft : 0}}>
                       <Text style = {{alignSelf : 'flex-start', fontSize : 18, color : Colors.primaryAppColor,marginBottom : '2%'}}>{item.eventname}</Text>
                       <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black',marginBottom : '0%'}}>City : {item.place}</Text>
-                      <Text style = {{alignSelf : 'center', fontSize : 15, color : 'black',textAlign : 'justify'}}>{item.fromtime} onwards</Text>
+                      <Text style = {{alignSelf : 'center', fontSize : 15, color : 'black',textAlign : 'left'}}>{item.fromtime} onwards</Text>
                     </View>
                     {this.showcurrentDate(item.fromtime)}
                   </View>

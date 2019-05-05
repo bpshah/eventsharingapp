@@ -202,8 +202,6 @@ export default class SuggestedEvents extends Component {
   render(){
 
       const {navigate} = this.props.navigation;
-      //console.log(this.state.datasrc);
-      //this.getEventData();
 
       if(!this.state.isConnected){
         return(

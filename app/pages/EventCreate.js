@@ -241,15 +241,24 @@ export default class EventCreate extends Component{
         });
     };
 
-  removeDuplicateTags = (Tagsarray) => {
-    let uniqueTags = Tagsarray.filter((v,i) => Tagsarray.indexOf(v) === i);
-    //let unique = [...new Set(Tagsarray)];
-    /*for(i=0; i < array.length; i++){
-        if(uniqueArray.indexOf(array[i]) === -1) {
-            uniqueArray.push(array[i]);
-        }
-    }*/
-    return uniqueTags;
+  removeDuplicateTags = (array) => {
+    //console.log(array);
+    let tempArray = [];
+    let i;
+    let j;
+    let arrayToString = '';
+    for(i = 0;i<array.length;i++){
+      console.log(array[i].length);
+      for(j = 0;j<array[i].length;j++){
+        console.log(array[i].length);
+        tempArray.push(array[i][j]);
+      }
+    }
+    let x = tempArray.filter((v,i) => tempArray.indexOf(v) === i)
+    for(i = 0;i<x.length;i++){
+      arrayToString += '' + x[i] +',';
+    }
+    return arrayToString;
   }
 
   mapCheckBox = () => {
@@ -288,21 +297,21 @@ export default class EventCreate extends Component{
       firebase
         .database()
         .ref('Events/'+ this.state.eventname)
-        .set({ eventname, place, org, mobileno, description, fromtime, totime, uid, imgsrc, address, membersLimit})
+        .set({ tags,eventname, place, org, mobileno, description, fromtime, totime, uid, imgsrc, address, membersLimit})
         .then(() => {
           firebase
             .database()
             .ref('Cats/' + eventname)
             .set({tcats})
-            .then(() => {
-              const resetAction = StackActions.reset({
-                          index: 0,
-                          actions: [
-                            NavigationActions.navigate({routeName: "TabNav"})
-                          ]
-                        });
-                        this.props.navigation.dispatch(resetAction);
-            })
+        })
+        .then(() => {
+          const resetAction = StackActions.reset({
+                      index: 0,
+                      actions: [
+                        NavigationActions.navigate({routeName: "TabNav"})
+                      ]
+                    });
+                    this.props.navigation.dispatch(resetAction);
         })
         .catch(error => this.setState({ errorMessage: error.message }))
       //console.log("Event Upload");
@@ -396,8 +405,6 @@ export default class EventCreate extends Component{
 
   focusNextField(id) {
     this.inputs[id].focus();
-    let tags = this.removeDuplicateTags(this.state.tags);
-    console.log(tags);
   }
 
   render(){

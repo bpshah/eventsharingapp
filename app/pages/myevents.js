@@ -22,7 +22,7 @@ export default class MyEvents extends Component {
   }
 
   componentWillMount(){
-    this.handleRefresh();
+    //this.handleRefresh();
   }
 
   componentDidMount(){

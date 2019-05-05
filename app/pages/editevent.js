@@ -75,30 +75,7 @@ export default class EditEvent extends Component {
             this.state.place.push(item);
 
         });
-        //console.log("Data 1 : " + this.state.place);
       })
-    /*firebase
-      .database()
-      .ref('Catgory/')
-      .once('value').then((snapshot) => {
-        snapshot.forEach((csnapshot) => {
-            let item = csnapshot.val();
-            this.state.category.push(item);
-        });
-        //console.log("Data 2 : " + this.state.category);
-      })
-      .then(() => {
-        let check = [];
-        this.state.category.forEach((item) => {
-          check.push(false);
-        })
-        this.setState({
-          checked : check,
-        })
-        this.setCheckBoxState();
-        //console.log("Check : " + check);
-        //console.log("Checked : " + this.state.checked);
-      })*/
     this.fetchMembers();
     this.setImageSource();
   }
@@ -243,9 +220,10 @@ export default class EditEvent extends Component {
     let fromtime = this.state.fromtime;
     let totime = this.state.totime;
     let description = this.state.desc;
+    let membersLimit = this.state.limit;
 
     console.log("Before Update");
-    firebase.database().ref('Events/' + this.state.eventname).update({place,mobileno,imgsrc,fromtime,totime,description});
+    firebase.database().ref('Events/' + this.state.eventname).update({membersLimit,place,mobileno,imgsrc,fromtime,totime,description});
     console.log("Updated");
   }
 
@@ -296,7 +274,7 @@ export default class EditEvent extends Component {
   render(){
     {this.setImageSource}
     return(
-      <ScrollView contentContainerStyle = {[styles.container,{height : 750 + this.state.height}]}
+      <ScrollView contentContainerStyle = {[styles.container,{height : 775 + this.state.height}]}
                   >
           <View style = {{height : 200, width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
             <ImageSlider

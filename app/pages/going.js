@@ -30,7 +30,7 @@ export default class Going extends Component {
   }
 
   componentDidMount(){
-    //this.handleRefresh();
+    this.handleRefresh();
   }
 
   emptyComp = () => {
@@ -105,41 +105,102 @@ export default class Going extends Component {
     const temail = user.email.slice(0,user.email.indexOf('@'));
     let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
     let data1 = [];
+    this.setState({
+        datasrc : data1,
+    })
     firebase
       .database()
       .ref('Users/' + temail1 + '/' + 'going')
       .once('value')
       .then(async (snapshot) => {
-        //console.log("Snapshot : "  + snapshot);
-        //if(snapshot !== null){
+        this.setState({
+          loading : false,
+        })
           let keys = snapshot._childKeys;
-          //console.log(snapshot._childKeys);
-          //console.log(snapshot);
-          await keys.forEach((item) => {
-            //console.log(snapshot._value[item].ename);
-            firebase
-              .database()
-              .ref('Events/')
-              .child(snapshot._value[item].ename)
-              .once('value')
-              .then((snapshot) => {
-                //console.log(snapshot);
-                data1.push(snapshot._value);
-                //console.log(data1);
-              })
-              .then(() => {
-                this.setState({
-                  datasrc : data1,
-                  refreshing : false,
-                  loading : false,
-                  searchArrayHolder : data1,
-                  tmpdata : data1
+          console.log(keys);
+            await keys.forEach((item) => {
+              firebase
+                .database()
+                .ref('Events/')
+                .child(snapshot._value[item].ename)
+                .once('value')
+                .then((snapshot) => {
+                  data1.push(snapshot._value);
                 })
-                //console.log("datasrc : " + this.state.datasrc);
-              })
-          })
-        //}
+                .then(() => {
+                  this.setState({
+                    datasrc : data1,
+                    refreshing : false,
+                    loading : false,
+                    searchArrayHolder : data1,
+                    tmpdata : data1
+                  })
+                })
+            })
       })
+    }
+
+  showcurrentDate = (d) => {
+      //console.log("In current date");
+      let time = new Date().getTime();
+      //console.log("Time " + time);
+      let temp = d.split(" ",3);
+      temp[1] = temp[1].replace(",","")
+      if(temp[1].length == 1){
+        temp[1] = '0' + temp[1];
+      }
+      //console.log(temp);
+      switch(temp[0]){
+        case 'January' :
+          temp[0] = '00';
+          break;
+        case 'February' :
+          temp[0] = '01';
+          break;
+        case 'March' :
+          temp[0] = '02';
+          break;
+        case 'April' :
+          temp[0] = '03';
+          break;
+        case 'May' :
+          temp[0] = '04';
+          break;
+        case 'June' :
+          temp[0] = '05';
+          break;
+        case 'July' :
+          temp[0] = '06';
+          break;
+        case 'August' :
+          temp[0] = '07';
+          break;
+        case 'September' :
+          temp[0] = '08';
+          break;
+        case 'October' :
+          temp[0] = '09';
+          break;
+        case 'November' :
+          temp[0] = '10';
+          break;
+        case 'December' :
+          temp[0] = '11';
+          break;
+      }
+      let unixtimet = new Date(Date.UTC(parseInt(temp[2]),parseInt(temp[0]),parseInt(temp[1])));
+      let eventtime = unixtimet.getTime()/1000;
+      if(eventtime < time/1000){
+        return(
+          <View>
+            <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black',textAlign : 'left', color : 'rgba(0,0,0,0.5)'}}>Event Expired</Text>
+          </View>
+        )
+      }
+      else {
+        //console.log("None");
+      }
+      //console.log(fulldate);
     }
 
   static navigationOptions = ({navigation}) => ({
@@ -186,11 +247,16 @@ export default class Going extends Component {
                                                                       category : item.category,
                                                                       })} >
               <Card containerStyle = {styles.Container}
-                    dividerStyle = {{backgroundColor : Colors.cardTextColor}}
-                    title = {item.eventname}
-                    titleStyle = {styles.title}
                     titleNumberOfLines = {2}>
-                <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : Colors.cardTextColor}}>By : {item.org} At : {item.place} {"\n"}</Text>
+                <View style = {{flex : 1,flexDirection : 'column',justifyContent : 'space-around'}}>
+                  <View style = {{marginLeft : 0}}>
+                    <Text style = {{alignSelf : 'flex-start', fontSize : 18, color : Colors.primaryAppColor,marginBottom : '2%'}}>{item.eventname}</Text>
+                    <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black',marginBottom : '0%'}}>City : {item.place}</Text>
+                    <Text style = {{alignSelf : 'center', fontSize : 15, color : 'black',textAlign : 'left'}}>{item.fromtime} onwards</Text>
+                  </View>
+                  {this.showcurrentDate(item.fromtime)}
+                </View>
+
               </Card>
             </TouchableWithoutFeedback>
           </View>
