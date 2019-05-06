@@ -184,7 +184,8 @@ export default class MyEvents extends Component {
                                                                       imgsrc : item.imgsrc,
                                                                       contact : item.mobileno,
                                                                       category : item.tcats,
-                                                                      limit : item.membersLimit})} >
+                                                                      limit : item.membersLimit,
+                                                                      tags : item.tags})} >
               <Card containerStyle = {styles.Container}
                     titleNumberOfLines = {2}>
                     <View style = {{flex : 1,flexDirection : 'column',justifyContent : 'space-around'}}>

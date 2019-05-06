@@ -254,7 +254,7 @@ export default class Going extends Component {
                   <View style = {{marginLeft : 0}}>
                     <Text style = {{alignSelf : 'flex-start', fontSize : 18, color : Colors.primaryAppColor,marginBottom : '2%'}}>{item.eventname}</Text>
                     <Text style = {{alignSelf : 'flex-start', fontSize : 15, color : 'black',marginBottom : '0%'}}>City : {item.place}</Text>
-                    <Text style = {{alignSelf : 'center', fontSize : 15, color : 'black',textAlign : 'left'}}>{item.fromtime} onwards</Text>
+                    <Text style = {{alignSelf : 'center', fontSize : 15, color : 'black',marginLeft : '-30%'}}>{item.fromtime} onwards</Text>
                   </View>
                   {this.showcurrentDate(item.fromtime)}
                 </View>

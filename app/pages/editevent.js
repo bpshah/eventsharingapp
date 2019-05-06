@@ -24,6 +24,8 @@ import DatePicker from 'react-native-datepicker';
 import Colors from '../styles/colors.js';
 import ImageSlider from 'react-native-image-slider';
 import ImagePicker from 'react-native-image-crop-picker';
+import Tags from "react-native-tags";
+
 
 export default class EditEvent extends Component {
 
@@ -40,11 +42,14 @@ constructor(props){
       contact : this.props.navigation.state.params.contact,
       selectedCategory : this.props.navigation.state.params.category,
       limit : this.props.navigation.state.params.limit,
+      tags : this.props.navigation.state.params.tags,
+      tempts : [],
       place : [],
       eventname : this.props.navigation.state.params.title,
       category : [],
       filePath : [],
       tempFilePath : null,
+      count : 0,
       cats : null,
       token : null,
       checked : [],
@@ -91,6 +96,8 @@ componentWillMount(){
       })
     this.fetchMembers();
     this.setImageSource();
+    this.createTagArray();
+    console.log("Place "+ this.state.selectedPlace);
   }
 
 // function fot manipulating checkbox state i.e checked or not
@@ -104,17 +111,17 @@ setCheckBoxState = () => {
 setImageSource = () => {
   let img = [];
   img.push(this.state.imgsrc);
-  console.log("Temp0 : " + img);
+  //console.log("Temp0 : " + img);
   this.setState({
     tempFilePath : img,
   })
-  console.log("Temp1 : " + this.state.tempFilePath);
+  //console.log("Temp1 : " + this.state.tempFilePath);
   if(this.state.filePath.length != 0){
     img.push(this.state.filePath);
     this.setState({
       tempFilePath : img,
     })
-    console.log("Temp File Path : " + this.state.tempFilePath);
+    //console.log("Temp File Path : " + this.state.tempFilePath);
     return this.state.tempFilePath
   }
   else{
@@ -217,11 +224,16 @@ handleEventUpdate = () => {
     let totime = this.state.totime;
     let description = this.state.desc;
     let membersLimit = this.state.limit;
+    console.log(this.state.tags);
 
-    console.log("Before Update");
+    let x = this.removeDuplicateTags(this.state.tags)
+    console.log("x : " + x);
+    let tags = this.createTagString(x);
+
+    //console.log("Before Update");
     // updating new event details
-    firebase.database().ref('Events/' + this.state.eventname).update({membersLimit,place,mobileno,imgsrc,fromtime,totime,description});
-    console.log("Updated");
+    firebase.database().ref('Events/' + this.state.eventname).update({tags,membersLimit,place,mobileno,imgsrc,fromtime,totime,description});
+    //console.log("Updated");
   }
 
 // update event routine with different subroutines
@@ -269,15 +281,54 @@ updateEvent = () => {
   console.log("After Update");
 }
 
+createTagArray = () => {
+  let tags = this.state.tags;
+  let tempTags = tags.split(",",3);
+  console.log("Tags" + tempTags);
+  this.setState({
+    tags : tempTags,
+  })
+  let count = tempTags.length;
+  this.setState({
+    count : count,
+  })
+}
+
+createTagString = (x) => {
+  let arrayToString = '';
+  let i;
+  for(i = 0;i<x.length;i++){
+    arrayToString += '' + x[i] +',';
+  }
+  return arrayToString;
+}
+
+removeDuplicateTags = (array) => {
+  //console.log(array);
+  let tempArray = [];
+  let i;
+  let j;
+  for(i = 0;i<array.length;i++){
+    //console.log(array[i].length);
+    //for(j = 0;j<array[i].length;j++){
+      //console.log(array[i].length);
+      tempArray.push(array[i]);
+    //}
+  }
+  let x = tempArray.filter((v,i) => tempArray.indexOf(v) === i)
+  return x;
+}
+
 focusNextField(id) {
   this.inputs[id].focus();
 }
 
 
   render(){
+
     {this.setImageSource}
     return(
-      <ScrollView contentContainerStyle = {[styles.container,{height : 775 + this.state.height}]}
+      <ScrollView contentContainerStyle = {[styles.container,{height : 950 + this.state.height}]}
                   >
           <View style = {{height : 200, width : '100%',marginTop : '5%',marginLeft : '2%',marginRight : '2%',marginBottom : '1%'}}>
             <ImageSlider
@@ -511,7 +562,36 @@ focusNextField(id) {
                   this.inputs['six'] = input;
                 }}/>
           </View>
-
+          <Text style = {{alignSelf : 'flex-start',paddingTop : '0%',paddingBottom : '0%',marginBottom : '0%',marginTop : '1%',marginRight : '8%',marginLeft : '12%',fontSize : 16}}> #Tags :  </Text>
+          <View style = {{flexDirection : 'row',justifyContent: 'space-around',flexWrap: 'wrap',alignSelf : 'flex-start',marginTop : '1%',marginRight : '4.5%',marginLeft : '2%'}}>
+            <Tags
+              initialText = ""
+              textInputProps = {{
+                placeholder : "Enter Space or Comma Seperated Tags"
+              }}
+              initialTags = {this.state.tags}
+              onChangeTags = {tags => {
+                //console.log("Tags: " + this.state.tags);
+                this.state.tags.push(tags[this.state.count]);
+                this.removeDuplicateTags(this.state.tags);
+                this.state.count++;
+              }}
+              maxNumberOfTags = {5}
+              onTagPress = {(index, tagLabel, event, deleted) =>
+                console.log(index, tagLabel, event, deleted ? "deleted" : "not deleted")
+              }
+              containerStyle = {[Colors.placeholderText,{width : '80%',marginLeft : '12%',paddingBottom : '5%'}]}
+              inputStyle = {{ backgroundColor : Colors.primaryBackGourndColor, borderBottomWidth : 1,marginLeft : '0%' }}
+              renderTag = {({ tag, index, onPress, deleteTagOnPress, readonly }) => {
+                return (
+                  <TouchableOpacity key = {`${tag}-${index}`} onPress = {onPress} style = {{backgroundColor : 'rgba(0,0,0,0.1)',borderRadius : 5}}>
+                    <Text style = {{textAlign : 'center',marginLeft : '6%'}}>{tag}  </Text>
+                  </TouchableOpacity>
+                  )
+              }
+              }
+            />
+          </View>
           <View style = {{flexDirection : 'row',justifyContent: 'space-around',alignSelf : 'flex-start',marginTop : '1%',marginRight : '4.5%',marginLeft : '2%'}}>
             <Icon name="scroll"
               size={22}
@@ -537,7 +617,7 @@ focusNextField(id) {
               onContentSizeChange={(event) => {
                 this.setState({ height : event.nativeEvent.contentSize.height })
               }}
-              value = {this.state.desc}
+              value = {this.state.description}
               ref = { input => {
                 this.inputs['seven'] = input;
               }}/>

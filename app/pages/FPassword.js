@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     marginTop : '1%',
     paddingHorizontal : 15,
     borderBottomWidth : 0.75,
-    color : Colors.inputColor,
+    color : 'white',
   },
   buttonContainer : {
     backgroundColor : Colors.primaryAppColor,
