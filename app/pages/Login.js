@@ -1,11 +1,29 @@
 import React, { Component } from 'react';
-import { Button, NetInfo,TextInput, View, StyleSheet, TouchableOpacity,TouchableHighlight, Text, StatusBar, Image, ScrollView, Dimensions,AsyncStorage,ToastAndroid} from 'react-native';
+import {  Button,
+          NetInfo,
+          TextInput,
+          View,
+          StyleSheet,
+          TouchableOpacity,
+          TouchableHighlight,
+          Text,
+          StatusBar,
+          Image,
+          ScrollView,
+          Dimensions,
+          AsyncStorage,
+          ToastAndroid} from 'react-native';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
 import Loader from '../components/loader.js'
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
-import { GoogleSignin, GoogleSigninButton, statusCodes } from 'react-native-google-signin';
-import { AccessToken, LoginManager, LoginButton, FBSDK } from 'react-native-fbsdk';
+import {  GoogleSignin,
+          GoogleSigninButton,
+          statusCodes } from 'react-native-google-signin';
+import {  AccessToken,
+          LoginManager,
+          LoginButton,
+          FBSDK } from 'react-native-fbsdk';
 
 export default class Login extends Component {
 
@@ -30,6 +48,7 @@ export default class Login extends Component {
     NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
   }
 
+  // subroutine to check internet connctivity
   handleConnectivityChange = (isConnected) => {
     if (isConnected) {
       this.setState({ isConnected : true});
@@ -45,6 +64,7 @@ export default class Login extends Component {
         this.forceUpdate();
       }
 
+  // function to login the user
   handleLogin = () => {
     const { email, password } = this.state;
 
@@ -101,14 +121,13 @@ export default class Login extends Component {
     console.log("Logged In");
   }
 
+  // function to login user by google
   googleLogin = () => {
     console.log("in googleLogin");
     let d;
     GoogleSignin
       .signIn()
       .then((data) => {
-        // Create a new Firebase credential with the token
-        //console.log("Data : ");
         this.setState({
           loading : true,
         })
@@ -119,7 +138,6 @@ export default class Login extends Component {
         return firebase.auth().signInWithCredential(credential)
       })
       .then((user) => {
-        //const user = ;
         console.log(user);
         console.log("Data ");
         console.log(d);
@@ -128,6 +146,7 @@ export default class Login extends Component {
           loading : false,
         })
         console.log("Family name "+ d.user.familyName);
+        // manipulating user details from google for storage purposes
         let temp = d.user.givenName.toLowerCase();
         let temp1 = temp.replace(temp.charAt(0),temp.charAt(0).toUpperCase())
         let temp2 = d.user.familyName.toLowerCase();
@@ -157,12 +176,13 @@ export default class Login extends Component {
     console.log("logged in ");
 }
 
+  // function to login user by facebook
   facebookLogin = async () => {
     try {
       const result = await LoginManager.logInWithReadPermissions(['public_profile', 'email']);
 
       if (result.isCancelled) {
-        throw new Error('User cancelled request'); // Handle this however fits the flow of your app
+        throw new Error('User cancelled request');
       }
 
       console.log(`Login success with permissions: ${result.grantedPermissions.toString()}`);
@@ -186,6 +206,7 @@ export default class Login extends Component {
     }
 }
 
+  // function to update the device token for new signin
   updateToken = async () => {
     let user = firebase.auth().currentUser;
     const email = user.email;

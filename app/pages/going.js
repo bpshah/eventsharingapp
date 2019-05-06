@@ -33,6 +33,7 @@ export default class Going extends Component {
     this.handleRefresh();
   }
 
+  // empty component for flatlist
   emptyComp = () => {
     return(
       <View style = {{flex : 1,justifyContent : 'center',alignItems : 'center'}}>
@@ -41,6 +42,7 @@ export default class Going extends Component {
     )
   }
 
+  // search function to search for events
   searchFilter = (text) => {
 
     this.setState({
@@ -72,6 +74,7 @@ export default class Going extends Component {
     })
   }
 
+  // component for serachbar header
   searchBarHeader = () => {
     return (
       <SearchBar
@@ -95,6 +98,7 @@ export default class Going extends Component {
     );
   }
 
+  // function to fetch event to which user is going to
   handleRefresh = () => {
 
     this.setState({
@@ -140,16 +144,14 @@ export default class Going extends Component {
       })
     }
 
+  // function to check expiration of event based on its starting data
   showcurrentDate = (d) => {
-      //console.log("In current date");
       let time = new Date().getTime();
-      //console.log("Time " + time);
       let temp = d.split(" ",3);
       temp[1] = temp[1].replace(",","")
       if(temp[1].length == 1){
         temp[1] = '0' + temp[1];
       }
-      //console.log(temp);
       switch(temp[0]){
         case 'January' :
           temp[0] = '00';

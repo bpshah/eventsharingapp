@@ -1,10 +1,23 @@
 import React, {Component}  from 'react';
-import {PixelRatio,View, ScrollView ,Text, Image, StyleSheet, TextInput, Dimensions,KeyboardAvoidingView, TouchableOpacity, Picker,TouchableHighlight,ToastAndroid} from 'react-native';
-import {StackActions, NavigationActions} from 'react-navigation';
+import {  PixelRatio,
+          View,
+          ScrollView ,
+          Text,
+          Image,
+          StyleSheet,
+          TextInput,
+          Dimensions,KeyboardAvoidingView,
+          TouchableOpacity,
+          Picker,
+          TouchableHighlight,
+          ToastAndroid} from 'react-native';
+import {  StackActions,
+          NavigationActions} from 'react-navigation';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import Activity from '../components/activityIndicator.js'
-import { Avatar, CheckBox } from 'react-native-elements';
+import {  Avatar,
+          CheckBox } from 'react-native-elements';
 import firebase from 'react-native-firebase';
 import RNFetchBlob from 'react-native-fetch-blob';
 import DatePicker from 'react-native-datepicker';
@@ -14,7 +27,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 
 export default class EditEvent extends Component {
 
-  constructor(props){
+constructor(props){
     super(props);
     this.state = {
       imgsrc : this.props.navigation.state.params.imgsrc,
@@ -44,7 +57,7 @@ export default class EditEvent extends Component {
 
   }
 
-  static navigationOptions = ({navigation}) => ({
+static navigationOptions = ({navigation}) => ({
     headerTitleStyle : {
        textAlign : 'justify',
        flex : 1,
@@ -65,7 +78,7 @@ export default class EditEvent extends Component {
     )
   })
 
-  componentWillMount(){
+componentWillMount(){
     firebase
       .database()
       .ref('Locations/')
@@ -80,140 +93,123 @@ export default class EditEvent extends Component {
     this.setImageSource();
   }
 
-  /*componentDidMount(){
-    this.setImageSource();
-  }*/
+// function fot manipulating checkbox state i.e checked or not
+setCheckBoxState = () => {
+  this.state.selectedCategory.forEach((item) => {
+    this.state.checked[this.state.category.indexOf(item)] = true;
+  })
+}
 
-  setCheckBoxState = () => {
-    this.state.selectedCategory.forEach((item) => {
-      this.state.checked[this.state.category.indexOf(item)] = true;
-    })
-  }
-
-  setImageSource = () => {
-    let img = [];
-    img.push(this.state.imgsrc);
-    console.log("Temp0 : " + img);
+// function for setting filepaths of images to be uploaded
+setImageSource = () => {
+  let img = [];
+  img.push(this.state.imgsrc);
+  console.log("Temp0 : " + img);
+  this.setState({
+    tempFilePath : img,
+  })
+  console.log("Temp1 : " + this.state.tempFilePath);
+  if(this.state.filePath.length != 0){
+    img.push(this.state.filePath);
     this.setState({
       tempFilePath : img,
     })
-    console.log("Temp1 : " + this.state.tempFilePath);
-    if(this.state.filePath.length != 0){
-      img.push(this.state.filePath);
-      this.setState({
-        tempFilePath : img,
-      })
-      console.log("Temp File Path : " + this.state.tempFilePath);
-      return this.state.tempFilePath
-    }
-    else{
-      return this.state.tempFilePath
-    }
+    console.log("Temp File Path : " + this.state.tempFilePath);
+    return this.state.tempFilePath
   }
+  else{
+    return this.state.tempFilePath
+  }
+}
 
-  chooseFile = () => {
-        let imgs = [];
-        //imgs.push(this.state.imgsrc)
-        var options = {
-          title: 'Select Image',
-          customButtons: [
-            { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
-          ],
-          storageOptions: {
-            skipBackup: true,
-            path: 'images',
-          },
-        };
-        ImagePicker.openPicker({
-          multiple: true
-        }).then(images => {
-          console.log(images);
-          images.forEach((img) => {
-            imgs.push(img.path);
-          })
-          this.setState({
-            filePath : imgs,
-          })
-          console.log(this.state.filePath);
+// function for opening storage and choosing file to be uploaded
+chooseFile = () => {
+      let imgs = [];
+      //imgs.push(this.state.imgsrc)
+      var options = {
+        title: 'Select Image',
+        customButtons: [
+          { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
+        ],
+        storageOptions: {
+          skipBackup: true,
+          path: 'images',
+        },
+      };
+      ImagePicker.openPicker({
+        multiple: true
+      }).then(images => {
+        console.log(images);
+        images.forEach((img) => {
+          imgs.push(img.path);
         })
-        .then(() => {
-          this.setImageSource();
-        });
-    };
-
-  focusNextField(id) {
-    this.inputs[id].focus();
-  }
-
-  fetchMembers = () => {
-    console.log(this.state.title);
-    let data1 = [];
-    firebase
-      .database()
-      .ref('Events/' + this.state.title + '/' + 'members')
-      .once('value')
-      .then(async (snapshot) => {
-        //console.log(snapshot);
-        let keys = snapshot._childKeys;
-        await keys.forEach((item) => {
-          //console.log(snapshot._value[item].ename);
-          firebase
-            .database()
-            .ref('Users/' + snapshot._value[item] + '/' + 'token')
-            .once('value')
-            .then((snapshot) => {
-              //console.log(snapshot._value);
-              data1.push(snapshot._value);
-              //console.log(data1);
-            })
-            .then(() => {
-              this.setState({
-                token : data1,
-              })
-              //console.log(this.state.token);
-            })
-          })
-        })
-
-  }
-
-  uploadImages = async (photos) => {
-    console.log("In photos : " + photos);
-    const uploadImagePromises = photos.map((p, index) => {
-      console.log("P :" + p);
-      index += this.state.imgsrc.length;
-      this.uploadImage( p, this.state.eventname + index )})
-    const urls = await Promise.all(uploadImagePromises)
-  }
-
-  mapCheckBox = () => {
-    let cats = [];
-    this.state.category.forEach((cat) => {
-      if(this.state.checked[this.state.category.indexOf(cat)] === true){
-        cats.push(this.state.category[this.state.category.indexOf(cat)]);
-      }
-    })
-    return cats;
-  }
-
-  /*readCategory = () => {
-    let tempcats = []
-    firebase
-      .database()
-      .ref('Events/' + this.state.title + '/' + 'tcats')
-      .once('value')
-      .then(async (snapshot) => {
-        console.log(snapshot._value);
         this.setState({
-          cats : snapshot._value,
+          filePath : imgs,
         })
-        console.log(this.state.cats);
-        console.log(this.state.selectedCategory);
+        console.log(this.state.filePath);
       })
-  }*/
+      .then(() => {
+        this.setImageSource();
+      });
+  };
 
-  handleEventUpdate = () => {
-    //let eventname = this.state.title;
+// fetching device tokens for user who are coming to this event
+fetchMembers = () => {
+  console.log(this.state.title);
+  let data1 = [];
+  firebase
+    .database()
+    .ref('Events/' + this.state.title + '/' + 'members')
+    .once('value')
+    .then(async (snapshot) => {
+      //console.log(snapshot);
+      let keys = snapshot._childKeys;
+      await keys.forEach((item) => {
+        //console.log(snapshot._value[item].ename);
+        firebase
+          .database()
+          .ref('Users/' + snapshot._value[item] + '/' + 'token')
+          .once('value')
+          .then((snapshot) => {
+            //console.log(snapshot._value);
+            data1.push(snapshot._value);
+            //console.log(data1);
+          })
+          .then(() => {
+            this.setState({
+              token : data1,
+            })
+            //console.log(this.state.token);
+          })
+        })
+      })
+
+}
+
+// function to upload multiple images
+uploadImages = async (photos) => {
+  console.log("In photos : " + photos);
+  const uploadImagePromises = photos.map((p, index) => {
+    console.log("P :" + p);
+    index += this.state.imgsrc.length;
+    this.uploadImage( p, this.state.eventname + index )})
+  const urls = await Promise.all(uploadImagePromises)
+}
+
+// function to map checkbox values to array for uploading on database
+mapCheckBox = () => {
+  let cats = [];
+  this.state.category.forEach((cat) => {
+    if(this.state.checked[this.state.category.indexOf(cat)] === true){
+      cats.push(this.state.category[this.state.category.indexOf(cat)]);
+    }
+  })
+  return cats;
+}
+
+// function to update event details on the database
+handleEventUpdate = () => {
+
     let place = this.state.selectedPlace;
     let mobileno = this.state.contact;
     let imgsrc = this.state.imgsrc;
@@ -223,53 +219,60 @@ export default class EditEvent extends Component {
     let membersLimit = this.state.limit;
 
     console.log("Before Update");
+    // updating new event details
     firebase.database().ref('Events/' + this.state.eventname).update({membersLimit,place,mobileno,imgsrc,fromtime,totime,description});
     console.log("Updated");
   }
 
-  updateEvent = () => {
-    let user = firebase.auth().currentUser;
-    const temail = user.email.slice(0,user.email.indexOf('@'));
-    console.log("FilePath : " + this.state.filePath);
-      this.uploadImages(this.state.filePath,temail + '.png')
-          .then( () => { this.setState({
-                                loading : false,
-                                });
-                                this.handleEventUpdate() })
-          .then(() => {
-            fetch('https://fcm.googleapis.com/fcm/send',
-                    {
-                        method: 'POST',
-                        headers:
-                        {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'key=AAAAP6OjSUc:APA91bGDee_s4YQeGx2pK1-WqjsqG3coAXtAhFRG_lB9A9SGzQB9dGGMasO90_TtbdqNfVW_nkhe3eTAAu8jXy3HyNBofELij1xAx7aHnP7tUk6iDrsDHjkzZidCUiPHoUTCt8ku5sP0'
-                        },
-                        body: JSON.stringify(
-                        {
-                          "notification": {
-                            "title": this.state.eventname,
-                            "body": this.state.selectedPlace,
-                        },
-                        "data": {
+// update event routine with different subroutines
+updateEvent = () => {
+  let user = firebase.auth().currentUser;
+  const temail = user.email.slice(0,user.email.indexOf('@'));
+  console.log("FilePath : " + this.state.filePath);
+    this.uploadImages(this.state.filePath,temail + '.png')          // uploading new event images
+        .then( () => { this.setState({
+                              loading : false,
+                              });
+                              this.handleEventUpdate() })           // updating event details after uploading the images
+        .then(() => {                                               // sending notification to used who have joine the event about the event update
+          fetch('https://fcm.googleapis.com/fcm/send',
+                  {
+                      method: 'POST',
+                      headers:
+                      {
+                          'Content-Type': 'application/json',
+                          'Authorization': 'key=AAAAP6OjSUc:APA91bGDee_s4YQeGx2pK1-WqjsqG3coAXtAhFRG_lB9A9SGzQB9dGGMasO90_TtbdqNfVW_nkhe3eTAAu8jXy3HyNBofELij1xAx7aHnP7tUk6iDrsDHjkzZidCUiPHoUTCt8ku5sP0'
+                      },
+                      body: JSON.stringify(
+                      {
+                        "notification": {
                           "title": this.state.eventname,
-                          "body": this.state.place + this.state.organizer,
-                        },
-                          "registration_ids" : this.state.token,
-                        })
-                    }).then((response) => response.json()).then((responseJsonFromServer) =>
-                    {
-                      console.log(responseJsonFromServer);
-                    }).catch((error) =>
-                    {
-                      console.log(error);
-                    });
+                          "body": this.state.selectedPlace,
+                      },
+                      "data": {
+                        "title": this.state.eventname,
+                        "body": this.state.place + this.state.organizer,
+                      },
+                        "registration_ids" : this.state.token,
+                      })
+                  }).then((response) => response.json()).then((responseJsonFromServer) =>
+                  {
+                    console.log(responseJsonFromServer);
+                  }).catch((error) =>
+                  {
+                    console.log(error);
+                  });
 
-          })
-          .then(() => this.props.navigation.navigate('MyEvents'));                      ;
+        })
+        .then(() => this.props.navigation.navigate('MyEvents'));                      ;
 
-    console.log("After Update");
-  }
+  console.log("After Update");
+}
+
+focusNextField(id) {
+  this.inputs[id].focus();
+}
+
 
   render(){
     {this.setImageSource}

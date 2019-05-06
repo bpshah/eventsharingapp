@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
-import { Button, TextInput, View, StyleSheet, TouchableOpacity, Text, StatusBar,ToastAndroid} from 'react-native';
+import {  Button,
+          TextInput,
+          View,
+          StyleSheet,
+          TouchableOpacity,
+          Text,
+          StatusBar,
+          ToastAndroid} from 'react-native';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
 
@@ -12,6 +19,11 @@ export default class FPassword extends Component{
     }
   }
 
+  static navigationOptions = {
+    header : null,
+  }
+
+  // function to send reset password link to user email address
   handleResetPwd = () => {
 
     if(this.state.email != ''){
@@ -24,10 +36,6 @@ export default class FPassword extends Component{
     else {
       ToastAndroid.showWithGravity( 'Please enter email.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
     }
-  }
-
-  static navigationOptions = {
-    header : null,
   }
 
   render(){
@@ -57,7 +65,6 @@ export default class FPassword extends Component{
     );
   }
 }
-
 
 const styles = StyleSheet.create({
 

@@ -1,7 +1,22 @@
 import React, { Component } from 'react';
-import { Button, TextInput,NetInfo, View, StyleSheet, TouchableOpacity, Text, StatusBar, ScrollView, Picker, Platform, Alert,AsyncStorage,ToastAndroid} from 'react-native';
+import {  Button,
+          TextInput,
+          NetInfo,
+          View,
+          StyleSheet,
+          TouchableOpacity,
+          Text,
+          StatusBar,
+          ScrollView,
+          Picker,
+          Platform,
+          Alert,
+          AsyncStorage,
+          ToastAndroid} from 'react-native';
 import {BackHandler} from 'react-native';
-import { Avatar, CheckBox, ButtonGroup } from 'react-native-elements';
+import {  Avatar,
+          CheckBox,
+          ButtonGroup } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker';
 import firebase from 'react-native-firebase';
@@ -60,6 +75,7 @@ export default class Signup extends Component {
     NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
   }
 
+  // subroutine for checking internet connctivity
   handleConnectivityChange = (isConnected) => {
     if (isConnected) {
       console.log("in if connectionChange");
@@ -70,6 +86,7 @@ export default class Signup extends Component {
     }
   }
 
+  // signing up user and sending him verification email
   handleSignUp = async () => {
     //if(pwd.length >= 8 ){
     let email = this.state.email
@@ -114,6 +131,7 @@ export default class Signup extends Component {
     }
   }
 
+  // uploading user profile image
   uploadImage = (uri, imageName, mime = 'image/png') => {
     const Blob = RNFetchBlob.polyfill.Blob;
     const fs = RNFetchBlob.fs;
@@ -160,6 +178,7 @@ export default class Signup extends Component {
     })
   }
 
+  // function to upload user details to database after activating the account
   handleProfileData = () => {
 
       console.log("In profile data");
@@ -187,6 +206,7 @@ export default class Signup extends Component {
 
   }
 
+  // function to choose image file from storage
   chooseFile = () => {
       var options = {
         title: 'Select Image',
@@ -218,6 +238,7 @@ export default class Signup extends Component {
       });
   };
 
+  // routine to sign up the user
   handle = () => {
 
     console.log("In handle");

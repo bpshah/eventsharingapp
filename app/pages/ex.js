@@ -1,7 +1,18 @@
 import React, { Component } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView,TouchableHighlight,ToastAndroid, Linking} from 'react-native';
-import { Button, Avatar, Divider } from 'react-native-elements';
-import { StackActions,NavigationActions } from 'react-navigation';
+import {  View,
+          Text,
+          Image,
+          StyleSheet,
+          TouchableOpacity,
+          ScrollView,
+          TouchableHighlight,
+          ToastAndroid,
+          Linking} from 'react-native';
+import {  Button,
+          Avatar,
+          Divider } from 'react-native-elements';
+import {  StackActions,
+          NavigationActions } from 'react-navigation';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Colors from '../styles/colors.js';
@@ -77,6 +88,7 @@ export default class Ex extends Component {
     imgs = [];
   }
 
+  // fetching memebers of event
   fetchMembers = () => {
     firebase
       .database()
@@ -103,6 +115,7 @@ export default class Ex extends Component {
       })
   }
 
+  // fetching profile images of members
   fetchMemberInfo = () => {
     let promises = [];
       //console.log("In userImages members : " + this.state.members);
@@ -140,6 +153,7 @@ export default class Ex extends Component {
       })
   }
 
+  // function to handle joining of member to event
   joinEvent = () => {
     //console.log("In join Event");
 
@@ -175,6 +189,7 @@ export default class Ex extends Component {
     }
   }
 
+  // function to handle leaving of memeber from event
   leaveEvent = () => {
     this.setState({
       joined : false,
@@ -215,6 +230,7 @@ export default class Ex extends Component {
       ToastAndroid.showWithGravity( 'You have unsubscribed for the event.',ToastAndroid.SHORT,ToastAndroid.BOTTOM,0,50);
   }
 
+  // component to show total no. of people going to event
   displayText = () => {
     if(this.state.members != [])
       return <Text style = {{flex : 1 ,alignSelf : 'flex-start',marginLeft : '9%', fontWeight : 'bold', fontSize : 18}}>{ this.state.members.length} people are going</Text>
@@ -223,6 +239,7 @@ export default class Ex extends Component {
 
   }
 
+  // function to handle state of join/leave button
   changeButton = () => {
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
@@ -257,14 +274,12 @@ export default class Ex extends Component {
     })
   }
 
+  // function to open dialer
   callOrganizer = () => {
     const args = {
       number : this.state.contact,
     }
     call(args).catch(console.error)
-  }
-
-  imageSlide = () => {
   }
 
   render(){

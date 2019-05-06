@@ -1,6 +1,22 @@
 import React, { Component } from 'react';
-import { Button, TextInput, ScrollView, StyleSheet, TouchableOpacity, AsyncStorage,Text, FlatList, StatusBar, View, Dimensions, KeyboardAvoidingView, Picker, ActivityIndicator, ToastAndroid} from 'react-native';
-import { Avatar,CheckBox, ButtonGroup } from 'react-native-elements';
+import {  Button,
+          TextInput,
+          ScrollView,
+          StyleSheet,
+          TouchableOpacity,
+          AsyncStorage,
+          Text,
+          FlatList,
+          StatusBar,
+          View,
+          Dimensions,
+          KeyboardAvoidingView,
+          Picker,
+          ActivityIndicator,
+          ToastAndroid } from 'react-native';
+import {  Avatar,
+          CheckBox,
+          ButtonGroup } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import DatePicker from 'react-native-datepicker'
@@ -76,6 +92,7 @@ export default class ProfilePage extends Component{
     this.mapCurrentInterests();
   }*/
 
+  // function to fetch categories of event from database
   getCategories = async () => {
     await firebase
       .database()
@@ -101,6 +118,7 @@ export default class ProfilePage extends Component{
       })
   }
 
+  // function to fetch user data from database
   getUserProfileData = async () => {
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));
@@ -132,6 +150,7 @@ export default class ProfilePage extends Component{
       });
   }
 
+  // function upload profile image of user to storage
   uploadImage = (uri, imageName, mime = 'image/png') => {
     const Blob = RNFetchBlob.polyfill.Blob;
     const fs = RNFetchBlob.fs;
@@ -169,6 +188,7 @@ export default class ProfilePage extends Component{
     })
   }
 
+  // function to choose image file from storage
   chooseFile = () => {
         var options = {
           title: 'Select Image',
@@ -199,6 +219,7 @@ export default class ProfilePage extends Component{
         });
     };
 
+  // function to map checkbox value to array
   mapCheckBox = () => {
     let cats = [];
     this.state.categories.forEach((cat) => {
@@ -223,6 +244,7 @@ export default class ProfilePage extends Component{
     console.log("check : " + this.state.checked);
   }
 
+  // function to upload user details to database
   handleUpdate = () => {
 
   let user = firebase.auth().currentUser;
@@ -254,6 +276,7 @@ export default class ProfilePage extends Component{
   }
 };
 
+  // routines for updating profile of user
   updateDP = () => {
     let user = firebase.auth().currentUser;
     const temail = user.email.slice(0,user.email.indexOf('@'));

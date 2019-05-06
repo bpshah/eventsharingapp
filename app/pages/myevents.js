@@ -1,6 +1,16 @@
 import React, { Component } from 'react';
-import { FlatList, Image, StyleSheet, View, Text,TouchableOpacity,TouchableWithoutFeedback,ToastAndroid} from 'react-native';
-import { List, ListItem, Card, SearchBar } from 'react-native-elements';
+import {  FlatList,
+          Image,
+          StyleSheet,
+          View,
+          Text,
+          TouchableOpacity,
+          TouchableWithoutFeedback,
+          ToastAndroid} from 'react-native';
+import {  List,
+          ListItem,
+          Card,
+          SearchBar } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import Icon1 from 'react-native-vector-icons/Ionicons.js';
 import firebase from 'react-native-firebase';
@@ -29,6 +39,7 @@ export default class MyEvents extends Component {
     this.handleRefresh();
   }
 
+  // empty component for flatlist
   emptyComp = () => {
     return(
       <View style = {{flex : 1,justifyContent : 'center',alignItems : 'center'}}>
@@ -37,6 +48,7 @@ export default class MyEvents extends Component {
     )
   }
 
+  //search function to search for events
   searchFilter = (text) => {
 
     this.setState({
@@ -68,6 +80,7 @@ export default class MyEvents extends Component {
     })
   }
 
+  // header component for serachbar
   searchBarHeader = () => {
     return (
       <SearchBar
@@ -91,6 +104,7 @@ export default class MyEvents extends Component {
     );
   }
 
+  // function to fetch events created by current user
   handleRefresh = () => {
 
     this.setState({

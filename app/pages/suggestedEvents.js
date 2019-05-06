@@ -1,6 +1,18 @@
 import React, { Component } from 'react';
-import { FlatList, Image, StyleSheet, View, Text,TouchableOpacity,TouchableWithoutFeedback,ToastAndroid, NetInfo} from 'react-native';
-import { List, ListItem, Card, Avatar, SearchBar } from 'react-native-elements';
+import {  FlatList,
+          Image,
+          StyleSheet,
+          View,
+          Text,
+          TouchableOpacity,
+          TouchableWithoutFeedback,
+          ToastAndroid,
+          NetInfo } from 'react-native';
+import {  List,
+          ListItem,
+          Card,
+          Avatar,
+          SearchBar } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
@@ -60,6 +72,7 @@ export default class SuggestedEvents extends Component {
       NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
     }
 
+  // subroutine to check internet connectivity
   handleConnectivityChange = (isConnected) => {
     if (isConnected) {
       this.setState({ isConnected : true});
@@ -68,6 +81,7 @@ export default class SuggestedEvents extends Component {
     }
   }
 
+  // empty component for flatlist
   emptyComp = () => {
     return(
       <View style = {{flex : 1,justifyContent : 'center',alignItems : 'center'}}>
@@ -76,6 +90,7 @@ export default class SuggestedEvents extends Component {
     )
   }
 
+  // search function to search events
   searchFilter = (text) => {
 
     this.setState({
@@ -107,6 +122,7 @@ export default class SuggestedEvents extends Component {
     })
   }
 
+  // header component for searh bar
   searchBarHeader = () => {
     return (
       <SearchBar
@@ -130,6 +146,7 @@ export default class SuggestedEvents extends Component {
     );
   }
 
+  // function to fetch curretn user's interests
   getUserInterests = async () => {
 
     let user = firebase.auth().currentUser;
@@ -147,6 +164,7 @@ export default class SuggestedEvents extends Component {
       })
   }
 
+  // function to fetch events based on user's interests
   getEventData = () => {
 
     this.setState({

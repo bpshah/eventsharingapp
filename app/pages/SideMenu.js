@@ -9,7 +9,7 @@ import Camera from 'react-native-camera';
 
 export default class SideMenu extends Component{
 
-  constructor(props){
+constructor(props){
     super(props);
     this.state = ({
       imgsrc : null,
@@ -17,13 +17,6 @@ export default class SideMenu extends Component{
       lastname : null,
     })
   }
-
-  navigateToScreen = (route) => () => {
-   const navigateAction = NavigationActions.navigate({
-     routeName: route
-   });
-   this.props.navigation.dispatch(navigateAction);
-}
 
 componentWillMount() {
   this.getUserData();
@@ -33,17 +26,24 @@ componentDidMount(){
   this.getUserData();
 }
 
+// for naviagtion from SideMenu options to different screens
+navigateToScreen = (route) => () => {
+   const navigateAction = NavigationActions.navigate({
+     routeName: route
+   });
+   this.props.navigation.dispatch(navigateAction);
+}
+
+// function for getting user images and user's firstname and lastname from database
 getUserData = () => {
   let user = firebase.auth().currentUser;
   const temail = user.email.slice(0,user.email.indexOf('@'));
   let temail1 = temail.replace(/[^a-zA-Z0-9]/g,'');
-  //console.log("Temail2 : " + temail1);
   firebase
     .database()
     .ref('Users/')
     .child(temail1)
     .on('value',(snapshot) => {
-      //console.log(snapshot.val());
       /*this.setState({
         imgsrc : snapshot.val().imgsrc,
         firsname : snapshot.val().firstname,
@@ -52,42 +52,10 @@ getUserData = () => {
     })
 }
 
-takePicture = async function() {
-  this.camera.capture().catch(err => console.error('capture picture error', err));
-  };
-
-  mapVisionRespToScreen = (visionResp, imageProperties) => {
-      const IMAGE_TO_SCREEN_Y = screenHeight / imageProperties.height;
-      const IMAGE_TO_SCREEN_X = screenWidth / imageProperties.width;
-
-      return visionResp.map(item => {
-        return {
-          ...item,
-          position: {
-            width: item.bounding.width * IMAGE_TO_SCREEN_X,
-            left: item.bounding.left * IMAGE_TO_SCREEN_X,
-            height: item.bounding.height * IMAGE_TO_SCREEN_Y,
-            top: item.bounding.top * IMAGE_TO_SCREEN_Y
-          }
-        };
-      });
-  };
-
-processImage = async (imageProperties) => {
-
-    const uri = this.takePicture();
-    const visionResp = await RNTextDetector.detectFromUri(uri);
-    if (!(visionResp && visionResp.length > 0)) {
-      throw "UNMATCHED";
-    }
-    this.setState({
-      visionResp : this.mapVisionRespToScreen(visionResp, imageProperties)
-    });
-};
-
-  render(){
+render(){
     return(
       <ScrollView>
+
         <View style = {{flex : 1,backgroundColor : Colors.white,justifyContent : 'flex-start',alignItems : 'center',paddingBottom : '20%'}}>
           <Avatar
               rounded
@@ -100,7 +68,17 @@ processImage = async (imageProperties) => {
           />
           <Text style = {{paddingTop : '14%',fontSize : 17,alignSelf : 'center',flex : 1}}> Welcome, {this.state.firstname} </Text>
         </View>
+
         <View style = {{flex : 2,backgroundColor : Colors.primaryBackGourndColor,paddingTop : '5%',height : '65%'}}>
+          <View style = {styles.child1}>
+            <Icon name="home"
+              size={18}
+              color='black'
+              style = {{paddingLeft : '10%',marginRight : '1%',alignSelf : 'center'}}/>
+            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
+                  onPress={this.navigateToScreen('TabNav')}>Home</Text>
+          </View>
+
           <View style = {{ flexDirection : 'row',justifyContent : 'flex-start',paddingTop : '6%',paddingBottom : '6%'}}>
             <Icon name="plus-square"
               size={18}
@@ -109,22 +87,7 @@ processImage = async (imageProperties) => {
             <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
                   onPress={this.navigateToScreen('EventCreate')}>Create Event</Text>
           </View>
-          <View style = {styles.child1}>
-            <Icon name="user-plus"
-              size={18}
-              color='black'
-              style = {{paddingLeft : '10%',marginRight : '1%',alignSelf : 'center'}}/>
-            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
-                  onPress={this.navigateToScreen('CreateGroup')}>Create Group</Text>
-          </View>
-          <View style = {styles.child1}>
-            <Icon name="plus"
-              size={18}
-              color='black'
-              style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
-            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
-                  onPress={this.navigateToScreen('ProfilePage')}>Join Group</Text>
-          </View>
+
           <View style = {styles.child1}>
             <Icon name="user"
               size={18}
@@ -133,14 +96,7 @@ processImage = async (imageProperties) => {
             <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
                   onPress={this.navigateToScreen('ProfilePage')}>Profile</Text>
           </View>
-          <View style = {styles.child1}>
-            <Icon name="camera"
-              size={18}
-              color='black'
-              style = {{marginLeft : '10%',marginRight : '4.5%',alignSelf : 'center'}}/>
-            <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
-                  onPress = {this.takePicture}>Capture Event Text</Text>
-          </View>
+
           <View style = {styles.child1}>
             <Icon name="sign-out-alt"
               size={18}
@@ -149,10 +105,12 @@ processImage = async (imageProperties) => {
             <Text style = {{ justifyContent : 'flex-start',fontSize : 17,marginLeft : '12%',alignSelf : 'center'}}
                   onPress = {() => firebase.auth().signOut().then((this.props.navigation.navigate('Login')))}>Logout</Text>
           </View>
+
         </View>
       </ScrollView>
     );
   }
+
 }
 
 const styles = StyleSheet.create({

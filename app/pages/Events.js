@@ -1,6 +1,19 @@
 import React, { Component } from 'react';
-import { FlatList, Image, StyleSheet, View, Text,TouchableOpacity,TouchableWithoutFeedback,ToastAndroid, NetInfo, AsyncStorage} from 'react-native';
-import { List, ListItem, Card, Avatar, SearchBar } from 'react-native-elements';
+import {  FlatList,
+          Image,
+          StyleSheet,
+          View,
+          Text,
+          TouchableOpacity,
+          TouchableWithoutFeedback,
+          ToastAndroid,
+          NetInfo,
+          AsyncStorage} from 'react-native';
+import {  List,
+          ListItem,
+          Card,
+          Avatar,
+          SearchBar } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome5.js';
 import firebase from 'react-native-firebase';
 import Colors from '../styles/colors.js';
@@ -56,7 +69,7 @@ export default class Events extends Component {
   }
 
   componentDidMount(){
-    NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);
+    NetInfo.isConnected.addEventListener('connectionChange', this.handleConnectivityChange);  // adding listener
     //this.handleRefresh();
 
     this.unsubscribeFromNotificationListener = firebase.notifications().onNotification(notification => {
@@ -81,9 +94,10 @@ export default class Events extends Component {
 
   componentWillUnmount(){
       this.handleRefresh();
-      NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
+      NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);  // removing listener
     }
 
+  // internet connectivity subroutine
   handleConnectivityChange = (isConnected) => {
     if (isConnected) {
       this.setState({ isConnected : true});
@@ -92,6 +106,7 @@ export default class Events extends Component {
     }
   }
 
+  // empty component for flatlist
   emptyComp = () => {
     return(
       <View style = {{flex : 1,justifyContent : 'center',alignItems : 'center'}}>
@@ -100,6 +115,7 @@ export default class Events extends Component {
     )
   }
 
+  // search function to search by event details
   searchFilter = (text) => {
 
     this.setState({
@@ -133,6 +149,7 @@ export default class Events extends Component {
     })
   }
 
+  // component for searchbar header
   searchBarHeader = () => {
     return (
       <SearchBar
@@ -156,6 +173,7 @@ export default class Events extends Component {
     );
   }
 
+  // fetching all event data from database
   handleRefresh = () => {
 
     this.setState({
@@ -193,16 +211,14 @@ export default class Events extends Component {
       }
     }
 
+  // checking if event has expired or not
   showcurrentDate = (d) => {
-    //console.log("In current date");
     let time = new Date().getTime();
-    //console.log("Time " + time);
     let temp = d.split(" ",3);
     temp[1] = temp[1].replace(",","")
     if(temp[1].length == 1){
       temp[1] = '0' + temp[1];
     }
-    //console.log(temp);
     switch(temp[0]){
       case 'January' :
         temp[0] = '00';
@@ -253,7 +269,6 @@ export default class Events extends Component {
     else {
       //console.log("None");
     }
-    //console.log(fulldate);
   }
 
   render(){
